@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Image, Row, Col } from 'antd';
 
 const ProductGallery = ({ images = [] }) => {
-  const defaultImage = 'https://via.placeholder.com/500?text=No+Image';
+  const defaultImage = 'https://dummyimage.com/500/cccccc/000000&text=No+Image';
   const displayImages = images.length > 0 ? [...images].sort((a, b) => a.sortOrder - b.sortOrder) : [{ id: 'default', imageUrl: defaultImage }];
   
   const [mainImage, setMainImage] = useState(displayImages[0].imageUrl);

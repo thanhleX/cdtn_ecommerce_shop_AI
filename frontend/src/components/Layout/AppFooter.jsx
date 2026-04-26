@@ -55,15 +55,15 @@ const AppFooter = () => {
           <Col xs={24} md={6} style={{ textAlign: 'left' }}>
             <div style={{ marginBottom: 24 }}>
               <Link to="/" style={{ display: 'inline-block', marginBottom: 16 }}>
-                <Title level={3} style={{ color: '#fff', margin: 0 }}>ECOMMERCE</Title>
+                <Title level={3} style={{ color: '#fff', margin: 0 }}>VietTech Store</Title>
               </Link>
               <Paragraph style={{ color: 'rgba(255, 255, 255, 0.45)', fontSize: 14 }}>
-                Hệ thống bán lẻ thời trang hàng đầu Việt Nam. Cam kết hàng chính hãng, giá cả cạnh tranh và dịch vụ tận tâm.
+                Hệ thống kinh doanh thiết bị công nghệ hàng đầu Việt Nam. Cam kết hàng chính hãng, giá cả cạnh tranh và dịch vụ tận tâm.
               </Paragraph>
               <Space orientation="vertical" size="middle">
                 <Space align="start">
                   <EnvironmentOutlined style={{ color: '#1890ff', marginTop: 4 }} />
-                  <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>Hoàng Mai, Hà Nội</Text>
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>Hoàn Kiếm, Hà Nội</Text>
                 </Space>
                 <Space>
                   <PhoneOutlined style={{ color: '#1890ff' }} />
@@ -71,7 +71,7 @@ const AppFooter = () => {
                 </Space>
                 <Space>
                   <MailOutlined style={{ color: '#1890ff' }} />
-                  <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>support@ecommerce.com</Text>
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>support@viettechstore.com</Text>
                 </Space>
               </Space>
             </div>
@@ -163,11 +163,11 @@ const AppFooter = () => {
         <Row justify="space-between" align="middle">
           <Col>
             <Text style={{ color: 'rgba(255, 255, 255, 0.45)' }}>
-              © {new Date().getFullYear()} Ecommerce. All rights reserved.
+              © {new Date().getFullYear()} VietTech Store. All rights reserved.
             </Text>
           </Col>
           <Col>
-            <Space split={<Divider type="vertical" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />}>
+            <Space separator={<Divider orientation="vertical" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />}>
               <Link to="/privacy" style={{ color: 'rgba(255, 255, 255, 0.45)' }}>Quyền riêng tư</Link>
               <Link to="/terms" style={{ color: 'rgba(255, 255, 255, 0.45)' }}>Điều khoản</Link>
             </Space>

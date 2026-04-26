@@ -12,7 +12,7 @@ public class VariantRequest {
     @NotBlank(message = "SKU không được để trống")
     private String sku;
 
-    private String attributes; // Example: {"Color":"Red","Size":"XL"}
+    private java.util.List<Long> attributeValueIds;
 
     @NotNull(message = "Giá sản phẩm là bắt buộc")
     private BigDecimal price;

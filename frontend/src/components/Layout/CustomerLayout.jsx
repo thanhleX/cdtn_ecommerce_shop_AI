@@ -1,12 +1,13 @@
-import { Layout, Menu, Button, Dropdown, Badge, Avatar, List, Typography, FloatButton } from 'antd';
-import { ShoppingCartOutlined, UserOutlined, LogoutOutlined, HomeOutlined, AppstoreOutlined, BellOutlined } from '@ant-design/icons';
+import { Layout, Menu, Button, Dropdown, Badge, Avatar, List, Typography, FloatButton, Input, Space } from 'antd';
+import { ShoppingCartOutlined, UserOutlined, LogoutOutlined, HomeOutlined, AppstoreOutlined, BellOutlined, SearchOutlined } from '@ant-design/icons';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import useAuthStore from '../../store/authStore';
 import useNotificationStore from '../../store/notificationStore';
 import { useAuth } from '../../hooks/useAuth';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import notificationApi from '../../api/notificationApi';
+import categoryApi from '../../api/categoryApi';
 import { useCart } from '../../hooks/useCart';
 import AppFooter from './AppFooter';
 
@@ -47,11 +48,143 @@ const CustomerLayout = () => {
     navigate('/profile');
   };
 
-  const menuItems = [
-    { key: '/', icon: <HomeOutlined />, label: <Link to="/">Trang Chủ</Link> },
-    { key: '/products', icon: <AppstoreOutlined />, label: <Link to="/products">Sản Phẩm</Link> },
-    { key: '/blog', label: <Link to="/blog">Blog</Link> },
-  ];
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCats = async () => {
+      try {
+        const res = await categoryApi.getAllCategories({ activeOnly: true });
+        setCategories(res.data || res);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      }
+    };
+    fetchCats();
+  }, []);
+
+  const [activeParentId, setActiveParentId] = useState(null);
+
+  const parentCategories = useMemo(() => categories.filter(c => !c.parentId), [categories]);
+
+  useEffect(() => {
+    if (parentCategories.length > 0 && !activeParentId) {
+      setActiveParentId(parentCategories[0].id);
+    }
+  }, [parentCategories, activeParentId]);
+
+  const categoryMegaMenuRender = () => {
+    // Lấy các danh mục cấp 1 của danh mục cha đang được hover
+    const level1Categories = categories.filter(c => c.parentId === activeParentId);
+
+    return (
+      <div style={{
+        display: 'flex',
+        background: '#fff',
+        borderRadius: 8,
+        boxShadow: '0 6px 16px rgba(0,0,0,0.12)',
+        overflow: 'hidden',
+        width: 800, // Rộng hơn để chứa nhiều cột
+        minHeight: 400
+      }}>
+        {/* Left Column: Parent Categories (Level 0) */}
+        <div style={{
+          width: 240,
+          background: '#f9f9f9',
+          borderRight: '1px solid #f0f0f0',
+          padding: '12px 0'
+        }}>
+          {parentCategories.map(parent => (
+            <div
+              key={parent.id}
+              onMouseEnter={() => setActiveParentId(parent.id)}
+              onClick={() => navigate(`/products?category=${parent.slug}`)}
+              style={{
+                padding: '12px 24px',
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: activeParentId === parent.id ? '#fff' : 'transparent',
+                fontWeight: activeParentId === parent.id ? 600 : 400,
+                color: activeParentId === parent.id ? '#1890ff' : '#262626',
+                borderLeft: activeParentId === parent.id ? '3px solid #1890ff' : '3px solid transparent',
+                transition: 'all 0.2s'
+              }}
+            >
+              <span>{parent.name}</span>
+              <span style={{ fontSize: 10, color: activeParentId === parent.id ? '#1890ff' : '#bfbfbf' }}>▶</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Right Column: Child Categories (Level 1 & Level 2) */}
+        <div style={{ flex: 1, padding: '24px', background: '#fff', overflowY: 'auto', maxHeight: 500 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)', // 3 cột
+            gap: '24px'
+          }}>
+            {level1Categories.map(l1 => {
+              // Tìm các danh mục cấp 2 của l1
+              const level2Categories = categories.filter(c => c.parentId === l1.id);
+
+              return (
+                <div key={l1.id}>
+                  {/* Tiêu đề nhóm (Level 1) */}
+                  <div
+                    onClick={() => navigate(`/products?category=${l1.slug}`)}
+                    style={{
+                      fontWeight: 600,
+                      marginBottom: 12,
+                      cursor: 'pointer',
+                      color: '#262626',
+                      transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = '#1890ff'}
+                    onMouseLeave={e => e.currentTarget.style.color = '#262626'}
+                  >
+                    {l1.name}
+                  </div>
+
+                  {/* Danh sách con (Level 2) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {level2Categories.map(l2 => (
+                      <div
+                        key={l2.id}
+                        onClick={() => navigate(`/products?category=${l2.slug}`)}
+                        style={{
+                          cursor: 'pointer',
+                          color: '#595959',
+                          fontSize: 13,
+                          transition: 'color 0.2s'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.color = '#1890ff'}
+                        onMouseLeave={e => e.currentTarget.style.color = '#595959'}
+                      >
+                        {l2.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {level1Categories.length === 0 && (
+            <div style={{ color: '#bfbfbf', textAlign: 'center', marginTop: 40 }}>
+              Không có danh mục con
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const handleSearch = (value) => {
+    if (value.trim()) {
+      navigate(`/products?q=${encodeURIComponent(value.trim())}`);
+    } else {
+      navigate('/products');
+    }
+  };
 
   const userMenuItems = [
     { key: 'profile', label: <Link to="/profile">Hồ sơ</Link>, icon: <UserOutlined /> },
@@ -69,12 +202,9 @@ const CustomerLayout = () => {
         overflow: 'hidden'
       }}
     >
-      {/* Header */}
       <div style={{ padding: '12px 16px', fontWeight: 'bold', borderBottom: '1px solid #f0f0f0' }}>
         Thông báo ({unreadCount} chưa đọc)
       </div>
-
-      {/* List */}
       <div style={{ maxHeight: 400, overflowY: 'auto' }}>
         {notifications.length === 0 ? (
           <div style={{ padding: 16, textAlign: 'center', color: '#999' }}>
@@ -110,42 +240,93 @@ const CustomerLayout = () => {
 
   return (
     <Layout className="layout" style={{ minHeight: '100vh' }}>
-      <Header style={{ display: 'flex', alignItems: 'center', background: '#fff', padding: '0 50px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', zIndex: 1 }}>
-        <div className="logo" style={{ float: 'left', width: '120px', height: '31px', margin: '16px 24px 16px 0', background: 'rgba(0, 0, 0, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span><Link to="/" style={{ color: '#fff', fontWeight: 'bold' }}>Ecommerce</Link></span>
+      <Header style={{
+        display: 'flex',
+        alignItems: 'center',
+        background: '#fff',
+        padding: '0 50px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        zIndex: 1000,
+        position: 'sticky',
+        top: 0,
+        height: 70
+      }}>
+        {/* LOGO */}
+        <div className="logo" style={{ marginRight: 40 }}>
+          <Link to="/" style={{ color: '#001529', fontWeight: 'bold', fontSize: 24, letterSpacing: -1 }}>
+            VietTech Store
+          </Link>
         </div>
 
-        <Menu theme="light" mode="horizontal" defaultSelectedKeys={['/']} items={menuItems} style={{ flex: 1, borderBottom: 'none' }} />
+        {/* [DANH MỤC] mega menu */}
+        <Dropdown popupRender={categoryMegaMenuRender} placement="bottomLeft" classNames={{ root: 'mega-menu-dropdown' }}>
+          <Button
+            type="primary"
+            size="large"
+            icon={<AppstoreOutlined />}
+            style={{ borderRadius: 8, fontWeight: 500, marginRight: 20 }}
+          >
+            Danh Mục
+          </Button>
+        </Dropdown>
 
-        <div style={{ float: 'right', display: 'flex', alignItems: 'center', gap: 24 }}>
+        {/* [SEARCH] */}
+        <div style={{ flex: 1, padding: '0 20px' }}>
+          <Input.Search
+            placeholder="Bạn cần tìm gì hôm nay?"
+            enterButton="Tìm kiếm"
+            size="large"
+            onSearch={handleSearch}
+            style={{ borderRadius: 8, overflow: 'hidden' }}
+          />
+        </div>
+
+        {/* [BLOG] & [OTHER] */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginLeft: 20 }}>
+          <Link to="/blog" style={{ color: '#595959', fontWeight: 500 }}>Blog</Link>
+
+          <div style={{ width: 1, height: 20, background: '#f0f0f0' }} />
+
           {isAuthenticated && (
             <Dropdown popupRender={() => notificationMenu} placement="bottomRight" trigger={['click']}>
-              <Badge count={unreadCount} style={{ cursor: 'pointer' }}>
-                <BellOutlined style={{ fontSize: 24, cursor: 'pointer' }} />
+              <Badge count={unreadCount} size="small">
+                <BellOutlined style={{ fontSize: 22, color: '#595959', cursor: 'pointer' }} />
               </Badge>
             </Dropdown>
           )}
 
           <Link to="/cart">
-            <Badge count={cartCount} showZero>
-              <ShoppingCartOutlined style={{ fontSize: 24 }} />
+            <Badge count={cartCount} showZero size="small">
+              <ShoppingCartOutlined style={{ fontSize: 22, color: '#595959' }} />
             </Badge>
           </Link>
 
           {isAuthenticated ? (
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <span style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Avatar icon={<UserOutlined />} />
-                <span>{user?.fullName || user?.username}</span>
+                <Avatar src={user?.avatar} icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
+                <span style={{ fontWeight: 500, color: '#262626' }}>{user?.fullName || user?.username}</span>
               </span>
             </Dropdown>
           ) : (
-            <div>
+            <Space>
               <Button type="text" onClick={() => navigate('/login')}>Đăng nhập</Button>
-              <Button type="primary" onClick={() => navigate('/register')}>Đăng ký</Button>
-            </div>
+              <Button type="primary" onClick={() => navigate('/register')} style={{ borderRadius: 6 }}>Đăng ký</Button>
+            </Space>
           )}
         </div>
+
+        <style dangerouslySetInnerHTML={{
+          __html: `
+          .mega-menu-dropdown .ant-dropdown-menu {
+            padding: 8px;
+            min-width: 200px;
+            border-radius: 8px;
+          }
+          .mega-menu-dropdown .ant-dropdown-menu-submenu-title {
+            padding: 12px 16px;
+          }
+        `}} />
       </Header>
 
       <Content style={{ padding: '0 50px', marginTop: 24 }}>

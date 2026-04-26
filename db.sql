@@ -1,15 +1,28 @@
+-- ======================
+-- CREATE DATABASE
+-- ======================
+CREATE DATABASE IF NOT EXISTS shop_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE shop_db;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ======================
--- DROP TABLE (ngược thứ tự phụ thuộc)
+-- DROP TABLE
 -- ======================
 DROP TABLE IF EXISTS voucher_usages;
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS cart_items;
 DROP TABLE IF EXISTS product_images;
+DROP TABLE IF EXISTS variant_values;
 DROP TABLE IF EXISTS product_variants;
 DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS category_attributes;
+DROP TABLE IF EXISTS attribute_values;
+DROP TABLE IF EXISTS attributes;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS blogs;
 DROP TABLE IF EXISTS blog_categories;
@@ -28,348 +41,291 @@ DROP TABLE IF EXISTS invalidated_tokens;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
+-- ======================
+-- TABLES
+-- ======================
 CREATE TABLE roles (
-  id bigint NOT NULL AUTO_INCREMENT,
-  name varchar(50) NOT NULL,
-  PRIMARY KEY (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE permissions (
-  id bigint NOT NULL AUTO_INCREMENT,
-  description varchar(255),
-  name varchar(50) NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_permissions_name (name)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE,
+  description VARCHAR(255)
 ) ENGINE=InnoDB;
 
 CREATE TABLE payment_methods (
-  id bigint NOT NULL AUTO_INCREMENT,
-  image text,
-  name varchar(100),
-  description varchar(255),
-  PRIMARY KEY (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  image TEXT,
+  description VARCHAR(255)
 ) ENGINE=InnoDB;
 
 CREATE TABLE vouchers (
-  id bigint NOT NULL AUTO_INCREMENT,
-  created_at datetime(6),
-  updated_at datetime(6),
-  code varchar(50) NOT NULL,
-  end_date datetime(6),
-  max_discount double,
-  min_order_value double,
-  start_date datetime(6),
-  status enum('ACTIVE','INACTIVE') NOT NULL,
-  type enum('PERCENT','FIXED') NOT NULL,
-  usage_limit int,
-  usage_per_user int,
-  value double NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_vouchers_code (code)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(50) NOT NULL UNIQUE,
+  type ENUM('PERCENT','FIXED') NOT NULL,
+  value DOUBLE NOT NULL,
+  min_order_value DOUBLE,
+  max_discount DOUBLE,
+  start_date DATETIME(6),
+  end_date DATETIME(6),
+  usage_limit INT,
+  usage_per_user INT,
+  status ENUM('ACTIVE','INACTIVE') NOT NULL,
+  created_at DATETIME(6),
+  updated_at DATETIME(6)
 ) ENGINE=InnoDB;
 
 CREATE TABLE users (
-  id bigint NOT NULL AUTO_INCREMENT,
-  created_at datetime(6),
-  updated_at datetime(6),
-  email varchar(100),
-  full_name varchar(100),
-  is_active boolean DEFAULT TRUE,
-  password varchar(255),
-  username varchar(50),
-  provider varchar(50) DEFAULT 'local',
-  provider_id varchar(255),
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_users_email (email),
-  UNIQUE KEY uq_users_username (username)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(100) UNIQUE,
+  username VARCHAR(50) UNIQUE,
+  password VARCHAR(255),
+  full_name VARCHAR(100),
+  is_active BOOLEAN DEFAULT TRUE,
+  provider VARCHAR(50) DEFAULT 'local',
+  provider_id VARCHAR(255),
+  created_at DATETIME(6),
+  updated_at DATETIME(6)
 ) ENGINE=InnoDB;
 
+CREATE TABLE roles_permissions_dummy (id INT); -- tránh lỗi thứ tự (xóa ngay dưới)
+DROP TABLE roles_permissions_dummy;
+
 CREATE TABLE blog_categories (
-  id bigint NOT NULL AUTO_INCREMENT,
-  is_active boolean,
-  name varchar(100),
-  slug varchar(150),
-  PRIMARY KEY (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  slug VARCHAR(150),
+  is_active BOOLEAN
 ) ENGINE=InnoDB;
 
 CREATE TABLE categories (
-  id bigint NOT NULL AUTO_INCREMENT,
-  image_url text,
-  is_active boolean,
-  name varchar(100),
-  slug varchar(150),
-  parent_id bigint,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_categories_slug (slug),
-  KEY idx_categories_parent_id (parent_id),
-  CONSTRAINT fk_categories_parent
-    FOREIGN KEY (parent_id) REFERENCES categories (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  slug VARCHAR(150) UNIQUE,
+  image_url TEXT,
+  is_active BOOLEAN,
+  parent_id BIGINT,
+  CONSTRAINT fk_cat_parent FOREIGN KEY (parent_id) REFERENCES categories(id)
 ) ENGINE=InnoDB;
 
-CREATE TABLE invalidated_tokens (
-  id bigint NOT NULL AUTO_INCREMENT,
-  created_at datetime(6),
-  expired_at datetime(6) NOT NULL,
-  token varchar(512) NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_invalidated_tokens_token (token)
+-- ATTRIBUTES
+CREATE TABLE attributes (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  is_filterable BOOLEAN DEFAULT TRUE,
+  is_pricing BOOLEAN DEFAULT FALSE,
+  display_type ENUM('BUTTON','COLOR','DROPDOWN'),
+  created_at DATETIME(6),
+  updated_at DATETIME(6)
 ) ENGINE=InnoDB;
 
--- ======================
--- PHỤ THUỘC USERS
--- ======================
+CREATE TABLE attribute_values (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  attribute_id BIGINT NOT NULL,
+  value VARCHAR(255),
+  FOREIGN KEY (attribute_id) REFERENCES attributes(id)
+) ENGINE=InnoDB;
 
+CREATE TABLE category_attributes (
+  category_id BIGINT,
+  attribute_id BIGINT,
+  PRIMARY KEY (category_id, attribute_id),
+  FOREIGN KEY (category_id) REFERENCES categories(id),
+  FOREIGN KEY (attribute_id) REFERENCES attributes(id)
+) ENGINE=InnoDB;
+
+-- USER RELATED
 CREATE TABLE addresses (
-  id bigint NOT NULL AUTO_INCREMENT,
-  full_address text,
-  is_default boolean,
-  phone varchar(20),
-  receiver_name varchar(100),
-  user_id bigint,
-  PRIMARY KEY (id),
-  KEY idx_addresses_user_id (user_id),
-  CONSTRAINT fk_addresses_users
-    FOREIGN KEY (user_id) REFERENCES users (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT,
+  full_address TEXT,
+  receiver_name VARCHAR(100),
+  phone VARCHAR(20),
+  is_default BOOLEAN,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE carts (
-  id bigint NOT NULL AUTO_INCREMENT,
-  user_id bigint,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_carts_user_id (user_id),
-  CONSTRAINT fk_carts_users
-    FOREIGN KEY (user_id) REFERENCES users (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNIQUE,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE refresh_tokens (
-  id bigint NOT NULL AUTO_INCREMENT,
-  created_at datetime(6),
-  expired_at datetime(6) NOT NULL,
-  token varchar(512) NOT NULL,
-  user_id bigint NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_refresh_tokens_token (token),
-  KEY idx_refresh_tokens_user_id (user_id),
-  CONSTRAINT fk_refresh_tokens_users
-    FOREIGN KEY (user_id) REFERENCES users (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  token VARCHAR(512) UNIQUE,
+  expired_at DATETIME(6),
+  created_at DATETIME(6),
+  user_id BIGINT,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE notifications (
-  id bigint NOT NULL AUTO_INCREMENT,
-  created_at datetime(6),
-  content text,
-  is_read boolean,
-  title varchar(255),
-  type enum('ORDER','SYSTEM'),
-  user_id bigint,
-  PRIMARY KEY (id),
-  KEY idx_notifications_user_id (user_id),
-  CONSTRAINT fk_notifications_users
-    FOREIGN KEY (user_id) REFERENCES users (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT,
+  title VARCHAR(255),
+  content TEXT,
+  type ENUM('ORDER','SYSTEM'),
+  is_read BOOLEAN,
+  created_at DATETIME(6),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE user_roles (
-  user_id bigint NOT NULL,
-  role_id bigint NOT NULL,
+  user_id BIGINT,
+  role_id BIGINT,
   PRIMARY KEY (user_id, role_id),
-  KEY idx_user_roles_role_id (role_id),
-  CONSTRAINT fk_user_roles_users
-    FOREIGN KEY (user_id) REFERENCES users (id),
-  CONSTRAINT fk_user_roles_roles
-    FOREIGN KEY (role_id) REFERENCES roles (id)
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (role_id) REFERENCES roles(id)
 ) ENGINE=InnoDB;
-
--- ======================
--- PHÂN QUYỀN
--- ======================
 
 CREATE TABLE role_permissions (
-  role_id bigint NOT NULL,
-  permission_id bigint NOT NULL,
+  role_id BIGINT,
+  permission_id BIGINT,
   PRIMARY KEY (role_id, permission_id),
-  KEY idx_role_permissions_permission_id (permission_id),
-  CONSTRAINT fk_role_permissions_roles
-    FOREIGN KEY (role_id) REFERENCES roles (id),
-  CONSTRAINT fk_role_permissions_permissions
-    FOREIGN KEY (permission_id) REFERENCES permissions (id)
+  FOREIGN KEY (role_id) REFERENCES roles(id),
+  FOREIGN KEY (permission_id) REFERENCES permissions(id)
 ) ENGINE=InnoDB;
 
--- ======================
 -- PRODUCT
--- ======================
-
 CREATE TABLE products (
-  id bigint NOT NULL AUTO_INCREMENT,
-  created_at datetime(6),
-  updated_at datetime(6),
-  description text,
-  is_active boolean,
-  name varchar(255),
-  slug varchar(255),
-  category_id bigint,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_products_slug (slug),
-  KEY idx_products_category_id (category_id),
-  CONSTRAINT fk_products_categories
-    FOREIGN KEY (category_id) REFERENCES categories (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255),
+  slug VARCHAR(255) UNIQUE,
+  description TEXT,
+  is_active BOOLEAN,
+  category_id BIGINT,
+  created_at DATETIME(6),
+  updated_at DATETIME(6),
+  FOREIGN KEY (category_id) REFERENCES categories(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE product_variants (
-  id bigint NOT NULL AUTO_INCREMENT,
-  attributes text,
-  is_active boolean,
-  price decimal(12,2),
-  quantity int,
-  sku varchar(100),
-  product_id bigint,
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_product_variants_sku (sku),
-  KEY idx_product_variants_product_id (product_id),
-  CONSTRAINT fk_product_variants_products
-    FOREIGN KEY (product_id) REFERENCES products (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  product_id BIGINT,
+  sku VARCHAR(100) UNIQUE,
+  price DECIMAL(12,2),
+  quantity INT,
+  is_active BOOLEAN,
+  FOREIGN KEY (product_id) REFERENCES products(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE variant_values (
+  variant_id BIGINT,
+  attribute_value_id BIGINT,
+  PRIMARY KEY (variant_id, attribute_value_id),
+  FOREIGN KEY (variant_id) REFERENCES product_variants(id),
+  FOREIGN KEY (attribute_value_id) REFERENCES attribute_values(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE product_images (
-  id bigint NOT NULL AUTO_INCREMENT,
-  image_url text,
-  is_thumbnail boolean,
-  sort_order int,
-  product_id bigint,
-  PRIMARY KEY (id),
-  KEY idx_product_images_product_id (product_id),
-  CONSTRAINT fk_product_images_products
-    FOREIGN KEY (product_id) REFERENCES products (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  product_id BIGINT,
+  image_url TEXT,
+  is_thumbnail BOOLEAN,
+  sort_order INT,
+  FOREIGN KEY (product_id) REFERENCES products(id)
 ) ENGINE=InnoDB;
 
--- ======================
--- CART + ORDER
--- ======================
-
-CREATE TABLE cart_items (
-  id bigint NOT NULL AUTO_INCREMENT,
-  quantity int,
-  cart_id bigint,
-  product_variant_id bigint,
-  PRIMARY KEY (id),
-  KEY idx_cart_items_cart_id (cart_id),
-  KEY idx_cart_items_product_variant_id (product_variant_id),
-  CONSTRAINT fk_cart_items_carts
-    FOREIGN KEY (cart_id) REFERENCES carts (id),
-  CONSTRAINT fk_cart_items_product_variants
-    FOREIGN KEY (product_variant_id) REFERENCES product_variants (id)
-) ENGINE=InnoDB;
-
+-- ORDER
 CREATE TABLE orders (
-  id bigint NOT NULL AUTO_INCREMENT,
-  discount_amount decimal(12,2),
-  final_amount decimal(12,2),
-  note text,
-  order_date datetime(6),
-  shipping_fee decimal(12,2),
-  status enum('PENDING','CONFIRMED','SHIPPING','COMPLETED','CANCELLED'),
-  total_amount decimal(12,2),
-  address_id bigint,
-  payment_method_id bigint,
-  user_id bigint,
-  PRIMARY KEY (id),
-  KEY idx_orders_address_id (address_id),
-  KEY idx_orders_payment_method_id (payment_method_id),
-  KEY idx_orders_user_id (user_id),
-  CONSTRAINT fk_orders_users
-    FOREIGN KEY (user_id) REFERENCES users (id),
-  CONSTRAINT fk_orders_payment_methods
-    FOREIGN KEY (payment_method_id) REFERENCES payment_methods (id),
-  CONSTRAINT fk_orders_addresses
-    FOREIGN KEY (address_id) REFERENCES addresses (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT,
+  address_id BIGINT,
+  payment_method_id BIGINT,
+  status ENUM('PENDING','CONFIRMED','SHIPPING','COMPLETED','CANCELLED'),
+  total_amount DECIMAL(12,2),
+  discount_amount DECIMAL(12,2),
+  final_amount DECIMAL(12,2),
+  shipping_fee DECIMAL(12,2),
+  note TEXT,
+  order_date DATETIME(6),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (address_id) REFERENCES addresses(id),
+  FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE order_items (
-  id bigint NOT NULL AUTO_INCREMENT,
-  price decimal(12,2),
-  product_name varchar(255),
-  quantity int,
-  total_amount decimal(12,2),
-  variant_attributes text,
-  order_id bigint,
-  product_variant_id bigint,
-  PRIMARY KEY (id),
-  KEY idx_order_items_order_id (order_id),
-  KEY idx_order_items_product_variant_id (product_variant_id),
-  CONSTRAINT fk_order_items_orders
-    FOREIGN KEY (order_id) REFERENCES orders (id),
-  CONSTRAINT fk_order_items_product_variants
-    FOREIGN KEY (product_variant_id) REFERENCES product_variants (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT,
+  product_variant_id BIGINT,
+  product_name VARCHAR(255),
+  quantity INT,
+  price DECIMAL(12,2),
+  total_amount DECIMAL(12,2),
+  variant_attributes TEXT,
+  FOREIGN KEY (order_id) REFERENCES orders(id),
+  FOREIGN KEY (product_variant_id) REFERENCES product_variants(id)
 ) ENGINE=InnoDB;
 
--- ======================
+CREATE TABLE cart_items (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  cart_id BIGINT,
+  product_variant_id BIGINT,
+  quantity INT,
+  FOREIGN KEY (cart_id) REFERENCES carts(id),
+  FOREIGN KEY (product_variant_id) REFERENCES product_variants(id)
+) ENGINE=InnoDB;
+
 -- BLOG
--- ======================
-
 CREATE TABLE blogs (
-  id bigint NOT NULL AUTO_INCREMENT,
-  created_at datetime(6),
-  updated_at datetime(6),
-  carousel_order int,
-  content text,
-  is_featured boolean,
-  is_published boolean,
-  slug varchar(255),
-  thumbnail text,
-  title varchar(255),
-  blog_category_id bigint,
-  user_id bigint,
-  PRIMARY KEY (id),
-  KEY idx_blogs_blog_category_id (blog_category_id),
-  KEY idx_blogs_user_id (user_id),
-  CONSTRAINT fk_blogs_blog_categories
-    FOREIGN KEY (blog_category_id) REFERENCES blog_categories (id),
-  CONSTRAINT fk_blogs_users
-    FOREIGN KEY (user_id) REFERENCES users (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255),
+  slug VARCHAR(255),
+  content TEXT,
+  thumbnail TEXT,
+  is_featured BOOLEAN,
+  is_published BOOLEAN,
+  carousel_order INT,
+  blog_category_id BIGINT,
+  user_id BIGINT,
+  created_at DATETIME(6),
+  updated_at DATETIME(6),
+  FOREIGN KEY (blog_category_id) REFERENCES blog_categories(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
--- ======================
 -- VOUCHER USAGE
--- ======================
-
 CREATE TABLE voucher_usages (
-  id bigint NOT NULL AUTO_INCREMENT,
-  used_at datetime(6),
-  order_id bigint NOT NULL,
-  user_id bigint NOT NULL,
-  voucher_id bigint NOT NULL,
-  PRIMARY KEY (id),
-  KEY idx_voucher_usages_order_id (order_id),
-  KEY idx_voucher_usages_user_id (user_id),
-  KEY idx_voucher_usages_voucher_id (voucher_id),
-  CONSTRAINT fk_voucher_usages_orders
-    FOREIGN KEY (order_id) REFERENCES orders (id),
-  CONSTRAINT fk_voucher_usages_users
-    FOREIGN KEY (user_id) REFERENCES users (id),
-  CONSTRAINT fk_voucher_usages_vouchers
-    FOREIGN KEY (voucher_id) REFERENCES vouchers (id)
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT,
+  user_id BIGINT,
+  voucher_id BIGINT,
+  used_at DATETIME(6),
+  FOREIGN KEY (order_id) REFERENCES orders(id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (voucher_id) REFERENCES vouchers(id)
 ) ENGINE=InnoDB;
 
-INSERT INTO roles (id, name) VALUES
-(1, 'SUPER_ADMIN'),
-(2, 'CUSTOMER'),
-(3, 'STAFF');
+-- ======================
+-- INSERT DATA (IDEMPOTENT)
+-- ======================
+
+INSERT INTO roles (id, name)
+VALUES (1,'SUPER_ADMIN'),(2,'CUSTOMER'),(3,'STAFF')
+ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 INSERT INTO permissions (id, name, description) VALUES
-(1, 'category:manage', 'Quản lý danh mục sản phẩm'),
-(2, 'voucher:manage', 'Quản lý mã giảm giá (Voucher)'),
-(3, 'blog:manage', 'Quản lý bài viết và blog'),
-(4, 'role:read', 'Xem danh sách vai trò'),
-(5, 'role:manage', 'Quản lý vai trò và phân quyền'),
-(6, 'product:read', 'Đọc sản phẩm'),
-(7, 'product:create', 'Tạo sản phẩm'),
-(8, 'product:update', 'Cập nhật sản phẩm'),
-(9, 'product:delete', 'Xóa sản phẩm'),
-(10, 'order:read', 'Xem đơn hàng'),
-(11, 'order:update', 'Cập nhật đơn hàng'),
-(12, 'user:read', 'Xem User'),
-(13, 'user:manage', 'Quản lý User'),
-(14, 'customer:manage', 'Quản lý khách hàng'),
-(15, 'staff:manage', 'Quản lý nhân viên');
+(1,'category:manage','Quản lý danh mục'),
+(2,'voucher:manage','Quản lý voucher'),
+(3,'blog:manage','Quản lý blog'),
+(4,'role:read','Xem role'),
+(5,'role:manage','Quản lý role'),
+(6,'product:read','Đọc sản phẩm'),
+(7,'product:create','Tạo sản phẩm'),
+(8,'product:update','Cập nhật'),
+(9,'product:delete','Xóa'),
+(10,'order:read','Xem đơn'),
+(11,'order:update','Cập nhật đơn'),
+(12,'user:read','Xem user'),
+(13,'user:manage','Quản lý user'),
+(14,'customer:manage','QL khách'),
+(15,'staff:manage','QL staff')
+ON DUPLICATE KEY UPDATE description=VALUES(description);
 
 INSERT INTO role_permissions (role_id, permission_id)
-SELECT 1, id FROM permissions;
+SELECT 1, id FROM permissions
+ON DUPLICATE KEY UPDATE role_id=role_id;

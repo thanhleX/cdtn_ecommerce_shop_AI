@@ -57,7 +57,7 @@ const BlogListPage = () => {
                   style={{ borderRadius: 12, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}
                   cover={
                     <Link to={`/blog/${blog.slug}`}>
-                      <img alt={blog.title} src={blog.thumbnail || 'https://via.placeholder.com/400x250'} style={{ width: '100%', height: 200, objectFit: 'cover' }} />
+                      <img alt={blog.title} src={blog.thumbnail || 'https://dummyimage.com/400x250/cccccc/000000&text=No+Image'} style={{ width: '100%', height: 200, objectFit: 'cover' }} />
                     </Link>
                   }
                   styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column' } }}

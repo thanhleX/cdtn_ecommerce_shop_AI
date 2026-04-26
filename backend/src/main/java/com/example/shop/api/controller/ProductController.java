@@ -31,6 +31,7 @@ public class ProductController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) List<Long> attributeValueIds,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -39,7 +40,7 @@ public class ProductController {
         Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        PageResponse<ProductResponse> products = productService.getProducts(keyword, categoryIds, minPrice, maxPrice, isActive, pageable);
+        PageResponse<ProductResponse> products = productService.getProducts(keyword, categoryIds, minPrice, maxPrice, isActive, attributeValueIds, pageable);
         return ResponseEntity.ok(ApiResponse.success(products, "Lấy danh sách sản phẩm thành công"));
     }
 

@@ -32,9 +32,11 @@ export const useProducts = () => {
       
       setProducts(data.content || []);
       setPagination({
-        current: (data.pageable?.pageNumber !== undefined ? data.pageable.pageNumber : apiParams.page) + 1,
-        pageSize: data.pageable?.pageSize || apiParams.size,
+        current: (data.pageNo !== undefined ? data.pageNo : apiParams.page) + 1,
+        pageSize: data.pageSize || apiParams.size,
         total: data.totalElements || 0,
+        minPrice: data.minPrice,
+        maxPrice: data.maxPrice
       });
     } catch (err) {
       setError(err);
@@ -59,7 +61,7 @@ export const useProducts = () => {
     }
   }, []);
 
-  const getProductBySlug = async (slug) => {
+  const getProductBySlug = useCallback(async (slug) => {
     setLoading(true);
     try {
       const response = await productApi.getBySlug(slug);
@@ -70,7 +72,7 @@ export const useProducts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
 
   return {

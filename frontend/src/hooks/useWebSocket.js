@@ -42,7 +42,6 @@ export const useWebSocket = () => {
       // Subscribe to role-based topics (for Admin/Staff)
       user.roles.forEach(role => {
         const topic = `/topic/notifications/role/${role}`;
-        console.log("Subscribe role topic:", topic);
         client.subscribe(topic, (message) => {
           if (message.body) {
             handleNewNotification(JSON.parse(message.body));
@@ -52,7 +51,6 @@ export const useWebSocket = () => {
 
       // Subscribe to personal topic (for Customer)
       const userTopic = `/topic/notifications/user/${user.id}`;
-      console.log("Subscribe user topic:", userTopic);
       client.subscribe(userTopic, (message) => {
         if (message.body) {
           handleNewNotification(JSON.parse(message.body));

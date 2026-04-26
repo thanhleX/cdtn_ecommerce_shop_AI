@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  Table, 
-  Button, 
-  Space, 
-  Typography, 
-  Modal, 
-  Form, 
-  Input, 
-  Switch, 
-  message, 
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  Table,
+  Button,
+  Space,
+  Typography,
+  Modal,
+  Form,
+  Input,
+  Switch,
+  message,
   Popconfirm,
   Tag,
   Select,
@@ -19,10 +19,10 @@ import {
   Row,
   Col
 } from 'antd';
-import { 
-  PlusOutlined, 
-  EditOutlined, 
-  DeleteOutlined, 
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
   UploadOutlined,
   MinusCircleOutlined
 } from '@ant-design/icons';
@@ -56,16 +56,29 @@ const ProductManagePage = () => {
     }
   }, []);
 
-  const fetchProducts = useCallback(async (page = 1, pageSize = 10) => {
+  const [keyword, setKeyword] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(undefined);
+
+  const fetchProducts = useCallback(async (page = 1, pageSize = 10, searchKeyword = keyword, catId = selectedCategory) => {
     setLoading(true);
     try {
-      const response = await productApi.getProducts({ 
-        page: page - 1, 
+      const params = {
+        page: page - 1,
         size: pageSize,
         sortBy: 'id',
         direction: 'desc',
         isActive: filterStatus
-      });
+      };
+      
+      if (searchKeyword && searchKeyword.trim() !== '') {
+        params.keyword = searchKeyword.trim();
+      }
+      if (catId) {
+        // categoryIds parameter in backend takes a comma separated list
+        params.categoryIds = catId; 
+      }
+
+      const response = await productApi.getProducts(params);
       // response.data is PageResponse { content, totalElements, ... }
       const data = response.data || response;
       setProducts(data.content);
@@ -79,15 +92,25 @@ const ProductManagePage = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [keyword, selectedCategory, filterStatus]);
 
   useEffect(() => {
     fetchProducts(pagination.current, pagination.pageSize);
     fetchCategories();
-  }, [fetchProducts, fetchCategories, filterStatus]);
+  }, [fetchProducts, fetchCategories]); // fetchProducts is memoized with dependencies
 
   const handleTableChange = (newPagination) => {
     fetchProducts(newPagination.current, newPagination.pageSize);
+  };
+
+  const handleSearch = (value) => {
+    setKeyword(value);
+    setPagination(prev => ({ ...prev, current: 1 }));
+  };
+
+  const handleCategoryFilter = (value) => {
+    setSelectedCategory(value);
+    setPagination(prev => ({ ...prev, current: 1 }));
   };
 
   const handleAdd = () => {
@@ -102,17 +125,28 @@ const ProductManagePage = () => {
       const response = await productApi.getById(record.id);
       const product = response.data || response;
       setEditingProduct(product);
+
       form.setFieldsValue({
         name: product.name,
         description: product.description,
         categoryId: product.categoryId,
         isActive: product.isActive,
-        variants: product.variants?.length > 1 || (product.variants?.length === 1 && product.variants[0].attributes) 
-          ? product.variants 
+        variants: product.variants?.length > 1 || (product.variants?.length === 1 && (product.variants[0].attributeValues?.length > 0))
+          ? product.variants.map(v => {
+              const variantData = { ...v };
+              v.attributeValues?.forEach(av => {
+                // Thử lấy ID thuộc tính từ nhiều nguồn để đảm bảo không bị rỗng
+                const attrId = av.attributeId || av.attribute?.id;
+                if (attrId) {
+                  variantData[`attr_${attrId}`] = av.id;
+                }
+              });
+              return variantData;
+            })
           : [],
-        sku: product.variants?.length === 1 && !product.variants[0].attributes ? product.variants[0].sku : undefined,
-        price: product.variants?.length === 1 && !product.variants[0].attributes ? product.variants[0].price : undefined,
-        quantity: product.variants?.length === 1 && !product.variants[0].attributes ? product.variants[0].quantity : undefined,
+        sku: product.variants?.length === 1 && (!product.variants[0].attributeValues || product.variants[0].attributeValues.length === 0) ? product.variants[0].sku : undefined,
+        price: product.variants?.length === 1 && (!product.variants[0].attributeValues || product.variants[0].attributeValues.length === 0) ? product.variants[0].price : undefined,
+        quantity: product.variants?.length === 1 && (!product.variants[0].attributeValues || product.variants[0].attributeValues.length === 0) ? product.variants[0].quantity : undefined,
         images: product.images
       });
       setIsModalVisible(true);
@@ -136,11 +170,23 @@ const ProductManagePage = () => {
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
+      
+      // Transform dynamic fields back to attributeValueIds
+      const formattedValues = { ...values };
+      if (values.variants) {
+        formattedValues.variants = values.variants.map(v => {
+          const attributeValueIds = Object.keys(v)
+            .filter(key => key.startsWith('attr_'))
+            .map(key => v[key]);
+          return { ...v, attributeValueIds };
+        });
+      }
+
       if (editingProduct) {
-        await productApi.update(editingProduct.id, values);
+        await productApi.update(editingProduct.id, formattedValues);
         message.success('Cập nhật sản phẩm thành công');
       } else {
-        await productApi.create(values);
+        await productApi.create(formattedValues);
         message.success('Thêm sản phẩm thành công');
       }
       setIsModalVisible(false);
@@ -151,13 +197,16 @@ const ProductManagePage = () => {
     }
   };
 
-  const flatCategories = (cats, result = []) => {
-    cats.forEach(c => {
-      result.push(c);
-      if (c.children) flatCategories(c.children, result);
-    });
-    return result;
-  };
+  const flattenedCategories = useMemo(() => {
+    const flat = (cats, result = []) => {
+      cats.forEach(c => {
+        result.push(c);
+        if (c.children) flat(c.children, result);
+      });
+      return result;
+    };
+    return flat(categories);
+  }, [categories]);
 
   const canCreate = hasPermission('product:create');
   const canUpdate = hasPermission('product:update');
@@ -200,10 +249,10 @@ const ProductManagePage = () => {
       render: (_, record) => (
         <Space size="middle">
           {canUpdate && (
-            <Button 
-              type="primary" 
-              ghost 
-              icon={<EditOutlined />} 
+            <Button
+              type="primary"
+              ghost
+              icon={<EditOutlined />}
               onClick={() => handleEdit(record)}
             />
           )}
@@ -225,9 +274,25 @@ const ProductManagePage = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <Title level={3}>Quản lý sản phẩm</Title>
-        <Space>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: '16px' }}>
+        <Title level={3} style={{ margin: 0 }}>Quản lý sản phẩm</Title>
+        <Space wrap>
+          <Input.Search
+            placeholder="Tìm kiếm theo tên..."
+            allowClear
+            onSearch={handleSearch}
+            style={{ width: 250 }}
+          />
+          <Select
+            placeholder="Lọc theo danh mục"
+            allowClear
+            style={{ width: 200 }}
+            onChange={handleCategoryFilter}
+          >
+            {flattenedCategories.map(c => (
+              <Option key={c.id} value={c.id}>{c.name}</Option>
+            ))}
+          </Select>
           {canCreate && (
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
               Thêm sản phẩm
@@ -236,10 +301,10 @@ const ProductManagePage = () => {
         </Space>
       </div>
 
-      <Table 
-        columns={columns} 
-        dataSource={products} 
-        rowKey="id" 
+      <Table
+        columns={columns}
+        dataSource={products}
+        rowKey="id"
         loading={loading}
         pagination={pagination}
         onChange={handleTableChange}
@@ -271,8 +336,8 @@ const ProductManagePage = () => {
                 rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
               >
                 <Select placeholder="Chọn danh mục" allowClear>
-                  {flatCategories(categories)
-                    .filter(c => c.isActive) // Chỉ hiện cate đang hoạt động
+                  {flattenedCategories
+                    .filter(c => c.isActive)
                     .map(c => (
                       <Option key={c.id} value={c.id}>{c.name}</Option>
                     ))}
@@ -300,9 +365,9 @@ const ProductManagePage = () => {
                       name={[name, 'imageUrl']}
                       rules={[{ required: true, message: 'Nhập URL ảnh' }]}
                     >
-                      <Input 
-                        placeholder="URL hình ảnh (nhập tay hoặc upload)" 
-                        style={{ width: 350 }} 
+                      <Input
+                        placeholder="URL hình ảnh (nhập tay hoặc upload)"
+                        style={{ width: 350 }}
                         addonAfter={
                           <Upload
                             showUploadList={false}
@@ -310,11 +375,11 @@ const ProductManagePage = () => {
                               try {
                                 const response = await fileApi.uploadFile(file);
                                 const url = response.data || response;
-                                
+
                                 const currentImages = form.getFieldValue('images');
                                 currentImages[name] = { ...currentImages[name], imageUrl: url };
                                 form.setFieldsValue({ images: currentImages });
-                                
+
                                 message.success('Upload ảnh thành công');
                                 onSuccess('ok');
                               } catch (err) {
@@ -350,7 +415,7 @@ const ProductManagePage = () => {
           </Form.List>
 
           <Divider titlePlacement="left">Thông tin bán hàng</Divider>
-          
+
           <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.variants !== curValues.variants}>
             {({ getFieldValue }) => {
               const variants = getFieldValue('variants') || [];
@@ -403,12 +468,76 @@ const ProductManagePage = () => {
                             >
                               <Input placeholder="SKU (VD: AO-SM-01)" />
                             </Form.Item>
-                            <Form.Item
-                              {...restField}
-                              name={[name, 'attributes']}
-                              label="Thuộc tính"
+                            <Form.Item 
+                              noStyle
+                              shouldUpdate={(prevValues, curValues) => prevValues.categoryId !== curValues.categoryId}
                             >
-                              <Input placeholder='VD: {"Size":"L"}' />
+                              {({ getFieldValue, setFieldsValue }) => {
+                                const categoryId = getFieldValue('categoryId');
+                                
+                                // Logic kế thừa thuộc tính từ cha
+                                const getInheritedAttributes = (catId) => {
+                                  const allAttrs = [];
+                                  const seenIds = new Set();
+                                  let currentId = catId;
+                                  while (currentId) {
+                                    const cat = flattenedCategories.find(c => c.id === currentId);
+                                    if (!cat) break;
+                                    (cat.attributes || []).forEach(attr => {
+                                      if (!seenIds.has(attr.id)) {
+                                        allAttrs.push(attr);
+                                        seenIds.add(attr.id);
+                                      }
+                                    });
+                                    currentId = cat.parentId;
+                                  }
+                                  return allAttrs;
+                                };
+
+                                const attrs = categoryId ? getInheritedAttributes(categoryId) : [];
+
+                                if (attrs.length === 0) {
+                                  return (
+                                    <div style={{ width: 300, color: '#999', fontStyle: 'italic', padding: '8px 0' }}>
+                                      Danh mục này chưa có thuộc tính.
+                                    </div>
+                                  );
+                                }
+
+                                return (
+                                  <Space wrap>
+                                    {attrs.map(attr => (
+                                      <Form.Item
+                                        key={attr.id}
+                                        {...restField}
+                                        name={[name, `attr_${attr.id}`]}
+                                        label={
+                                          <span>
+                                            {attr.name}
+                                            {attr.isPricing && <Tooltip title="Thuộc tính ảnh hưởng đến giá"><span style={{ color: '#faad14', marginLeft: 4 }}>★</span></Tooltip>}
+                                          </span>
+                                        }
+                                        rules={[{ required: true, message: `Chọn ${attr.name}` }]}
+                                        style={{ width: 150, marginBottom: 0 }}
+                                      >
+                                        <Select 
+                                          placeholder={attr.name}
+                                          onChange={(val) => {
+                                            // Sync back to hidden attributeValueIds if needed, 
+                                            // but we'll do it during onFinish to keep it clean.
+                                          }}
+                                        >
+                                          {attr.values?.map(val => (
+                                            <Select.Option key={val.id} value={val.id}>
+                                              {val.value}
+                                            </Select.Option>
+                                          ))}
+                                        </Select>
+                                      </Form.Item>
+                                    ))}
+                                  </Space>
+                                );
+                              }}
                             </Form.Item>
                             <Form.Item
                               {...restField}
@@ -430,13 +559,13 @@ const ProductManagePage = () => {
                           </Space>
                         ))}
                         <Form.Item>
-                          <Button 
-                            type="dashed" 
+                          <Button
+                            type="dashed"
                             onClick={() => {
                               // If converting from simple to variants, clear simple fields if needed
                               add();
-                            }} 
-                            block 
+                            }}
+                            block
                             icon={<PlusOutlined />}
                           >
                             Thêm biến thể (Chuyển sang chế độ nhiều biến thể)

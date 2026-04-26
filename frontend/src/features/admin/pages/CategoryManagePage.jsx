@@ -13,8 +13,9 @@ import {
   Tag,
   Select
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined } from '@ant-design/icons';
 import categoryApi from '../../../api/categoryApi';
+import attributeApi from '../../../api/attributeApi';
 import usePermission from '../../../hooks/usePermission';
 
 const { Title } = Typography;
@@ -26,6 +27,9 @@ const CategoryManagePage = () => {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [isAttrModalVisible, setIsAttrModalVisible] = useState(false);
+  const [allAttributes, setAllAttributes] = useState([]);
+  const [selectedAttrIds, setSelectedAttrIds] = useState([]);
   const [form] = Form.useForm();
 
   const fetchCategories = async () => {
@@ -90,6 +94,42 @@ const CategoryManagePage = () => {
     }
   };
 
+  const handleManageAttributes = async (record) => {
+    setEditingCategory(record);
+    try {
+      const allRes = await attributeApi.getAllAttributes();
+      setAllAttributes(allRes.data || []);
+      
+      // Selected attributes of this category
+      setSelectedAttrIds(record.attributes?.map(a => a.id) || []);
+      setIsAttrModalVisible(true);
+    } catch (error) {
+      message.error('Không thể tải thuộc tính');
+    }
+  };
+
+  const handleAttrModalOk = async () => {
+    const currentIds = editingCategory.attributes?.map(a => a.id) || [];
+    
+    try {
+      // Find attributes to add
+      const toAdd = selectedAttrIds.filter(id => !currentIds.includes(id));
+      // Find attributes to remove
+      const toRemove = currentIds.filter(id => !selectedAttrIds.includes(id));
+
+      await Promise.all([
+        ...toAdd.map(id => attributeApi.assignAttributeToCategory(editingCategory.id, id)),
+        ...toRemove.map(id => attributeApi.removeAttributeFromCategory(editingCategory.id, id))
+      ]);
+
+      message.success('Cập nhật thuộc tính thành công');
+      setIsAttrModalVisible(false);
+      fetchCategories();
+    } catch (error) {
+      message.error('Lỗi khi cập nhật thuộc tính');
+    }
+  };
+
   // Flatten categories for Select parent option
   const flatCategories = (cats, result = []) => {
     cats.forEach(c => {
@@ -132,6 +172,12 @@ const CategoryManagePage = () => {
                 ghost 
                 icon={<EditOutlined />} 
                 onClick={() => handleEdit(record)}
+              />
+              <Button 
+                type="default" 
+                icon={<TagsOutlined />} 
+                onClick={() => handleManageAttributes(record)}
+                title="Cấu hình bộ lọc"
               />
               <Popconfirm
                 title="Bạn có chắc chắn muốn xóa?"
@@ -210,6 +256,27 @@ const CategoryManagePage = () => {
             <Switch checkedChildren="Bật" unCheckedChildren="Tắt" />
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title={`Cấu hình bộ lọc cho: ${editingCategory?.name}`}
+        open={isAttrModalVisible}
+        onOk={handleAttrModalOk}
+        onCancel={() => setIsAttrModalVisible(false)}
+      >
+        <p>Chọn các thuộc tính sẽ dùng làm bộ lọc cho danh mục này:</p>
+        <Select
+          mode="multiple"
+          style={{ width: '100%' }}
+          placeholder="Chọn thuộc tính"
+          value={selectedAttrIds}
+          onChange={setSelectedAttrIds}
+          optionFilterProp="children"
+        >
+          {allAttributes.map(attr => (
+            <Option key={attr.id} value={attr.id}>{attr.name}</Option>
+          ))}
+        </Select>
       </Modal>
     </div>
   );

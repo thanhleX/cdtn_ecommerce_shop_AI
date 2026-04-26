@@ -239,9 +239,12 @@ const CheckoutPage = () => {
 
               {checkoutItems.map(item => (
                 <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-                  <Text style={{ flex: 1, paddingRight: 16 }}>
-                    {item.productName} (x{item.quantity})
-                  </Text>
+                  <div style={{ flex: 1, paddingRight: 16 }}>
+                    <Text style={{ display: 'block' }}>{item.productName}</Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {item.variantAttributes || 'Mặc định'} (x{item.quantity})
+                    </Text>
+                  </div>
                   <Text strong>
                     {new Intl.NumberFormat('vi-VN').format(item.price * item.quantity)}đ
                   </Text>

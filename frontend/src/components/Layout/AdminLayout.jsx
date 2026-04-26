@@ -10,7 +10,8 @@ import {
   SettingOutlined,
   FileTextOutlined,
   DollarCircleOutlined,
-  BellOutlined
+  BellOutlined,
+  TagsOutlined
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
@@ -120,6 +121,7 @@ const AdminLayout = () => {
     { key: '/admin', icon: <DashboardOutlined />, label: <Link to="/admin">Thống kê</Link> },
     hasPermission('order:read') && { key: '/admin/orders', icon: <ShoppingOutlined />, label: <Link to="/admin/orders">Đơn hàng</Link> },
     hasPermission('product:read') && { key: '/admin/products', icon: <AppstoreOutlined />, label: <Link to="/admin/products">Sản phẩm</Link> },
+    hasPermission('product:read') && { key: '/admin/attributes', icon: <TagsOutlined />, label: <Link to="/admin/attributes">Thuộc tính</Link> },
     hasPermission('category:manage') && { key: '/admin/categories', icon: <AppstoreOutlined />, label: <Link to="/admin/categories">Danh mục</Link> },
     hasPermission('voucher:manage') && { key: '/admin/vouchers', icon: <DollarCircleOutlined />, label: <Link to="/admin/vouchers">Vouchers</Link> },
     hasPermission('blog:manage') && { key: '/admin/blogs', icon: <FileTextOutlined />, label: <Link to="/admin/blogs">Bài viết</Link> },

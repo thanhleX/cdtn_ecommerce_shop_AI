@@ -26,8 +26,9 @@ const useCartStore = create((set, get) => ({
   },
 
   fetchCart: async () => {
-    const isAuthenticated = useAuthStore.getState().isAuthenticated;
-    if (!isAuthenticated) return;
+    const { isAuthenticated, permissions } = useAuthStore.getState();
+    // Chỉ fetch giỏ hàng nếu đã đăng nhập VÀ là CUSTOMER
+    if (!isAuthenticated || !permissions.includes('ROLE_CUSTOMER')) return;
 
     set({ loading: true });
     try {

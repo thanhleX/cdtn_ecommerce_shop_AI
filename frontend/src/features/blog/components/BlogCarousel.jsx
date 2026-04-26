@@ -36,11 +36,11 @@ const BlogCarousel = () => {
   return (
     <div style={{ marginTop: 60, marginBottom: 60 }}>
       <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>Bài Viết Nổi Bật</Title>
-      
-      <Carousel 
-        autoplay 
-        dots 
-        arrows 
+
+      <Carousel
+        autoplay
+        dots
+        arrows
         slidesToShow={1}
         slidesToScroll={1}
         style={{ padding: '0 40px' }}
@@ -52,10 +52,10 @@ const BlogCarousel = () => {
                 hoverable
                 cover={
                   <div style={{ height: 350, overflow: 'hidden' }}>
-                    <img 
-                      alt={blog.title} 
-                      src={blog.thumbnail || 'https://via.placeholder.com/400x200?text=No+Image'} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    <img
+                      alt={blog.title}
+                      src={blog.thumbnail || 'https://dummyimage.com/400x200/cccccc/000000&text=No+Image'}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   </div>
                 }
@@ -74,7 +74,8 @@ const BlogCarousel = () => {
         ))}
       </Carousel>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .ant-carousel .slick-prev, .ant-carousel .slick-next {
           color: #001529;
           font-size: 24px;

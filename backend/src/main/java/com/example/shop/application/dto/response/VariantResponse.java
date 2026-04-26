@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 public class VariantResponse {
     private Long id;
     private String sku;
-    private String attributes;
-    private BigDecimal price;
+    private java.util.List<AttributeValueResponse> attributeValues;
+    private java.math.BigDecimal price;
     private Integer quantity;
     private Boolean isActive;
 }

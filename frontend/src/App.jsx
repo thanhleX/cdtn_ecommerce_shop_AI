@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ChatWidget from './components/chat/ChatWidget';
 import CustomerLayout from './components/Layout/CustomerLayout';
 import AdminLayout from './components/Layout/AdminLayout';
@@ -31,6 +31,7 @@ import VoucherManagePage from './features/admin/pages/VoucherManagePage';
 import UserManagePage from './features/admin/pages/UserManagePage';
 import StaffManagePage from './features/admin/pages/StaffManagePage';
 import RoleManagePage from './features/admin/pages/RoleManagePage';
+import AttributeManagePage from './features/admin/pages/AttributeManagePage';
 
 import { useCart } from './hooks/useCart';
 import ScrollToTop from './components/common/ScrollToTop';
@@ -40,6 +41,8 @@ import ScrollToTop from './components/common/ScrollToTop';
 ========================= */
 function AppContent() {
   const { initCart } = useCart();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     initCart();
@@ -79,6 +82,7 @@ function AppContent() {
           <Route element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="products" element={<ProductManagePage />} />
+            <Route path="attributes" element={<AttributeManagePage />} />
             <Route path="categories" element={<CategoryManagePage />} />
             <Route path="orders" element={<OrderManagePage />} />
             <Route path="users" element={<UserManagePage />} />
@@ -92,7 +96,7 @@ function AppContent() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      <ChatWidget />
+      {!isAdminRoute && <ChatWidget />}
     </>
   );
 }

@@ -10,7 +10,7 @@ export const useAuth = () => {
   const navigate = useNavigate();
   const { login: setAuthData, logout: clearAuthData } = useAuthStore();
 
-  const handleLoginSuccess = async (response, redirectUrl) => {
+  const handleLoginSuccess = async (response, redirectUrl, showSuccessMessage = true) => {
     // response assumes the form { code, data: { token, refreshToken } } based on interceptor
     const token = response.data?.token || response.token;
     const refreshToken = response.data?.refreshToken || response.refreshToken;
@@ -29,7 +29,9 @@ export const useAuth = () => {
     // Save final user data & tokens
     setAuthData(user, token, refreshToken);
 
-    message.success('Đăng nhập thành công!');
+    if (showSuccessMessage) {
+      message.success('Đăng nhập thành công!');
+    }
 
     // Check for guest cart to merge
     const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
@@ -97,7 +99,7 @@ export const useAuth = () => {
     setLoading(true);
     try {
       const response = await authApi.register(values);
-      await handleLoginSuccess(response, '/');
+      await handleLoginSuccess(response, '/', false);
       message.success('Đăng ký tài khoản thành công!');
     } catch (error) {
       console.error('Register Error:', error);

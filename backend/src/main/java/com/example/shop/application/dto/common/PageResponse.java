@@ -15,6 +15,8 @@ public class PageResponse<T> {
     private long totalElements;
     private int totalPages;
     private boolean last;
+    private java.math.BigDecimal minPrice;
+    private java.math.BigDecimal maxPrice;
 
     public static <T> PageResponse<T> of(Page<T> page) {
         return PageResponse.<T>builder()

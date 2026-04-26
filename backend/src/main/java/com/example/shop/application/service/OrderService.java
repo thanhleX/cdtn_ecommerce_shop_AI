@@ -102,7 +102,7 @@ public class OrderService {
                     .order(order)
                     .productVariant(variant)
                     .productName(variant.getProduct().getName())
-                    .variantAttributes(variant.getAttributes())
+                    .variantAttributes(variant.getAttributesString())
                     .price(variant.getPrice())
                     .quantity(cartItem.getQuantity())
                     .totalAmount(itemTotal)

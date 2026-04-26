@@ -220,8 +220,9 @@ const OrderHistoryPage = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <Avatar src={item.imageUrl} size={48} />
                     <div>
-                      <Text strong>{item.productName}</Text>
-                      <div>Số lượng: {item.quantity}</div>
+                      <Text strong style={{ display: 'block' }}>{item.productName}</Text>
+                      <Text type="secondary" style={{ fontSize: 12 }}>{item.variantAttributes || 'Mặc định'}</Text>
+                      <div style={{ fontSize: 13, marginTop: 4 }}>Số lượng: {item.quantity}</div>
                     </div>
                   </div>
 

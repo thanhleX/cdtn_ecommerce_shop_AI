@@ -3,9 +3,11 @@ package com.example.shop.application.mapper;
 import com.example.shop.application.dto.request.ImageRequest;
 import com.example.shop.application.dto.request.ProductRequest;
 import com.example.shop.application.dto.request.VariantRequest;
+import com.example.shop.application.dto.response.AttributeValueResponse;
 import com.example.shop.application.dto.response.ImageResponse;
 import com.example.shop.application.dto.response.ProductResponse;
 import com.example.shop.application.dto.response.VariantResponse;
+import com.example.shop.domain.entity.AttributeValue;
 import com.example.shop.domain.entity.Category;
 import com.example.shop.domain.entity.Product;
 import com.example.shop.domain.entity.ProductImage;
@@ -13,15 +15,19 @@ import com.example.shop.domain.entity.ProductVariant;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-04-24T00:17:52+0700",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-04-26T22:41:44+0700",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
 public class ProductMapperImpl implements ProductMapper {
+
+    @Autowired
+    private AttributeMapper attributeMapper;
 
     @Override
     public Product toProduct(ProductRequest request) {
@@ -31,9 +37,9 @@ public class ProductMapperImpl implements ProductMapper {
 
         Product.ProductBuilder product = Product.builder();
 
+        product.name( request.getName() );
         product.description( request.getDescription() );
         product.isActive( request.getIsActive() );
-        product.name( request.getName() );
 
         return product.build();
     }
@@ -48,15 +54,15 @@ public class ProductMapperImpl implements ProductMapper {
 
         productResponse.categoryId( productCategoryId( product ) );
         productResponse.categoryName( productCategoryName( product ) );
-        productResponse.createdAt( product.getCreatedAt() );
-        productResponse.description( product.getDescription() );
         productResponse.id( product.getId() );
-        productResponse.images( productImageListToImageResponseList( product.getImages() ) );
-        productResponse.isActive( product.getIsActive() );
         productResponse.name( product.getName() );
         productResponse.slug( product.getSlug() );
-        productResponse.updatedAt( product.getUpdatedAt() );
+        productResponse.description( product.getDescription() );
+        productResponse.isActive( product.getIsActive() );
         productResponse.variants( productVariantListToVariantResponseList( product.getVariants() ) );
+        productResponse.images( productImageListToImageResponseList( product.getImages() ) );
+        productResponse.createdAt( product.getCreatedAt() );
+        productResponse.updatedAt( product.getUpdatedAt() );
 
         return productResponse.build();
     }
@@ -81,9 +87,9 @@ public class ProductMapperImpl implements ProductMapper {
             return;
         }
 
+        product.setName( request.getName() );
         product.setDescription( request.getDescription() );
         product.setIsActive( request.getIsActive() );
-        product.setName( request.getName() );
     }
 
     @Override
@@ -94,11 +100,10 @@ public class ProductMapperImpl implements ProductMapper {
 
         ProductVariant.ProductVariantBuilder productVariant = ProductVariant.builder();
 
-        productVariant.attributes( request.getAttributes() );
-        productVariant.isActive( request.getIsActive() );
+        productVariant.sku( request.getSku() );
         productVariant.price( request.getPrice() );
         productVariant.quantity( request.getQuantity() );
-        productVariant.sku( request.getSku() );
+        productVariant.isActive( request.getIsActive() );
 
         return productVariant.build();
     }
@@ -111,12 +116,12 @@ public class ProductMapperImpl implements ProductMapper {
 
         VariantResponse.VariantResponseBuilder variantResponse = VariantResponse.builder();
 
-        variantResponse.attributes( variant.getAttributes() );
         variantResponse.id( variant.getId() );
-        variantResponse.isActive( variant.getIsActive() );
+        variantResponse.sku( variant.getSku() );
+        variantResponse.attributeValues( attributeValueListToAttributeValueResponseList( variant.getAttributeValues() ) );
         variantResponse.price( variant.getPrice() );
         variantResponse.quantity( variant.getQuantity() );
-        variantResponse.sku( variant.getSku() );
+        variantResponse.isActive( variant.getIsActive() );
 
         return variantResponse.build();
     }
@@ -128,11 +133,10 @@ public class ProductMapperImpl implements ProductMapper {
         }
 
         variant.setId( request.getId() );
-        variant.setAttributes( request.getAttributes() );
-        variant.setIsActive( request.getIsActive() );
+        variant.setSku( request.getSku() );
         variant.setPrice( request.getPrice() );
         variant.setQuantity( request.getQuantity() );
-        variant.setSku( request.getSku() );
+        variant.setIsActive( request.getIsActive() );
     }
 
     @Override
@@ -196,6 +200,19 @@ public class ProductMapperImpl implements ProductMapper {
         return name;
     }
 
+    protected List<VariantResponse> productVariantListToVariantResponseList(List<ProductVariant> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<VariantResponse> list1 = new ArrayList<VariantResponse>( list.size() );
+        for ( ProductVariant productVariant : list ) {
+            list1.add( toVariantResponse( productVariant ) );
+        }
+
+        return list1;
+    }
+
     protected List<ImageResponse> productImageListToImageResponseList(List<ProductImage> list) {
         if ( list == null ) {
             return null;
@@ -209,14 +226,14 @@ public class ProductMapperImpl implements ProductMapper {
         return list1;
     }
 
-    protected List<VariantResponse> productVariantListToVariantResponseList(List<ProductVariant> list) {
+    protected List<AttributeValueResponse> attributeValueListToAttributeValueResponseList(List<AttributeValue> list) {
         if ( list == null ) {
             return null;
         }
 
-        List<VariantResponse> list1 = new ArrayList<VariantResponse>( list.size() );
-        for ( ProductVariant productVariant : list ) {
-            list1.add( toVariantResponse( productVariant ) );
+        List<AttributeValueResponse> list1 = new ArrayList<AttributeValueResponse>( list.size() );
+        for ( AttributeValue attributeValue : list ) {
+            list1.add( attributeMapper.toAttributeValueResponse( attributeValue ) );
         }
 
         return list1;

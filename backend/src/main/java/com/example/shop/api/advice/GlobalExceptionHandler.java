@@ -35,6 +35,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({
+        org.springframework.security.authentication.BadCredentialsException.class,
+        org.springframework.security.authentication.InternalAuthenticationServiceException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(Exception e) {
+        ApiResponse<Void> response = ApiResponse.error("Tài khoản hoặc mật khẩu không hợp lệ", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception e) {
         ApiResponse<Void> response = ApiResponse.error(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage(), e.getMessage());

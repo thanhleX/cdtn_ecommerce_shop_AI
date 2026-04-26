@@ -1,150 +1,116 @@
-import { Checkbox, Divider, Slider, Typography, Space, Button, Collapse } from 'antd';
+import { Checkbox, Divider, Slider, Typography, Space, Button, Collapse, Tag } from 'antd';
 import { useState, useEffect, useMemo } from 'react';
 
 const { Title, Text } = Typography;
 
 const ProductFilter = ({
-  categories = [], // This is now already the categoryTree from parent
-  selectedCategories = [],
-  priceRange = [0, 3000000],
+  attributeGroups = [], // Danh sách các thuộc tính kèm giá trị (đã gom nhóm theo category)
+  selectedAttributeValues = [],
+  priceRange = [0, 50000000],
+  dynamicMinPrice = 0,
+  dynamicMaxPrice = 50000000,
   onFilterChange
 }) => {
   const [localPrice, setLocalPrice] = useState(priceRange);
-
-  const activeParentKey = useMemo(() => {
-    const activeParent = categories.find(parent =>
-      selectedCategories.includes(parent.id) ||
-      (parent.children && parent.children.some(child => selectedCategories.includes(child.id)))
-    );
-    return activeParent ? activeParent.id.toString() : null;
-  }, [categories, selectedCategories]);
 
   useEffect(() => {
     setLocalPrice(priceRange);
   }, [JSON.stringify(priceRange)]);
 
-  const toggleCategory = (id) => {
-    let newSelected = [...selectedCategories];
-    const isEditingParent = categories.find(p => p.id === id);
-
-    if (newSelected.includes(id)) {
-      // Uncheck
-      newSelected = newSelected.filter(item => item !== id);
-      if (isEditingParent) {
-        // If unchecking a parent, uncheck all its children
-        const childIds = isEditingParent.children.map(c => c.id);
-        newSelected = newSelected.filter(item => !childIds.includes(item));
-      } else {
-        // If unchecking a child, also uncheck its parent just in case
-        const parent = categories.find(p => p.children.some(c => c.id === id));
-        if (parent) {
-          newSelected = newSelected.filter(item => item !== parent.id);
-        }
-      }
+  const toggleAttributeValue = (valueId) => {
+    let newValues = [...selectedAttributeValues];
+    if (newValues.includes(valueId)) {
+      newValues = newValues.filter(v => v !== valueId);
     } else {
-      // Check
-      newSelected.push(id);
-      if (isEditingParent) {
-        // If checking a parent, check all its children
-        isEditingParent.children.forEach(c => {
-          if (!newSelected.includes(c.id)) {
-            newSelected.push(c.id);
-          }
-        });
-      } else {
-        // If checking a child, check if all children are checked
-        const parent = categories.find(p => p.children.some(c => c.id === id));
-        if (parent) {
-          const allChildrenChecked = parent.children.every(c => newSelected.includes(c.id));
-          if (allChildrenChecked && !newSelected.includes(parent.id)) {
-            newSelected.push(parent.id);
-          }
-        }
-      }
+      newValues.push(valueId);
     }
-    onFilterChange?.({ categories: newSelected, priceRange });
-  };
-
-  const handlePriceChange = (value) => {
-    setLocalPrice(value);
+    onFilterChange?.({ 
+      priceRange: localPrice, 
+      attributeValueIds: newValues 
+    });
   };
 
   const applyPriceFilter = () => {
-    onFilterChange?.({ categories: selectedCategories, priceRange: localPrice });
+    onFilterChange?.({ 
+      priceRange: localPrice, 
+      attributeValueIds: selectedAttributeValues 
+    });
   };
 
-  // 🔥 NEW: items thay cho Panel
-  const collapseItems = categories.map(parent => ({
-    key: parent.id.toString(),
-    label: (
-      <div
-        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Checkbox
-          checked={selectedCategories.includes(parent.id)}
-          onChange={() => toggleCategory(parent.id)}
-        />
-        <span style={{ fontWeight: 500 }}>{parent.name}</span>
-      </div>
-    ),
-    children: (
-      <>
-        {parent.children.map(child => (
-          <div
-            key={child.id}
-            style={{
-              padding: '8px 0 8px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8
-            }}
-          >
-            <Checkbox
-              checked={selectedCategories.includes(child.id)}
-              onChange={() => toggleCategory(child.id)}
-            />
-            <span>{child.name}</span>
-          </div>
-        ))}
-      </>
-    ),
-    showArrow: parent.children.length > 0,
-    collapsible: parent.children.length > 0 ? 'header' : undefined
-  }));
+  // Nếu không có giá trị động từ BE, dùng mặc định
+  const min = dynamicMinPrice !== null ? Number(dynamicMinPrice) : 0;
+  const max = dynamicMaxPrice !== null ? Number(dynamicMaxPrice) : 50000000;
 
   return (
-    <div style={{ padding: '24px', background: '#fff', borderRadius: 8, border: '1px solid #f0f0f0' }}>
-      <Title level={5} style={{ marginTop: 0 }}>Danh mục sản phẩm</Title>
-
-      <Collapse
-        ghost
-        accordion
-        items={collapseItems}
-        activeKey={activeParentKey ? [activeParentKey] : []}
-        expandIconPlacement="end"
-        style={{ marginTop: 16 }}
-      />
-
-      <Divider />
-
-      <Title level={5}>Khoảng giá</Title>
+    <div style={{ padding: '24px', background: '#fff', borderRadius: 16, border: '1px solid #f0f0f0', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+      <Title level={5} style={{ marginBottom: 20 }}>Khoảng giá</Title>
       <Slider
         range
-        step={50000}
-        max={3000000}
+        step={10000}
+        min={min}
+        max={max}
         value={localPrice}
-        onChange={handlePriceChange}
+        onChange={setLocalPrice}
+        tooltip={{ formatter: (v) => `${new Intl.NumberFormat('vi-VN').format(v)}đ` }}
       />
-
-      <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Text strong>{new Intl.NumberFormat('vi-VN').format(localPrice[0])}đ</Text>
-        <Text strong>{new Intl.NumberFormat('vi-VN').format(localPrice[1])}đ</Text>
-      </Space>
-
-      <Button type="primary" onClick={applyPriceFilter} block style={{ borderRadius: 6 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <Text type="secondary" style={{ fontSize: 12 }}>Từ: <Text strong>{new Intl.NumberFormat('vi-VN').format(localPrice[0])}đ</Text></Text>
+        <Text type="secondary" style={{ fontSize: 12 }}>Đến: <Text strong>{new Intl.NumberFormat('vi-VN').format(localPrice[1])}đ</Text></Text>
+      </div>
+      <Button type="primary" onClick={applyPriceFilter} block style={{ borderRadius: 8, height: 40 }}>
         Áp dụng lọc giá
       </Button>
+
+      {/* --- Attribute Filters --- */}
+      {attributeGroups.length > 0 && (
+        <>
+          <Divider />
+          <Title level={5} style={{ marginBottom: 20 }}>Lọc theo thông số</Title>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {attributeGroups.map(attr => (
+              <div key={attr.id}>
+                <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 13, textTransform: 'uppercase', color: '#8c8c8c' }}>
+                  {attr.name}
+                </Text>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {attr.values?.map(val => {
+                    const isSelected = selectedAttributeValues.includes(val.id);
+                    return (
+                      <Tag.CheckableTag
+                        key={val.id}
+                        checked={isSelected}
+                        onChange={() => toggleAttributeValue(val.id)}
+                        style={{ 
+                          border: '1px solid #d9d9d9',
+                          padding: '4px 12px',
+                          borderRadius: 6,
+                          margin: 0,
+                          fontSize: 13,
+                          background: isSelected ? '#1890ff' : '#fff',
+                          color: isSelected ? '#fff' : '#595959'
+                        }}
+                      >
+                        {val.value}
+                      </Tag.CheckableTag>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Clear Filters */}
+      {(selectedAttributeValues.length > 0) && (
+        <Button 
+          type="link" 
+          onClick={() => onFilterChange({ priceRange: [min, max], attributeValueIds: [] })} 
+          style={{ width: '100%', marginTop: 24, color: '#ff4d4f' }}
+        >
+          Xóa tất cả bộ lọc
+        </Button>
+      )}
     </div>
   );
 };

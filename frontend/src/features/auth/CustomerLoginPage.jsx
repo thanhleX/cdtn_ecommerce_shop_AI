@@ -23,7 +23,7 @@ const CustomerLoginPage = () => {
         
         {/* Logo */}
         <Link to="/" style={{ fontWeight: 'bold', fontSize: 18 }}>
-          Ecommerce
+          VietTech Store
         </Link>
 
         {/* Nút quay lại */}
@@ -40,7 +40,7 @@ const CustomerLoginPage = () => {
       <Content style={{ 
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}>
         <CustomerLoginForm />
       </Content>

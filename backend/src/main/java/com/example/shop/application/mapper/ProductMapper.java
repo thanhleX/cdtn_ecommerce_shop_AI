@@ -16,7 +16,9 @@ import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", 
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {AttributeMapper.class})
 public interface ProductMapper {
 
     @Mapping(target = "category", ignore = true)

@@ -42,12 +42,12 @@ const CartPage = () => {
       key: 'productName',
       render: (text, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <img src={record.imageUrl || 'https://via.placeholder.com/80'} alt={text} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }} />
+          <img src={record.imageUrl || 'https://dummyimage.com/80/cccccc/000000&text=No+Image'} alt={text} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }} />
           <div>
             <Text strong style={{ fontSize: 16 }}>{text}</Text>
             <br />
-            <Text type="secondary">
-              Phân loại: {record.size || 'Mặc định'} / {record.color || 'Mặc định'}
+            <Text type="secondary" style={{ fontSize: 13 }}>
+              Phân loại: {record.variantAttributes || 'Mặc định'}
             </Text>
           </div>
         </div>

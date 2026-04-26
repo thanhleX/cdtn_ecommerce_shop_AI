@@ -1,10 +1,12 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Row, Col, Pagination, Spin, Typography, Empty, Input } from 'antd';
+import { Helmet } from 'react-helmet-async';
 import { useProducts } from '../../hooks/useProducts';
 import ProductCard from './components/ProductCard';
 import ProductFilter from './components/ProductFilter';
 import categoryApi from '../../api/categoryApi';
 import { useSearchParams } from 'react-router-dom';
+import CategoryBreadcrumb from '../../components/common/CategoryBreadcrumb';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -60,36 +62,33 @@ const ProductListPage = () => {
   const filtersFromUrl = useMemo(() => {
     const slugs = searchParams.getAll('category');
     const priceStr = searchParams.get('price');
+    const attrIdsStr = searchParams.get('attr');
     const keyword = searchParams.get('q') || '';
     const page = parseInt(searchParams.get('page') || '1', 10);
 
-    // Map slugs to IDs with Hierarchy Awareness
     let categoryIds = [];
+    let specificCategoryId = null;
+
     slugs.forEach(slug => {
       const cat = categories.find(c => c.slug === slug);
       if (cat) {
-        const hasChildren = categories.some(c => c.parentId === cat.id);
-        if (hasChildren) {
-          categoryIds = [...new Set([...categoryIds, ...getAllChildIds(cat.id, categories)])];
-        } else {
-          categoryIds = [...new Set([...categoryIds, cat.id])];
-        }
+        specificCategoryId = cat.id;
+        categoryIds = [...new Set([...categoryIds, ...getAllChildIds(cat.id, categories)])];
       }
     });
 
-    let priceRange = DEFAULT_PRICE_RANGE;
+    const attributeValueIds = attrIdsStr ? attrIdsStr.split(',').map(Number) : [];
+
+    // Parse price range from URL or use a wide default until API returns range
+    let priceRange = [0, 100000000]; 
     if (priceStr && priceStr.includes('-')) {
       const parts = priceStr.split('-');
-      if (parts.length === 2) {
-        const min = parseInt(parts[0], 10);
-        const max = parseInt(parts[1], 10);
-        if (!isNaN(min) && !isNaN(max)) {
-          priceRange = [min, max];
-        }
-      }
+      const min = parseInt(parts[0], 10);
+      const max = parseInt(parts[1], 10);
+      if (!isNaN(min) && !isNaN(max)) priceRange = [min, max];
     }
 
-    return { categoryIds, priceRange, page, keyword, rawSlugs: slugs };
+    return { categoryIds, specificCategoryId, priceRange, page, keyword, rawSlugs: slugs, attributeValueIds };
   }, [searchParams, categories]);
 
   // 5. Fetch Products on Filter Change
@@ -100,7 +99,8 @@ const ProductListPage = () => {
         keyword: filtersFromUrl.keyword,
         categoryIds: filtersFromUrl.categoryIds.length > 0 ? filtersFromUrl.categoryIds : undefined,
         minPrice: filtersFromUrl.priceRange[0],
-        maxPrice: filtersFromUrl.priceRange[1]
+        maxPrice: filtersFromUrl.priceRange[1],
+        attributeValueIds: filtersFromUrl.attributeValueIds.length > 0 ? filtersFromUrl.attributeValueIds : undefined
       });
     }
   }, [
@@ -108,38 +108,25 @@ const ProductListPage = () => {
     filtersFromUrl.keyword,
     JSON.stringify(filtersFromUrl.categoryIds),
     JSON.stringify(filtersFromUrl.priceRange),
+    JSON.stringify(filtersFromUrl.attributeValueIds),
     categories.length,
     fetchProducts
   ]);
 
   // 6. Update URL on Filter Change
-  const handleFilterChange = ({ categories: newCategoryIds, priceRange: newPriceRange }) => {
+  const handleFilterChange = ({ priceRange: newPriceRange, attributeValueIds: newAttrIds }) => {
     const newParams = new URLSearchParams(searchParams);
     
-    // Clear old categories to replace with new ones
-    newParams.delete('category');
-    newCategoryIds.forEach(id => {
-      const cat = categories.find(c => c.id === id);
-      if (cat) newParams.append('category', cat.slug);
-    });
-
-    if (newPriceRange[0] !== DEFAULT_PRICE_RANGE[0] || newPriceRange[1] !== DEFAULT_PRICE_RANGE[1]) {
+    if (newPriceRange) {
       newParams.set('price', `${newPriceRange[0]}-${newPriceRange[1]}`);
-    } else {
-      newParams.delete('price');
     }
 
-    newParams.set('page', '1');
-    setSearchParams(newParams);
-  };
-
-  const handleSearch = (value) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (value) {
-      newParams.set('q', value);
+    if (newAttrIds && newAttrIds.length > 0) {
+      newParams.set('attr', newAttrIds.join(','));
     } else {
-      newParams.delete('q');
+      newParams.delete('attr');
     }
+
     newParams.set('page', '1');
     setSearchParams(newParams);
   };
@@ -151,34 +138,84 @@ const ProductListPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Derive attribute groups for the selected categories
+  const attributeGroups = useMemo(() => {
+    if (filtersFromUrl.rawSlugs.length === 0) return [];
+    
+    const attrMap = new Map();
+
+    const collectAttributes = (categoryId) => {
+      const cat = categories.find(c => c.id === categoryId);
+      if (cat) {
+        if (cat.attributes) {
+          cat.attributes.forEach(attr => {
+            if (!attrMap.has(attr.id)) attrMap.set(attr.id, attr);
+          });
+        }
+        if (cat.parentId) {
+          collectAttributes(cat.parentId);
+        }
+      }
+    };
+
+    filtersFromUrl.rawSlugs.forEach(slug => {
+      const cat = categories.find(c => c.slug === slug);
+      if (cat) {
+        collectAttributes(cat.id);
+      }
+    });
+    return Array.from(attrMap.values());
+  }, [filtersFromUrl.rawSlugs, categories]);
+
+  // Use dynamic price range from PageResponse (returned by useProducts hook)
+  // Note: We need to update useProducts hook to expose minPrice/maxPrice from response
+  const { minPrice: dynamicMin, maxPrice: dynamicMax } = pagination; 
+
+  const currentCategoryName = useMemo(() => {
+    if (filtersFromUrl.rawSlugs.length === 1) {
+      const cat = categories.find(c => c.slug === filtersFromUrl.rawSlugs[0]);
+      return cat?.name;
+    }
+    return null;
+  }, [filtersFromUrl.rawSlugs, categories]);
+
+  const pageTitle = currentCategoryName 
+    ? `${currentCategoryName} chính hãng, giá tốt 2026 | VietTech Store`
+    : filtersFromUrl.keyword 
+      ? `Kết quả tìm kiếm cho "${filtersFromUrl.keyword}" | VietTech Store`
+      : 'Danh sách sản phẩm công nghệ chính hãng | VietTech Store';
+
   return (
     <div>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={`Mua ngay ${currentCategoryName || 'sản phẩm công nghệ'} chính hãng tại VietTech Store.`} />
+      </Helmet>
+
+      <CategoryBreadcrumb 
+        currentCategoryId={filtersFromUrl.specificCategoryId} 
+        categories={categories} 
+      />
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <Title level={2} style={{ margin: 0 }}>Sản Phẩm Của Chúng Tôi</Title>
+        <Title level={2} style={{ margin: 0 }}>
+          {currentCategoryName || (filtersFromUrl.keyword ? `Kết quả cho "${filtersFromUrl.keyword}"` : 'Tất cả sản phẩm')}
+        </Title>
         <Text type="secondary">Tìm thấy {pagination.total} sản phẩm</Text>
       </div>
 
       <Row gutter={[32, 24]}>
         <Col xs={24} md={6}>
           <ProductFilter
-            categories={categoryTree}
-            selectedCategories={filtersFromUrl.categoryIds}
+            attributeGroups={attributeGroups}
+            selectedAttributeValues={filtersFromUrl.attributeValueIds}
             priceRange={filtersFromUrl.priceRange}
+            dynamicMinPrice={dynamicMin}
+            dynamicMaxPrice={dynamicMax}
             onFilterChange={handleFilterChange}
           />
         </Col>
         <Col xs={24} md={18}>
-          <div style={{ marginBottom: 24 }}>
-            <Search
-              placeholder="Tìm kiếm sản phẩm..."
-              allowClear
-              enterButton="Tìm kiếm"
-              size="large"
-              defaultValue={filtersFromUrl.keyword}
-              onSearch={handleSearch}
-            />
-          </div>
-
           {loading ? (
             <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>
           ) : products.length === 0 ? (

@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-04-24T00:17:51+0700",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-04-26T22:41:44+0700",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
 public class CartMapperImpl implements CartMapper {
@@ -54,12 +54,13 @@ public class CartMapperImpl implements CartMapper {
         cartItemResponse.productVariantId( cartItemProductVariantId( cartItem ) );
         cartItemResponse.productName( cartItemProductVariantProductName( cartItem ) );
         cartItemResponse.productSlug( cartItemProductVariantProductSlug( cartItem ) );
-        cartItemResponse.variantAttributes( cartItemProductVariantAttributes( cartItem ) );
         cartItemResponse.sku( cartItemProductVariantSku( cartItem ) );
         cartItemResponse.price( cartItemProductVariantPrice( cartItem ) );
         cartItemResponse.imageUrl( mapImageUrl( cartItemProductVariantProductImages( cartItem ) ) );
         cartItemResponse.id( cartItem.getId() );
         cartItemResponse.quantity( cartItem.getQuantity() );
+
+        cartItemResponse.variantAttributes( cartItem.getProductVariant().getAttributesString() );
 
         return cartItemResponse.build();
     }
@@ -130,21 +131,6 @@ public class CartMapperImpl implements CartMapper {
             return null;
         }
         return slug;
-    }
-
-    private String cartItemProductVariantAttributes(CartItem cartItem) {
-        if ( cartItem == null ) {
-            return null;
-        }
-        ProductVariant productVariant = cartItem.getProductVariant();
-        if ( productVariant == null ) {
-            return null;
-        }
-        String attributes = productVariant.getAttributes();
-        if ( attributes == null ) {
-            return null;
-        }
-        return attributes;
     }
 
     private String cartItemProductVariantSku(CartItem cartItem) {

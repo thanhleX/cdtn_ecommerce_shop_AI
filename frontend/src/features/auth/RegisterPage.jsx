@@ -30,7 +30,7 @@ const RegisterPage = () => {
       }}>
         
         <Link to="/" style={{ fontWeight: 'bold', fontSize: 18 }}>
-          Ecommerce
+          VietTech Store
         </Link>
 
         {canGoBack && (
@@ -62,6 +62,7 @@ const RegisterPage = () => {
             onFinish={onFinish}
             size="large"
             layout="vertical"
+            style={{ textAlign: 'left' }}
           >
             <Form.Item
               name="username"

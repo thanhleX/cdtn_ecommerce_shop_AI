@@ -22,7 +22,7 @@ public interface CartMapper {
     @Mapping(source = "productVariant.id", target = "productVariantId")
     @Mapping(source = "productVariant.product.name", target = "productName")
     @Mapping(source = "productVariant.product.slug", target = "productSlug")
-    @Mapping(source = "productVariant.attributes", target = "variantAttributes")
+    @Mapping(target = "variantAttributes", expression = "java(cartItem.getProductVariant().getAttributesString())")
     @Mapping(source = "productVariant.sku", target = "sku")
     @Mapping(source = "productVariant.price", target = "price")
     @Mapping(source = "productVariant.product.images", target = "imageUrl", qualifiedByName = "mapImageUrl")

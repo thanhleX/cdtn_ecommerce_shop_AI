@@ -1,26 +1,35 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
-import { Result, Button } from 'antd';
+import { Result, Button, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const AdminRoute = () => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, permissions } = useAuthStore();
   const navigate = useNavigate();
 
   // dark mode of Chrome
   const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-  // Redirect to admin login if not logged in at all
+  // 1. Nếu chưa đăng nhập -> đá về login
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;
   }
 
-  // Hệ thống RBAC: Cho phép vào Admin nếu:
-  // 1. Có role ADMIN/SUPER_ADMIN/STAFF (với tiền tố ROLE_)
-  // 2. HOẶC sở hữu bất kỳ quyền quản trị nào (permissions không trống)
-  const isStaffOrAdmin = user?.roles?.some(r =>
-    ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_STAFF'].includes(r)
-  ) || (user?.permissions && user.permissions.length > 0);
+  // 2. Nếu đã có token nhưng chưa có profile (đang load profile) 
+  // -> Hiện loading thay vì 403
+  if (isAuthenticated && !user) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Spin size="large" tip="Đang xác thực quyền truy cập..." />
+      </div>
+    );
+  }
+
+  // 3. Hệ thống RBAC: 
+  // Ưu tiên dùng permissions từ store (vì nó được giải mã từ JWT ngay khi có token)
+  const isStaffOrAdmin = permissions?.some(p =>
+    ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_STAFF'].includes(p)
+  ) || permissions?.length > 0;
 
   if (!isStaffOrAdmin) {
     return (

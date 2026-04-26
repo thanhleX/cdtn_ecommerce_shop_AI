@@ -31,21 +31,55 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final com.example.shop.domain.repository.AttributeValueRepository attributeValueRepository;
     private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getProducts(String keyword, List<Long> categoryIds, BigDecimal minPrice, BigDecimal maxPrice,
-            Boolean isActive, Pageable pageable) {
+            Boolean isActive, List<Long> attributeValueIds, Pageable pageable) {
         List<Long> expandedCategoryIds = null;
         if (categoryIds != null && !categoryIds.isEmpty()) {
             expandedCategoryIds = getAllCategoryIdsRecursive(categoryIds);
         }
 
-        Page<Product> productPage = productRepository.findByFilters(keyword, expandedCategoryIds, minPrice, maxPrice, isActive,
+        boolean hasCategoryIds = expandedCategoryIds != null && !expandedCategoryIds.isEmpty();
+        boolean hasAttributeValueIds = attributeValueIds != null && !attributeValueIds.isEmpty();
+
+        Long attrCount = hasAttributeValueIds ? (long) attributeValueIds.size() : 0L;
+
+        // Xử lý danh sách rỗng để tránh lỗi SQL IN ()
+        List<Long> finalCategoryIds = hasCategoryIds ? expandedCategoryIds : List.of(-1L);
+        List<Long> finalAttrIds = hasAttributeValueIds ? attributeValueIds : List.of(-1L);
+
+        Page<Product> productPage = productRepository.findByFilters(
+                keyword, 
+                hasCategoryIds, finalCategoryIds, 
+                minPrice, maxPrice, isActive,
+                hasAttributeValueIds, finalAttrIds, 
+                attrCount,
                 pageable);
 
-        return PageResponse.of(
+        BigDecimal dynamicMin = productRepository.findMinPriceByFilters(
+                keyword, 
+                hasCategoryIds, finalCategoryIds, 
+                isActive, 
+                hasAttributeValueIds, finalAttrIds, 
+                attrCount);
+        
+        BigDecimal dynamicMax = productRepository.findMaxPriceByFilters(
+                keyword, 
+                hasCategoryIds, finalCategoryIds, 
+                isActive, 
+                hasAttributeValueIds, finalAttrIds, 
+                attrCount);
+
+        PageResponse<ProductResponse> response = PageResponse.of(
                 productPage.map(productMapper::toProductResponse));
+        
+        response.setMinPrice(dynamicMin);
+        response.setMaxPrice(dynamicMax);
+        
+        return response;
     }
 
     private List<Long> getAllCategoryIdsRecursive(List<Long> categoryIds) {
@@ -113,6 +147,9 @@ public class ProductService {
             for (VariantRequest vRequest : request.getVariants()) {
                 ProductVariant variant = productMapper.toVariant(vRequest);
                 variant.setProduct(product);
+                if (vRequest.getAttributeValueIds() != null) {
+                    variant.setAttributeValues(attributeValueRepository.findAllById(vRequest.getAttributeValueIds()));
+                }
                 product.getVariants().add(variant);
             }
         } else if (request.getSku() != null && request.getPrice() != null && request.getQuantity() != null) {
@@ -180,15 +217,24 @@ public class ProductService {
                             .orElse(null);
                     if (existing != null) {
                         productMapper.updateVariant(existing, vRequest);
+                        if (vRequest.getAttributeValueIds() != null) {
+                            existing.setAttributeValues(attributeValueRepository.findAllById(vRequest.getAttributeValueIds()));
+                        }
                         newVariants.add(existing);
                     } else {
                         ProductVariant variant = productMapper.toVariant(vRequest);
                         variant.setProduct(product);
+                        if (vRequest.getAttributeValueIds() != null) {
+                            variant.setAttributeValues(attributeValueRepository.findAllById(vRequest.getAttributeValueIds()));
+                        }
                         newVariants.add(variant);
                     }
                 } else {
                     ProductVariant variant = productMapper.toVariant(vRequest);
                     variant.setProduct(product);
+                    if (vRequest.getAttributeValueIds() != null) {
+                        variant.setAttributeValues(attributeValueRepository.findAllById(vRequest.getAttributeValueIds()));
+                    }
                     newVariants.add(variant);
                 }
             }

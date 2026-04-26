@@ -28,4 +28,12 @@ public class Category extends BaseEntity {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @ManyToMany
+    @JoinTable(
+        name = "category_attributes",
+        joinColumns = @JoinColumn(name = "category_id"),
+        inverseJoinColumns = @JoinColumn(name = "attribute_id")
+    )
+    private java.util.List<Attribute> attributes = new java.util.ArrayList<>();
+
 }
