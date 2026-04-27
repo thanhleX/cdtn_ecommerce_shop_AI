@@ -25,9 +25,9 @@ import {
 } from '@ant-design/icons';
 import adminApi from '../../../api/adminApi';
 import axiosClient from '../../../api/axiosClient';
-import blogApi from '../../../api/blogApi';
 import usePermission from '../../../hooks/usePermission';
 import fileApi from '../../../api/fileApi';
+import TiptapEditor from '../../../components/common/TiptapEditor';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -299,8 +299,8 @@ const BlogManagePage = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item name="content" label="Nội dung">
-            <TextArea rows={6} placeholder="Viết nội dung tại đây..." />
+          <Form.Item name="content" label="Nội dung" rules={[{ required: true, message: 'Nội dung không được để trống!' }]}>
+            <TiptapEditor />
           </Form.Item>
 
           <Form.Item 
