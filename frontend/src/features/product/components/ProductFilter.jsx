@@ -6,16 +6,19 @@ const { Title, Text } = Typography;
 const ProductFilter = ({
   attributeGroups = [], // Danh sách các thuộc tính kèm giá trị (đã gom nhóm theo category)
   selectedAttributeValues = [],
-  priceRange = [0, 50000000],
-  dynamicMinPrice = 0,
-  dynamicMaxPrice = 50000000,
+  priceRange,
+  dynamicMinPrice,
+  dynamicMaxPrice,
   onFilterChange
 }) => {
-  const [localPrice, setLocalPrice] = useState(priceRange);
+  const min = dynamicMinPrice !== undefined && dynamicMinPrice !== null ? Number(dynamicMinPrice) : 0;
+  const max = dynamicMaxPrice !== undefined && dynamicMaxPrice !== null ? Number(dynamicMaxPrice) : 50000000;
+
+  const [localPrice, setLocalPrice] = useState(priceRange || [min, max]);
 
   useEffect(() => {
-    setLocalPrice(priceRange);
-  }, [JSON.stringify(priceRange)]);
+    setLocalPrice(priceRange || [min, max]);
+  }, [JSON.stringify(priceRange), min, max]);
 
   const toggleAttributeValue = (valueId) => {
     let newValues = [...selectedAttributeValues];
@@ -36,10 +39,6 @@ const ProductFilter = ({
       attributeValueIds: selectedAttributeValues 
     });
   };
-
-  // Nếu không có giá trị động từ BE, dùng mặc định
-  const min = dynamicMinPrice !== null ? Number(dynamicMinPrice) : 0;
-  const max = dynamicMaxPrice !== null ? Number(dynamicMaxPrice) : 50000000;
 
   return (
     <div style={{ padding: '24px', background: '#fff', borderRadius: 16, border: '1px solid #f0f0f0', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>

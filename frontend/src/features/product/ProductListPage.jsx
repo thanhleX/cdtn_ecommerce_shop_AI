@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Row, Col, Pagination, Spin, Typography, Empty, Input } from 'antd';
+import { Row, Col, Pagination, Spin, Typography, Empty, Input, Select, Space } from 'antd';
 import { Helmet } from 'react-helmet-async';
 import { useProducts } from '../../hooks/useProducts';
 import ProductCard from './components/ProductCard';
@@ -79,8 +79,8 @@ const ProductListPage = () => {
 
     const attributeValueIds = attrIdsStr ? attrIdsStr.split(',').map(Number) : [];
 
-    // Parse price range from URL or use a wide default until API returns range
-    let priceRange = [0, 100000000]; 
+    // Parse price range from URL or use null until API returns range
+    let priceRange = null; 
     if (priceStr && priceStr.includes('-')) {
       const parts = priceStr.split('-');
       const min = parseInt(parts[0], 10);
@@ -88,7 +88,16 @@ const ProductListPage = () => {
       if (!isNaN(min) && !isNaN(max)) priceRange = [min, max];
     }
 
-    return { categoryIds, specificCategoryId, priceRange, page, keyword, rawSlugs: slugs, attributeValueIds };
+    const sortValue = searchParams.get('sort') || 'id_desc';
+    let sortBy = 'id';
+    let direction = 'desc';
+    if (sortValue.includes('_')) {
+      const parts = sortValue.split('_');
+      sortBy = parts[0];
+      direction = parts[1];
+    }
+
+    return { categoryIds, specificCategoryId, priceRange, page, keyword, rawSlugs: slugs, attributeValueIds, sortValue, sortBy, direction };
   }, [searchParams, categories]);
 
   // 5. Fetch Products on Filter Change
@@ -98,9 +107,11 @@ const ProductListPage = () => {
         page: filtersFromUrl.page,
         keyword: filtersFromUrl.keyword,
         categoryIds: filtersFromUrl.categoryIds.length > 0 ? filtersFromUrl.categoryIds : undefined,
-        minPrice: filtersFromUrl.priceRange[0],
-        maxPrice: filtersFromUrl.priceRange[1],
-        attributeValueIds: filtersFromUrl.attributeValueIds.length > 0 ? filtersFromUrl.attributeValueIds : undefined
+        minPrice: filtersFromUrl.priceRange ? filtersFromUrl.priceRange[0] : undefined,
+        maxPrice: filtersFromUrl.priceRange ? filtersFromUrl.priceRange[1] : undefined,
+        attributeValueIds: filtersFromUrl.attributeValueIds.length > 0 ? filtersFromUrl.attributeValueIds : undefined,
+        sortBy: filtersFromUrl.sortBy,
+        direction: filtersFromUrl.direction
       });
     }
   }, [
@@ -109,6 +120,7 @@ const ProductListPage = () => {
     JSON.stringify(filtersFromUrl.categoryIds),
     JSON.stringify(filtersFromUrl.priceRange),
     JSON.stringify(filtersFromUrl.attributeValueIds),
+    filtersFromUrl.sortValue,
     categories.length,
     fetchProducts
   ]);
@@ -119,6 +131,8 @@ const ProductListPage = () => {
     
     if (newPriceRange) {
       newParams.set('price', `${newPriceRange[0]}-${newPriceRange[1]}`);
+    } else {
+      newParams.delete('price');
     }
 
     if (newAttrIds && newAttrIds.length > 0) {
@@ -138,10 +152,15 @@ const ProductListPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Derive attribute groups for the selected categories
+  const handleSortChange = (value) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('sort', value);
+    newParams.set('page', '1');
+    setSearchParams(newParams);
+  };
+
+  // Derive attribute groups for the selected categories OR search results
   const attributeGroups = useMemo(() => {
-    if (filtersFromUrl.rawSlugs.length === 0) return [];
-    
     const attrMap = new Map();
 
     const collectAttributes = (categoryId) => {
@@ -158,14 +177,22 @@ const ProductListPage = () => {
       }
     };
 
-    filtersFromUrl.rawSlugs.forEach(slug => {
-      const cat = categories.find(c => c.slug === slug);
-      if (cat) {
-        collectAttributes(cat.id);
-      }
-    });
+    if (filtersFromUrl.rawSlugs.length > 0) {
+      filtersFromUrl.rawSlugs.forEach(slug => {
+        const cat = categories.find(c => c.slug === slug);
+        if (cat) {
+          collectAttributes(cat.id);
+        }
+      });
+    } else if (filtersFromUrl.keyword && products.length > 0) {
+      const categoryIds = new Set(products.map(p => p.categoryId));
+      categoryIds.forEach(id => {
+        collectAttributes(id);
+      });
+    }
+    
     return Array.from(attrMap.values());
-  }, [filtersFromUrl.rawSlugs, categories]);
+  }, [filtersFromUrl.rawSlugs, filtersFromUrl.keyword, categories, products]);
 
   // Use dynamic price range from PageResponse (returned by useProducts hook)
   // Note: We need to update useProducts hook to expose minPrice/maxPrice from response
@@ -197,11 +224,24 @@ const ProductListPage = () => {
         categories={categories} 
       />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
         <Title level={2} style={{ margin: 0 }}>
           {currentCategoryName || (filtersFromUrl.keyword ? `Kết quả cho "${filtersFromUrl.keyword}"` : 'Tất cả sản phẩm')}
         </Title>
-        <Text type="secondary">Tìm thấy {pagination.total} sản phẩm</Text>
+        
+        <Space size="large" align="center">
+          <Text type="secondary">Tìm thấy {pagination.total} sản phẩm</Text>
+          <Select 
+            value={filtersFromUrl.sortValue}
+            onChange={handleSortChange}
+            style={{ width: 180 }}
+            options={[
+              { value: 'id_desc', label: 'Mới nhất' },
+              { value: 'price_asc', label: 'Giá tăng dần' },
+              { value: 'price_desc', label: 'Giá giảm dần' }
+            ]}
+          />
+        </Space>
       </div>
 
       <Row gutter={[32, 24]}>

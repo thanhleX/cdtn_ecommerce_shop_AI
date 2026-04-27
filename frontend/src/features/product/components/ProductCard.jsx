@@ -98,10 +98,10 @@ const ProductCard = ({ product }) => {
       className="product-card-modern"
       style={{
         borderRadius: 12,
-        border: '1px solid #f0f0f0',
+        border: '3px solid #f0f0f0',
         height: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
       }}
       bodyStyle={{
         padding: 12,
@@ -113,7 +113,7 @@ const ProductCard = ({ product }) => {
         <div
           onClick={() => navigate(`/products/slug/${product.slug || product.id}`)}
           style={{
-            height: 180,
+            height: 220,
             background: '#fff',
             display: 'flex',
             alignItems: 'center',
@@ -174,7 +174,7 @@ const ProductCard = ({ product }) => {
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: 4,
-                justifyContent: 'flex-start' // 🔥 FIX: căn trái
+                justifyContent: 'flex-start'
               }}
               optionType="button"
               buttonStyle="solid"
