@@ -34,9 +34,13 @@ const BlogCarousel = () => {
   }
 
   return (
-    <div style={{ marginTop: 60, marginBottom: 60 }}>
-      <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>Bài Viết Nổi Bật</Title>
-
+    <div style={{
+      marginTop: 60,
+      marginBottom: 60,
+      maxWidth: 1000,
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }}>
       <Carousel
         autoplay
         dots
@@ -51,7 +55,7 @@ const BlogCarousel = () => {
               <Card
                 hoverable
                 cover={
-                  <div style={{ height: 350, overflow: 'hidden' }}>
+                  <div style={{ height: 500, overflow: 'hidden' }}>
                     <img
                       alt={blog.title}
                       src={blog.thumbnail || 'https://dummyimage.com/400x200/cccccc/000000&text=No+Image'}

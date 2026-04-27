@@ -4,6 +4,7 @@ import { useProducts } from '../../hooks/useProducts';
 import ProductCard from '../product/components/ProductCard';
 import { Link } from 'react-router-dom';
 import BlogCarousel from '../blog/components/BlogCarousel';
+import BlogGrid from '../blog/components/BlogGrid';
 
 const { Title, Paragraph } = Typography;
 
@@ -15,17 +16,11 @@ const HomePage = () => {
   }, [fetchFeaturedProducts]);
 
   return (
-    <div>
-      <div style={{ background: '#001529', padding: '60px 20px', textAlign: 'center', color: '#fff', borderRadius: 12, marginBottom: 40, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        <Title style={{ color: '#fff', margin: 0 }}>Khám Phá Bộ Sưu Tập Mới</Title>
-        <Paragraph style={{ color: '#aaa', fontSize: 18, marginTop: 16, marginBottom: 24 }}>Sản phẩm chất lượng cao, thiết kế độc quyền.</Paragraph>
-        <Link to="/products">
-          <Button type="primary" size="large" style={{ borderRadius: 8, padding: '0 32px' }}>Mua Sắm Ngay</Button>
-        </Link>
-      </div>
+    <div style={{ marginTop: -50, marginBottom: 60 }}>
+      <BlogCarousel />
 
       <Title level={2} style={{ textAlign: 'center', marginBottom: 30 }}>Sản Phẩm Nổi Bật</Title>
-      
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>
       ) : (
@@ -37,7 +32,8 @@ const HomePage = () => {
               </Col>
             ))}
           </Row>
-          <BlogCarousel />
+          
+          <BlogGrid />
         </>
       )}
     </div>
