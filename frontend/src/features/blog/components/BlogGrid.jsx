@@ -38,36 +38,42 @@ const BlogGrid = () => {
 
   return (
     <div style={{ marginTop: 60, marginBottom: 60 }}>
-      <Title level={2} style={{ textAlign: 'center', marginBottom: 30 }}>Bài Viết Tiêu Biểu</Title>
-      
+      <div style={{ textAlign: 'center', marginBottom: 40, marginTop: 40 }}>
+        <Title level={2} style={{ margin: 0 }}>Bài Viết Tiêu Biểu</Title>
+        <div style={{ width: 60, height: 4, background: '#1890ff', margin: '12px auto', borderRadius: 2 }} />
+      </div>
+
       <Row gutter={[24, 24]}>
         {blogs.map(blog => (
           <Col xs={24} sm={12} md={8} xl={6} key={blog.id}>
             <Link to={`/blog/${blog.slug}`}>
               <Card
                 hoverable
-                className="product-card-modern"
+                className="product-card-premium"
                 style={{
                   borderRadius: 12,
-                  border: '3px solid #f0f0f0',
+                  border: '1px solid rgba(0,0,0,0.04)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                   height: '100%',
                   display: 'flex',
-                  flexDirection: 'column'
+                  flexDirection: 'column',
+                  overflow: 'hidden'
                 }}
-                styles={{ 
-                  body: { 
-                    padding: 16, 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    flexGrow: 1 
-                  } 
+                styles={{
+                  body: {
+                    padding: 16,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexGrow: 1
+                  }
                 }}
                 cover={
-                  <div style={{ height: 220, overflow: 'hidden', borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
+                  <div style={{ height: 220, overflow: 'hidden' }}>
                     <img
                       alt={blog.title}
                       src={blog.thumbnail || 'https://dummyimage.com/400x200/cccccc/000000&text=No+Image'}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      className="product-image"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
                     />
                   </div>
                 }

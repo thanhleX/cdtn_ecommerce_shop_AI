@@ -79,8 +79,8 @@ const CustomerLayout = () => {
       <div style={{
         display: 'flex',
         background: '#fff',
-        borderRadius: 8,
-        boxShadow: '0 6px 16px rgba(0,0,0,0.12)',
+        borderRadius: 12,
+        boxShadow: '0 12px 32px rgba(0,0,0,0.1)',
         overflow: 'hidden',
         width: 800, // Rộng hơn để chứa nhiều cột
         minHeight: 400
@@ -243,9 +243,12 @@ const CustomerLayout = () => {
       <Header style={{
         display: 'flex',
         alignItems: 'center',
-        background: '#fff',
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(0,0,0,0.04)',
         padding: '0 50px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
         zIndex: 1000,
         position: 'sticky',
         top: 0,
@@ -329,8 +332,8 @@ const CustomerLayout = () => {
         `}} />
       </Header>
 
-      <Content style={{ padding: '0 50px', marginTop: 24 }}>
-        <div style={{ background: '#fff', padding: 24, minHeight: 280, borderRadius: 8 }}>
+      <Content style={{ padding: '0 50px', marginTop: 32 }}>
+        <div style={{ background: '#fff', padding: 32, minHeight: 280, borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
           <Outlet />
         </div>
       </Content>

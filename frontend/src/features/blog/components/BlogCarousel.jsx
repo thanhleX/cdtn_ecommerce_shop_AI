@@ -54,17 +54,19 @@ const BlogCarousel = () => {
             <Link to={`/blog/${blog.slug}`}>
               <Card
                 hoverable
+                className="product-card-premium"
                 cover={
                   <div style={{ height: 500, overflow: 'hidden' }}>
                     <img
                       alt={blog.title}
                       src={blog.thumbnail || 'https://dummyimage.com/400x200/cccccc/000000&text=No+Image'}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      className="product-image"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
                     />
                   </div>
                 }
                 styles={{ body: { padding: '16px' } }}
-                style={{ borderRadius: 12, overflow: 'hidden', height: '100%' }}
+                style={{ borderRadius: 12, overflow: 'hidden', height: '100%', border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}
               >
                 <Title level={4} ellipsis={{ rows: 2 }} style={{ margin: 0, fontSize: '1.1rem' }}>
                   {blog.title}

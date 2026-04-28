@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { ConfigProvider } from 'antd';
 import ChatWidget from './components/chat/ChatWidget';
 import CustomerLayout from './components/Layout/CustomerLayout';
 import AdminLayout from './components/Layout/AdminLayout';
@@ -106,9 +107,29 @@ function AppContent() {
 ========================= */
 function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#1890ff',
+          borderRadius: 8,
+          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          colorTextBase: '#1f2937',
+        },
+        components: {
+          Layout: {
+            headerBg: 'rgba(255, 255, 255, 0.85)',
+            bodyBg: '#f3f4f6',
+          },
+          Card: {
+            borderRadiusLG: 12,
+          }
+        }
+      }}
+    >
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </ConfigProvider>
   );
 }
 

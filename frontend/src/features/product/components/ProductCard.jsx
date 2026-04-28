@@ -95,13 +95,15 @@ const ProductCard = ({ product }) => {
   return (
     <Card
       hoverable
-      className="product-card-modern"
+      className="product-card-premium"
       style={{
         borderRadius: 12,
-        border: '3px solid #f0f0f0',
+        border: '1px solid rgba(0,0,0,0.04)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden'
       }}
       bodyStyle={{
         padding: 12,
@@ -113,22 +115,27 @@ const ProductCard = ({ product }) => {
         <div
           onClick={() => navigate(`/products/slug/${product.slug || product.id}`)}
           style={{
-            height: 220,
-            background: '#fff',
+            position: 'relative',
+            height: 240,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: 12,
-            cursor: 'pointer'
+            cursor: 'pointer',
+            overflow: 'hidden',
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
           }}
         >
           <img
             alt={product.name}
             src={thumbnail}
+            className="product-image"
             style={{
               maxWidth: '100%',
               maxHeight: '100%',
-              objectFit: 'contain'
+              objectFit: 'contain',
+              transition: 'transform 0.4s ease'
             }}
           />
         </div>
@@ -203,7 +210,7 @@ const ProductCard = ({ product }) => {
         <div style={{
           fontSize: 20,
           fontWeight: 700,
-          color: '#d70018'
+          color: '#1890ff'
         }}>
           {currentVariant
             ? formatPrice(currentVariant.price)
@@ -221,10 +228,11 @@ const ProductCard = ({ product }) => {
       <Button
         type="primary"
         block
+        size="large"
         style={{
-          marginTop: 8,
-          borderRadius: 6,
-          fontWeight: 500
+          marginTop: 12,
+          borderRadius: 8,
+          fontWeight: 600
         }}
         icon={<ShoppingCartOutlined />}
         disabled={!currentVariant || currentVariant.quantity <= 0}

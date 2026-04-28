@@ -43,7 +43,7 @@ const ProductDetailPage = () => {
         const data = await getProductBySlug(slug);
         if (isMounted) {
           setProduct(data);
-          
+
           if (data.variants && data.variants.length > 0) {
             const firstVariant = data.variants[0];
             const initial = {};
@@ -67,7 +67,7 @@ const ProductDetailPage = () => {
   }, [slug, getProductBySlug]);
 
   // --- Logic Variant ---
-  
+
   const attributes = useMemo(() => {
     if (!product) return [];
     const attrMap = {};
@@ -93,7 +93,7 @@ const ProductDetailPage = () => {
 
   const selectedVariant = useMemo(() => {
     if (!product || !product.variants) return null;
-    
+
     // 1. Cố gắng tìm variant khớp chính xác TẤT CẢ các options đã chọn
     const exactMatch = product.variants.find(variant => {
       return attributes.every(attr => {
@@ -109,7 +109,7 @@ const ProductDetailPage = () => {
     const pricingMatch = product.variants.find(variant => {
       const pricingAttributes = attributes.filter(a => a.isPricing);
       if (pricingAttributes.length === 0) return false;
-      
+
       return pricingAttributes.every(attr => {
         const selectedValue = selectedOptions[attr.name];
         if (!selectedValue) return true;
@@ -163,8 +163,8 @@ const ProductDetailPage = () => {
         </script>
       </Helmet>
 
-      <CategoryBreadcrumb 
-        currentCategoryId={product.categoryId} 
+      <CategoryBreadcrumb
+        currentCategoryId={product.categoryId}
         categories={categories}
         extraItems={[{ title: product.name }]}
       />
@@ -174,25 +174,25 @@ const ProductDetailPage = () => {
           <Col xs={24} lg={10}>
             <ProductGallery images={product.images || []} />
           </Col>
-          
+
           <Col xs={24} lg={14}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <Tag color="blue" style={{ width: 'fit-content' }}>{product.categoryName}</Tag>
-              <Title level={1} style={{ marginTop: 0, fontSize: 32 }}>{product.name}</Title>
-              
+              <Title level={1} style={{ display: 'flex', alignItems: 'start', marginTop: 0, fontSize: 32 }}>{product.name}</Title>
+
               <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                 <Text type="secondary">Mã SKU: <Text strong>{selectedVariant?.sku || 'N/A'}</Text></Text>
                 <Divider type="vertical" />
                 <Text type="secondary">Đã bán: <Text strong>{product.soldCount || 0}</Text></Text>
               </div>
 
-              <div style={{ background: '#fff5f5', padding: '24px', borderRadius: 12, border: '1px solid #ffe8e8' }}>
+              <div style={{ background: '#f0f5ff', padding: '24px', borderRadius: 12, border: '1px solid #d6e4ff' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
-                  <Title level={1} type="danger" style={{ margin: 0, fontSize: 36 }}>
+                  <Title level={1} style={{ margin: 0, fontSize: 36, color: '#1890ff' }}>
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedVariant?.price || 0)}
                   </Title>
                   {product.discount > 0 && (
-                    <Tag color="error" style={{ fontSize: 16, padding: '4px 12px' }}>-{product.discount}%</Tag>
+                    <Tag color="blue" style={{ fontSize: 16, padding: '4px 12px' }}>-{product.discount}%</Tag>
                   )}
                 </div>
               </div>
@@ -203,38 +203,43 @@ const ProductDetailPage = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                 {attributes.map(attr => (
                   <div key={attr.name}>
-                    <Text strong style={{ display: 'block', marginBottom: 12, textTransform: 'uppercase', fontSize: 12, color: '#8c8c8c' }}>
+                    <Text strong style={{ display: 'flex', alignItems: 'start', marginBottom: 12, textTransform: 'uppercase', fontSize: 12, color: '#8c8c8c' }}>
                       {attr.name} {attr.isPricing && <Tooltip title="Lựa chọn này làm thay đổi giá"><span style={{ color: '#faad14', marginLeft: 4 }}>★</span></Tooltip>}
                     </Text>
-                    <Radio.Group 
-                      size="large" 
+                    <Radio.Group
+                      size="large"
                       value={selectedOptions[attr.name]}
                       onChange={(e) => handleOptionChange(attr.name, e.target.value)}
                       optionType="button"
                       buttonStyle="solid"
+                      style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 8,
+                        justifyContent: 'flex-start',
+                        width: '100%'
+                      }}
                     >
-                      <Space wrap>
-                        {attr.values.map(val => (
-                          <Radio.Button 
-                            key={val} 
-                            value={val}
-                            style={{ 
-                              borderRadius: 8,
-                              textAlign: 'center',
-                              minWidth: 80
-                            }}
-                          >
-                            {val}
-                          </Radio.Button>
-                        ))}
-                      </Space>
+                      {attr.values.map(val => (
+                        <Radio.Button
+                          key={val}
+                          value={val}
+                          style={{
+                            borderRadius: 8,
+                            minWidth: 80,
+                            textAlign: 'center'
+                          }}
+                        >
+                          {val}
+                        </Radio.Button>
+                      ))}
                     </Radio.Group>
                   </div>
                 ))}
               </div>
 
               <div style={{ marginTop: 24 }}>
-                <Text strong style={{ display: 'block', marginBottom: 12, textTransform: 'uppercase', fontSize: 12, color: '#8c8c8c' }}>
+                <Text strong style={{ display: 'flex', alignItems: 'start', marginBottom: 12, textTransform: 'uppercase', fontSize: 12, color: '#8c8c8c' }}>
                   SỐ LƯỢNG
                 </Text>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -260,11 +265,11 @@ const ProductDetailPage = () => {
                   icon={<ShoppingCartOutlined />}
                   onClick={handleAddToCart}
                   disabled={!selectedVariant || selectedVariant.quantity < 1}
-                  style={{ 
-                    flex: 1, 
-                    height: 56, 
-                    fontSize: 18, 
-                    fontWeight: 700, 
+                  style={{
+                    flex: 1,
+                    height: 56,
+                    fontSize: 18,
+                    fontWeight: 700,
                     borderRadius: 12,
                     boxShadow: '0 4px 14px rgba(24, 144, 255, 0.4)'
                   }}
@@ -278,20 +283,20 @@ const ProductDetailPage = () => {
       </div>
 
       <div style={{ background: '#fff', padding: 40, borderRadius: 16, marginTop: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-        <Tabs 
+        <Tabs
           size="large"
           items={[
             {
               label: 'MÔ TẢ SẢN PHẨM',
               key: '1',
               children: (
-                <div 
-                  style={{ fontSize: 16, lineHeight: '1.8', color: '#4a4a4a', padding: '16px 0' }} 
-                  dangerouslySetInnerHTML={{ __html: product.description?.replace(/\n/g, '<br/>') || 'Chưa có mô tả' }} 
+                <div
+                  style={{ display: 'flex', alignItems: 'start', fontSize: 16, lineHeight: '1.8', color: '#4a4a4a', padding: '16px 0' }}
+                  dangerouslySetInnerHTML={{ __html: product.description?.replace(/\n/g, '<br/>') || 'Chưa có mô tả' }}
                 />
               )
             }
-          ]} 
+          ]}
         />
       </div>
     </div>

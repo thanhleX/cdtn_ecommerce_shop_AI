@@ -19,7 +19,10 @@ const HomePage = () => {
     <div style={{ marginTop: -50, marginBottom: 60 }}>
       <BlogCarousel />
 
-      <Title level={2} style={{ textAlign: 'center', marginBottom: 30 }}>Sản Phẩm Nổi Bật</Title>
+      <div style={{ textAlign: 'center', marginBottom: 40, marginTop: 40 }}>
+        <Title level={2} style={{ margin: 0 }}>Sản Phẩm Nổi Bật</Title>
+        <div style={{ width: 60, height: 4, background: '#1890ff', margin: '12px auto', borderRadius: 2 }} />
+      </div>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>
@@ -32,7 +35,7 @@ const HomePage = () => {
               </Col>
             ))}
           </Row>
-          
+
           <BlogGrid />
         </>
       )}
