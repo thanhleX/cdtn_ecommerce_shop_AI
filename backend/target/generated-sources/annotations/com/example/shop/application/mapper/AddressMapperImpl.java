@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-04-27T22:02:47+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
+    date = "2026-04-28T21:07:43+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class AddressMapperImpl implements AddressMapper {
@@ -25,9 +25,9 @@ public class AddressMapperImpl implements AddressMapper {
         Address.AddressBuilder address = Address.builder();
 
         address.fullAddress( request.getFullAddress() );
+        address.isDefault( request.getIsDefault() );
         address.phone( request.getPhone() );
         address.receiverName( request.getReceiverName() );
-        address.isDefault( request.getIsDefault() );
 
         return address.build();
     }
@@ -40,11 +40,11 @@ public class AddressMapperImpl implements AddressMapper {
 
         AddressResponse.AddressResponseBuilder addressResponse = AddressResponse.builder();
 
-        addressResponse.id( address.getId() );
         addressResponse.fullAddress( address.getFullAddress() );
+        addressResponse.id( address.getId() );
+        addressResponse.isDefault( address.getIsDefault() );
         addressResponse.phone( address.getPhone() );
         addressResponse.receiverName( address.getReceiverName() );
-        addressResponse.isDefault( address.getIsDefault() );
 
         return addressResponse.build();
     }
@@ -70,8 +70,8 @@ public class AddressMapperImpl implements AddressMapper {
         }
 
         address.setFullAddress( request.getFullAddress() );
+        address.setIsDefault( request.getIsDefault() );
         address.setPhone( request.getPhone() );
         address.setReceiverName( request.getReceiverName() );
-        address.setIsDefault( request.getIsDefault() );
     }
 }

@@ -100,7 +100,7 @@ const CartPage = () => {
       <div style={{ textAlign: 'center', padding: 100, background: '#fff', borderRadius: 12 }}>
         <ShoppingCartOutlined style={{ fontSize: 80, color: '#d9d9d9', marginBottom: 24 }} />
         <Title level={3} style={{ marginTop: 0 }}>Giỏ hàng của bạn đang trống</Title>
-        <Link to="/products">
+        <Link to="/">
           <Button type="primary" size="large" style={{ marginTop: 16 }}>Tiếp tục mua sắm</Button>
         </Link>
       </div>

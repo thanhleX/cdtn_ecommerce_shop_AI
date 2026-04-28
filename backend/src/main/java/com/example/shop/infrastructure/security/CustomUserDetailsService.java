@@ -32,7 +32,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user.getRoles() != null) {
             user.getRoles().forEach(role -> {
                 // Keep the ROLE_ prefix for backwards compatibility
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+                String roleName = role.getName();
+                if (roleName != null && !roleName.startsWith("ROLE_")) {
+                    roleName = "ROLE_" + roleName;
+                }
+                authorities.add(new SimpleGrantedAuthority(roleName));
                 
                 // Add permissions
                 if (role.getPermissions() != null) {

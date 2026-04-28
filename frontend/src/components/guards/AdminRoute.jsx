@@ -20,7 +20,7 @@ const AdminRoute = () => {
   if (isAuthenticated && !user) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Spin size="large" tip="Đang xác thực quyền truy cập..." />
+        <Spin size="large" description="Đang xác thực quyền truy cập..." />
       </div>
     );
   }

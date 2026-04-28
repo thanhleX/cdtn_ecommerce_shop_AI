@@ -16,12 +16,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import com.example.shop.application.service.RolePermissionCacheService;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
+    private final RolePermissionCacheService rolePermissionCacheService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -36,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = tokenProvider.getUsernameFromJWT(jwt);
                 Long userId = tokenProvider.getUserIdFromJWT(jwt);
                 java.util.List<String> roles = tokenProvider.getRolesFromJWT(jwt);
-                java.util.List<String> permissions = tokenProvider.getPermissionsFromJWT(jwt);
+                java.util.List<String> permissions = rolePermissionCacheService.getPermissionsForRoles(roles);
 
                 java.util.List<org.springframework.security.core.GrantedAuthority> authorities = new java.util.ArrayList<>();
                 

@@ -12,6 +12,7 @@ public class UserResponse {
     private String fullName;
     private String email;
     private java.util.Set<String> roles;
+    private java.util.Set<String> permissions;
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

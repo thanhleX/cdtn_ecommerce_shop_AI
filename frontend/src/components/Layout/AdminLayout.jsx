@@ -1,4 +1,4 @@
-import { Layout, Menu, Button, Dropdown, Avatar, Badge, List, Typography } from 'antd';
+import { Layout, Menu, Button, Dropdown, Avatar, Badge, List, Typography, Alert } from 'antd';
 import {
   DashboardOutlined,
   ShoppingOutlined,
@@ -122,26 +122,41 @@ const AdminLayout = () => {
     { key: '/admin', icon: <DashboardOutlined />, label: <Link to="/admin">Thống kê</Link> },
 
     // 2. Vận hành chính
-    hasPermission('order:read') && { key: '/admin/orders', icon: <ShoppingOutlined />, label: <Link to="/admin/orders">Đơn hàng</Link> },
+    { key: '/admin/orders', icon: <ShoppingOutlined />, label: <Link to="/admin/orders">Đơn hàng</Link> },
 
     // 3. Sản phẩm
-    hasPermission('product:read') && { key: '/admin/products', icon: <AppstoreOutlined />, label: <Link to="/admin/products">Sản phẩm</Link> },
-    hasPermission('product:read') && { key: '/admin/attributes', icon: <TagsOutlined />, label: <Link to="/admin/attributes">Thuộc tính</Link> },
-    hasPermission('category:manage') && { key: '/admin/categories', icon: <AppstoreOutlined />, label: <Link to="/admin/categories">Danh mục</Link> },
+    { key: '/admin/products', icon: <AppstoreOutlined />, label: <Link to="/admin/products">Sản phẩm</Link> },
+    { key: '/admin/attributes', icon: <TagsOutlined />, label: <Link to="/admin/attributes">Thuộc tính</Link> },
+    { key: '/admin/categories', icon: <AppstoreOutlined />, label: <Link to="/admin/categories">Danh mục</Link> },
 
     // 4. Marketing / bán hàng
-    hasPermission('voucher:manage') && { key: '/admin/vouchers', icon: <DollarCircleOutlined />, label: <Link to="/admin/vouchers">Vouchers</Link> },
+    { key: '/admin/vouchers', icon: <DollarCircleOutlined />, label: <Link to="/admin/vouchers">Vouchers</Link> },
 
     // 5. Nội dung
-    hasPermission('blog:manage') && { key: '/admin/blogs', icon: <FileTextOutlined />, label: <Link to="/admin/blogs">Bài viết</Link> },
+    { key: '/admin/blogs', icon: <FileTextOutlined />, label: <Link to="/admin/blogs">Bài viết</Link> },
 
     // 6. Người dùng
-    hasPermission('customer:manage') && { key: '/admin/users', icon: <UserOutlined />, label: <Link to="/admin/users">Khách hàng</Link> },
-    isSystemAdmin && hasPermission('staff:manage') && { key: '/admin/staff', icon: <UserOutlined />, label: <Link to="/admin/staff">Nhân viên</Link> },
+    { key: '/admin/users', icon: <UserOutlined />, label: <Link to="/admin/users">Khách hàng</Link> },
+    isSystemAdmin && { key: '/admin/staff', icon: <UserOutlined />, label: <Link to="/admin/staff">Nhân viên</Link> },
 
     // 7. Hệ thống
-    isSystemAdmin && hasPermission('role:read') && { key: '/admin/roles', icon: <SettingOutlined />, label: <Link to="/admin/roles">Phân quyền</Link> },
+    isSystemAdmin && { key: '/admin/roles', icon: <SettingOutlined />, label: <Link to="/admin/roles">Phân quyền</Link> },
   ].filter(Boolean);
+
+  const routePermissions = {
+    '/admin/orders': 'order:read',
+    '/admin/products': 'product:read',
+    '/admin/attributes': 'product:read',
+    '/admin/categories': 'category:manage',
+    '/admin/vouchers': 'voucher:manage',
+    '/admin/blogs': 'blog:manage',
+    '/admin/users': 'customer:manage',
+    '/admin/staff': 'staff:manage',
+    '/admin/roles': 'role:read',
+  };
+
+  const requiredPermission = Object.entries(routePermissions).find(([path]) => location.pathname.startsWith(path))?.[1];
+  const hasAccess = !requiredPermission || hasPermission(requiredPermission);
 
   const userMenuItems = [
     { key: 'logout', label: 'Đăng xuất', icon: <LogoutOutlined />, onClick: logout },
@@ -194,7 +209,17 @@ const AdminLayout = () => {
             borderRadius: 8
           }}
         >
-          <Outlet />
+          {!hasAccess ? (
+            <Alert
+              message="Bạn không có quyền truy cập chức năng này"
+              description="Vui lòng liên hệ Quản trị viên hệ thống nếu bạn cần được cấp quyền."
+              type="error"
+              showIcon
+              style={{ margin: 24 }}
+            />
+          ) : (
+            <Outlet />
+          )}
         </Content>
       </Layout>
     </Layout>

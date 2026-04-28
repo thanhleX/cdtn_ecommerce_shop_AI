@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-04-27T22:02:47+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
+    date = "2026-04-28T21:07:44+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class AttributeMapperImpl implements AttributeMapper {
@@ -27,10 +27,10 @@ public class AttributeMapperImpl implements AttributeMapper {
 
         Attribute.AttributeBuilder attribute = Attribute.builder();
 
-        attribute.name( request.getName() );
-        attribute.isFilterable( request.getIsFilterable() );
         attribute.displayType( request.getDisplayType() );
+        attribute.isFilterable( request.getIsFilterable() );
         attribute.isPricing( request.getIsPricing() );
+        attribute.name( request.getName() );
 
         return attribute.build();
     }
@@ -43,11 +43,11 @@ public class AttributeMapperImpl implements AttributeMapper {
 
         AttributeResponse.AttributeResponseBuilder attributeResponse = AttributeResponse.builder();
 
-        attributeResponse.id( attribute.getId() );
-        attributeResponse.name( attribute.getName() );
-        attributeResponse.isFilterable( attribute.getIsFilterable() );
         attributeResponse.displayType( attribute.getDisplayType() );
+        attributeResponse.id( attribute.getId() );
+        attributeResponse.isFilterable( attribute.getIsFilterable() );
         attributeResponse.isPricing( attribute.getIsPricing() );
+        attributeResponse.name( attribute.getName() );
         attributeResponse.values( attributeValueListToAttributeValueResponseList( attribute.getValues() ) );
 
         return attributeResponse.build();
@@ -59,10 +59,10 @@ public class AttributeMapperImpl implements AttributeMapper {
             return;
         }
 
-        attribute.setName( request.getName() );
-        attribute.setIsFilterable( request.getIsFilterable() );
         attribute.setDisplayType( request.getDisplayType() );
+        attribute.setIsFilterable( request.getIsFilterable() );
         attribute.setIsPricing( request.getIsPricing() );
+        attribute.setName( request.getName() );
     }
 
     @Override

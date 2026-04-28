@@ -44,33 +44,31 @@ public class JwtTokenProvider {
         Long id = userDetails.getId();
         
         java.util.List<String> roles = new java.util.ArrayList<>();
-        java.util.List<String> permissions = new java.util.ArrayList<>();
         
         authentication.getAuthorities().forEach(authority -> {
             String auth = authority.getAuthority();
             if (auth.startsWith("ROLE_")) {
                 roles.add(auth.substring(5));
-            } else {
-                permissions.add(auth);
             }
         });
         
-        return buildToken(username, id, roles, permissions, jwtExpirationInMs);
+        return buildToken(username, id, roles, jwtExpirationInMs);
     }
 
     public String generateTokenFromUser(com.example.shop.domain.entity.User user) {
         java.util.List<String> roles = new java.util.ArrayList<>();
-        java.util.List<String> permissions = new java.util.ArrayList<>();
         
         if (user.getRoles() != null) {
             user.getRoles().forEach(role -> {
-                roles.add(role.getName());
-                if (role.getPermissions() != null) {
-                    role.getPermissions().forEach(p -> permissions.add(p.getName()));
+                String roleName = role.getName();
+                if (roleName != null && roleName.startsWith("ROLE_")) {
+                    roles.add(roleName.substring(5));
+                } else {
+                    roles.add(roleName);
                 }
             });
         }
-        return buildToken(user.getUsername(), user.getId(), roles, permissions, jwtExpirationInMs);
+        return buildToken(user.getUsername(), user.getId(), roles, jwtExpirationInMs);
     }
 
     public String generateRefreshToken(String username) {
@@ -100,10 +98,6 @@ public class JwtTokenProvider {
         return parseClaims(token).get("roles", java.util.List.class);
     }
 
-    @SuppressWarnings("unchecked")
-    public java.util.List<String> getPermissionsFromJWT(String token) {
-        return parseClaims(token).get("perms", java.util.List.class);
-    }
 
     public LocalDateTime getExpirationFromJWT(String token) {
         Date expiration = parseClaims(token).getExpiration();
@@ -116,7 +110,7 @@ public class JwtTokenProvider {
     }
 
     private String buildToken(String username, Long id, java.util.List<String> roles, 
-                             java.util.List<String> permissions, long expirationMs) {
+                             long expirationMs) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
@@ -124,7 +118,6 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .claim("id", id)
                 .claim("roles", roles)
-                .claim("perms", permissions)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS256)

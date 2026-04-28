@@ -31,11 +31,10 @@ const parseJwt = (token) => {
 };
 
 const getInitialPermissions = () => {
-  const token = getInitialToken();
-  if (token) {
-    const decoded = parseJwt(token);
-    const roles = decoded?.roles?.map(r => `ROLE_${r}`) || [];
-    const perms = decoded?.perms || [];
+  const user = getInitialUser();
+  if (user) {
+    const roles = user.roles?.map(r => r.startsWith('ROLE_') ? r : `ROLE_${r}`) || [];
+    const perms = user.permissions || [];
     return [...roles, ...perms];
   }
   return [];
@@ -54,9 +53,8 @@ const useAuthStore = create((set) => ({
     sessionStorage.setItem('refreshToken', refreshToken);
     sessionStorage.setItem('user', JSON.stringify(user));
 
-    const decoded = parseJwt(token);
-    const roles = decoded?.roles?.map(r => `ROLE_${r}`) || [];
-    const perms = decoded?.perms || [];
+    const roles = user?.roles?.map(r => r.startsWith('ROLE_') ? r : `ROLE_${r}`) || [];
+    const perms = user?.permissions || [];
     const permissions = [...roles, ...perms];
 
     set({
@@ -70,13 +68,7 @@ const useAuthStore = create((set) => ({
 
   setToken: (token) => {
     sessionStorage.setItem('token', token);
-
-    const decoded = parseJwt(token);
-    const roles = decoded?.roles?.map(r => `ROLE_${r}`) || [];
-    const perms = decoded?.perms || [];
-    const permissions = [...roles, ...perms];
-
-    set({ token, permissions });
+    set({ token });
   },
 
   logout: () => {
@@ -95,7 +87,10 @@ const useAuthStore = create((set) => ({
 
   updateUser: (updatedUser) => {
     sessionStorage.setItem('user', JSON.stringify(updatedUser));
-    set({ user: updatedUser });
+    const roles = updatedUser?.roles?.map(r => r.startsWith('ROLE_') ? r : `ROLE_${r}`) || [];
+    const perms = updatedUser?.permissions || [];
+    const permissions = [...roles, ...perms];
+    set({ user: updatedUser, permissions });
   }
 }));
 

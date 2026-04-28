@@ -12,6 +12,7 @@ import com.example.shop.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +35,7 @@ public class RoleService {
     }
 
     @Transactional
+    @CacheEvict(value = "rolePermissions", allEntries = true)
     public RoleResponse createRole(RoleRequest request) {
         if (roleRepository.findByName(request.getName()).isPresent()) {
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION); // Could be DUPLICATE_ROLE
@@ -51,6 +53,7 @@ public class RoleService {
     }
 
     @Transactional
+    @CacheEvict(value = "rolePermissions", allEntries = true)
     public RoleResponse updateRole(Long id, RoleRequest request) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION)); // ROLE_NOT_FOUND
@@ -70,6 +73,7 @@ public class RoleService {
     }
 
     @Transactional
+    @CacheEvict(value = "rolePermissions", allEntries = true)
     public void deleteRole(Long id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
