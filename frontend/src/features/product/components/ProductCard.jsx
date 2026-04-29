@@ -158,7 +158,7 @@ const ProductCard = ({ product }) => {
 
       {/* VARIANTS LEFT-ALIGNED */}
       <div style={{ marginBottom: 10 }}>
-        {attributes.map(attr => (
+        {attributes.slice(0, 2).map(attr => (
           <div key={attr.name} style={{ marginBottom: 6, textAlign: 'left' }}>
 
             {/* LABEL */}
