@@ -20,17 +20,10 @@ public class Attribute extends BaseAuditEntity {
     @Column(name = "is_filterable")
     private Boolean isFilterable = true;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "display_type")
-    private DisplayType displayType = DisplayType.BUTTON;
-
     @Column(name = "is_pricing")
     private Boolean isPricing = false;
 
     @OneToMany(mappedBy = "attribute", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AttributeValue> values;
 
-    public enum DisplayType {
-        BUTTON, COLOR, DROPDOWN
-    }
 }

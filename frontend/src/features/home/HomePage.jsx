@@ -141,10 +141,16 @@ const HomePage = () => {
                 <Card 
                   hoverable 
                   onClick={() => navigate(`/products?category=${cat.slug}`)}
-                  style={{ textAlign: 'center', borderRadius: 16, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                  style={{ textAlign: 'center', borderRadius: 16, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', overflow: 'hidden' }}
                   bodyStyle={{ padding: '30px 10px' }}
                 >
-                  <div style={{ fontSize: 40, color: '#1890ff', marginBottom: 16 }}>{getCategoryIcon(cat.name)}</div>
+                  <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center', alignItems: 'center', height: 80 }}>
+                    {cat.imageUrl ? (
+                      <img src={cat.imageUrl} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    ) : (
+                      <div style={{ fontSize: 40, color: '#1890ff' }}>{getCategoryIcon(cat.name)}</div>
+                    )}
+                  </div>
                   <Title level={5} style={{ margin: 0 }}>{cat.name}</Title>
                 </Card>
               </Col>

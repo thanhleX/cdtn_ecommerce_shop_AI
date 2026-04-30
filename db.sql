@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS voucher_usages;
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS cart_items;
+DROP TABLE IF EXISTS product_reviews;
 DROP TABLE IF EXISTS product_images;
 DROP TABLE IF EXISTS variant_values;
 DROP TABLE IF EXISTS product_variants;
@@ -117,7 +118,6 @@ CREATE TABLE attributes (
   name VARCHAR(100) NOT NULL,
   is_filterable BOOLEAN DEFAULT TRUE,
   is_pricing BOOLEAN DEFAULT FALSE,
-  display_type ENUM('BUTTON','COLOR','DROPDOWN'),
   created_at DATETIME(6),
   updated_at DATETIME(6)
 ) ENGINE=InnoDB;
@@ -197,6 +197,8 @@ CREATE TABLE products (
   slug VARCHAR(255) UNIQUE,
   description TEXT,
   is_active BOOLEAN,
+  average_rating DOUBLE DEFAULT 5.0,
+  review_count INTEGER DEFAULT 0,
   category_id BIGINT,
   created_at DATETIME(6),
   updated_at DATETIME(6),
@@ -228,6 +230,20 @@ CREATE TABLE product_images (
   is_thumbnail BOOLEAN,
   sort_order INT,
   FOREIGN KEY (product_id) REFERENCES products(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE product_reviews (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  product_id BIGINT NOT NULL,
+  rating INT NOT NULL,
+  comment TEXT,
+  status ENUM('ACTIVE','HIDDEN','REPORTED') NOT NULL DEFAULT 'ACTIVE',
+  created_at DATETIME(6),
+  updated_at DATETIME(6),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (product_id) REFERENCES products(id),
+  UNIQUE KEY unique_user_product (user_id, product_id)
 ) ENGINE=InnoDB;
 
 -- ORDER

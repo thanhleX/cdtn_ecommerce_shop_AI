@@ -128,6 +128,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
         Optional<Product> findBySlug(String slug);
 
-        @Query(value = "SELECT * FROM products WHERE is_active = true ORDER BY RAND() LIMIT 4", nativeQuery = true)
+        @Query(value = "SELECT * FROM products WHERE is_active = true ORDER BY average_rating DESC, review_count DESC, created_at DESC LIMIT 4", nativeQuery = true)
         List<Product> findFeaturedProducts();
 }

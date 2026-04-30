@@ -35,5 +35,7 @@ public class Category extends BaseEntity {
         inverseJoinColumns = @JoinColumn(name = "attribute_id")
     )
     private java.util.List<Attribute> attributes = new java.util.ArrayList<>();
+    @Column(name = "image_url")
+    private String imageUrl;
 
 }

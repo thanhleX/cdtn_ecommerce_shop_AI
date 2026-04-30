@@ -11,11 +11,14 @@ import {
   message, 
   Popconfirm,
   Tag,
-  Select
+  Select,
+  Upload,
+  Image as AntImage
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined, LoadingOutlined } from '@ant-design/icons';
 import categoryApi from '../../../api/categoryApi';
 import attributeApi from '../../../api/attributeApi';
+import fileApi from '../../../api/fileApi';
 import usePermission from '../../../hooks/usePermission';
 
 const { Title } = Typography;
@@ -30,6 +33,7 @@ const CategoryManagePage = () => {
   const [isAttrModalVisible, setIsAttrModalVisible] = useState(false);
   const [allAttributes, setAllAttributes] = useState([]);
   const [selectedAttrIds, setSelectedAttrIds] = useState([]);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [form] = Form.useForm();
 
   const fetchCategories = async () => {
@@ -62,6 +66,7 @@ const CategoryManagePage = () => {
       name: record.name,
       parentId: record.parentId,
       isActive: record.isActive,
+      imageUrl: record.imageUrl,
     });
     setIsModalVisible(true);
   };
@@ -91,6 +96,21 @@ const CategoryManagePage = () => {
     } catch (error) {
       if (error?.errorFields) return; // Form validation error
       message.error(error?.message || 'Lỗi khi lưu danh mục');
+    }
+  };
+
+  const handleUpload = async (info) => {
+    const { file } = info;
+    setUploadLoading(true);
+    try {
+      const response = await fileApi.uploadFile(file);
+      const url = response.data || response;
+      form.setFieldsValue({ imageUrl: url });
+      message.success('Tải ảnh lên thành công');
+    } catch (error) {
+      message.error('Lỗi khi tải ảnh lên');
+    } finally {
+      setUploadLoading(false);
     }
   };
 
@@ -140,6 +160,15 @@ const CategoryManagePage = () => {
   };
 
   const columns = [
+    {
+      title: 'Hình ảnh',
+      dataIndex: 'imageUrl',
+      key: 'imageUrl',
+      width: 100,
+      render: (img, record) => record.parentId ? null : (
+        <AntImage src={img} width={50} height={50} style={{ objectFit: 'contain', borderRadius: 4 }} fallback="https://placehold.co/50x50?text=Cat" />
+      )
+    },
     {
       title: 'Tên danh mục',
       dataIndex: 'name',
@@ -245,6 +274,46 @@ const CategoryManagePage = () => {
                 ))
               }
             </Select>
+          </Form.Item>
+
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) => prevValues.parentId !== currentValues.parentId}
+          >
+            {({ getFieldValue }) => 
+              !getFieldValue('parentId') ? (
+                <Form.Item 
+                  name="imageUrl" 
+                  label="Ảnh đại diện (chỉ dành cho danh mục cha)"
+                >
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <Upload
+                      name="file"
+                      listType="picture-card"
+                      showUploadList={false}
+                      customRequest={handleUpload}
+                      accept="image/*"
+                    >
+                      {form.getFieldValue('imageUrl') ? (
+                        <img src={form.getFieldValue('imageUrl')} alt="imageUrl" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      ) : (
+                        <div>
+                          {uploadLoading ? <LoadingOutlined /> : <PlusOutlined />}
+                          <div style={{ marginTop: 8 }}>Tải ảnh</div>
+                        </div>
+                      )}
+                    </Upload>
+                    {form.getFieldValue('imageUrl') && (
+                      <Input 
+                        value={form.getFieldValue('imageUrl')} 
+                        onChange={(e) => form.setFieldsValue({ imageUrl: e.target.value })}
+                        placeholder="Hoặc nhập URL ảnh tại đây"
+                      />
+                    )}
+                  </Space>
+                </Form.Item>
+              ) : null
+            }
           </Form.Item>
 
 

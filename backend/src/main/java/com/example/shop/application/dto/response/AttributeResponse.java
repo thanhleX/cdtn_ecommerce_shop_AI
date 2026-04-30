@@ -13,7 +13,6 @@ public class AttributeResponse {
     private Long id;
     private String name;
     private Boolean isFilterable;
-    private Attribute.DisplayType displayType;
     private Boolean isPricing;
     private List<AttributeValueResponse> values;
 }

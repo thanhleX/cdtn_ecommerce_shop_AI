@@ -84,7 +84,6 @@ public class AttributeService {
                 .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
         
         attribute.setName(request.getName());
-        attribute.setDisplayType(request.getDisplayType());
         attribute.setIsFilterable(request.getIsFilterable());
         attribute.setIsPricing(request.getIsPricing());
         

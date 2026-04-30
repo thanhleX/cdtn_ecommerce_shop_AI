@@ -117,12 +117,6 @@ const AttributeManagePage = () => {
       render: (val) => (val ? <Tag color="gold">Có</Tag> : <Tag color="default">Không</Tag>),
     },
     {
-      title: 'Kiểu hiển thị',
-      dataIndex: 'displayType',
-      key: 'displayType',
-      render: (val) => <Tag color="blue">{val}</Tag>,
-    },
-    {
       title: 'Thao tác',
       key: 'action',
       render: (_, record) => (
@@ -186,13 +180,6 @@ const AttributeManagePage = () => {
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item name="name" label="Tên thuộc tính (VD: RAM, Màu sắc)" rules={[{ required: true }]}>
             <Input />
-          </Form.Item>
-          <Form.Item name="displayType" label="Kiểu hiển thị" initialValue="BUTTON">
-            <Select>
-              <Select.Option value="BUTTON">Nút bấm</Select.Option>
-              <Select.Option value="COLOR">Màu sắc</Select.Option>
-              <Select.Option value="DROPDOWN">Danh sách thả xuống</Select.Option>
-            </Select>
           </Form.Item>
           <Form.Item name="isFilterable" label="Sử dụng để lọc?" valuePropName="checked" initialValue={true}>
             <Select>

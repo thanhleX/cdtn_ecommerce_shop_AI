@@ -195,19 +195,81 @@ const ProductCard = ({ product }) => {
               buttonStyle="solid"
               disabled={!attr.isPricing}
             >
-              {attr.values.map(val => (
-                <Radio.Button
-                  key={val}
-                  value={val}
-                  style={{
-                    fontSize: 13,
-                    padding: '0 10px',
-                    borderRadius: 6
-                  }}
-                >
-                  {val}
-                </Radio.Button>
-              ))}
+              {attr.values.map(val => {
+                const isColorAttr =
+                  attr.name.toLowerCase().includes('màu') ||
+                  attr.name.toLowerCase().includes('color');
+
+                if (isColorAttr) {
+                  const normalizeColor = (str) =>
+                    str
+                      ?.toLowerCase()
+                      .normalize("NFD")
+                      .replace(/[\u0300-\u036f]/g, "")
+                      .trim();
+
+                  const COLOR_MAP = {
+                    do: '#ff4d4f',
+                    'do dam': '#cf1322',
+                    xanh: '#1890ff',
+                    'xanh duong': '#1890ff',
+                    'xanh la': '#52c41a',
+                    den: '#000000',
+                    trang: '#ffffff',
+                    vang: '#fadb14',
+                    hong: '#eb2f96',
+                    tim: '#722ed1',
+                    cam: '#fa8c16',
+                    xam: '#bfbfbf',
+                    nau: '#873800',
+                    bac: '#d9d9d9',
+                    gold: '#ffd700',
+                    titan: '#878681',
+                    silver: '#d9d9d9',
+                    gray: '#bfbfbf',
+                    blue: '#1890ff',
+                    red: '#ff4d4f',
+                    green: '#52c41a',
+                    black: '#000000',
+                    white: '#ffffff'
+                  };
+
+                  const normalized = normalizeColor(val);
+                  const color = COLOR_MAP[normalized];
+
+                  return (
+                    <Tooltip key={val} title={val}>
+                      <div
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          backgroundColor: color || '#ccc',
+                          border:
+                            color === '#ffffff'
+                              ? '1px solid #ccc'
+                              : '1px solid #d9d9d9',
+                          cursor: 'default'
+                        }}
+                      />
+                    </Tooltip>
+                  );
+                }
+
+                return (
+                  <Radio.Button
+                    key={val}
+                    value={val}
+                    style={{
+                      fontSize: 13,
+                      padding: '0 10px',
+                      borderRadius: 6
+                    }}
+                  >
+                    {val}
+                  </Radio.Button>
+                );
+              })}
             </Radio.Group>
           </div>
         ))}

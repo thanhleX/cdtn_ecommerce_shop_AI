@@ -304,11 +304,11 @@ const ProductDetailPage = () => {
                 <div style={{ marginTop: 16, maxWidth: 800 }}>
                   <div style={{ border: '1px solid #f0f0f0', borderRadius: 8, overflow: 'hidden' }}>
                     {attributes.map((attr, index) => (
-                      <div 
-                        key={attr.name} 
-                        style={{ 
-                          display: 'flex', 
-                          padding: '16px 24px', 
+                      <div
+                        key={attr.name}
+                        style={{
+                          display: 'flex',
+                          padding: '16px 24px',
                           backgroundColor: index % 2 === 0 ? '#fafafa' : '#fff',
                           borderBottom: index < attributes.length - 1 ? '1px solid #f0f0f0' : 'none'
                         }}

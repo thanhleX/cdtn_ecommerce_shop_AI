@@ -92,6 +92,7 @@ public class CategoryService {
                 throw new AppException(ErrorCode.INVALID_CATEGORY_PARENT);
             }
             category.setParent(parent);
+            category.setImageUrl(null); // Chỉ category cha mới có ảnh
         }
 
         return categoryMapper.toCategoryResponse(categoryRepository.save(category));
@@ -124,6 +125,7 @@ public class CategoryService {
                 throw new AppException(ErrorCode.INVALID_CATEGORY_PARENT);
             }
             category.setParent(parent);
+            category.setImageUrl(null); // Chỉ category cha mới có ảnh
         } else {
             category.setParent(null);
         }

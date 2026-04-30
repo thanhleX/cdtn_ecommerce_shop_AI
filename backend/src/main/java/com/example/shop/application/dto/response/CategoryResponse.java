@@ -18,4 +18,5 @@ public class CategoryResponse {
     private LocalDateTime updatedAt;
     private List<CategoryResponse> children;
     private List<AttributeResponse> attributes;
+    private String imageUrl;
 }
