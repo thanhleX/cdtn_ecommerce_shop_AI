@@ -36,6 +36,12 @@ public class Product extends BaseAuditEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 
+    @Transient
+    private Double averageRating;
+
+    @Transient
+    private Integer reviewCount;
+
     @PrePersist
     protected void onCreate() {
 

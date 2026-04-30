@@ -9,6 +9,7 @@ import ProductGallery from './components/ProductGallery';
 
 import categoryApi from '../../api/categoryApi';
 import CategoryBreadcrumb from '../../components/common/CategoryBreadcrumb';
+import ReviewSection from './components/review/ReviewSection';
 
 const { Title, Text } = Typography;
 
@@ -299,6 +300,8 @@ const ProductDetailPage = () => {
           ]}
         />
       </div>
+
+      {product && <ReviewSection productId={product.id} />}
     </div>
   );
 };

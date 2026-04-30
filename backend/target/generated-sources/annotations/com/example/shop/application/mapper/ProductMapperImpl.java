@@ -20,8 +20,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-04-28T21:07:44+0700",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-04-30T14:13:09+0700",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
 public class ProductMapperImpl implements ProductMapper {
@@ -37,9 +37,9 @@ public class ProductMapperImpl implements ProductMapper {
 
         Product.ProductBuilder product = Product.builder();
 
+        product.name( request.getName() );
         product.description( request.getDescription() );
         product.isActive( request.getIsActive() );
-        product.name( request.getName() );
 
         return product.build();
     }
@@ -54,15 +54,15 @@ public class ProductMapperImpl implements ProductMapper {
 
         productResponse.categoryId( productCategoryId( product ) );
         productResponse.categoryName( productCategoryName( product ) );
-        productResponse.createdAt( product.getCreatedAt() );
-        productResponse.description( product.getDescription() );
         productResponse.id( product.getId() );
-        productResponse.images( productImageListToImageResponseList( product.getImages() ) );
-        productResponse.isActive( product.getIsActive() );
         productResponse.name( product.getName() );
         productResponse.slug( product.getSlug() );
-        productResponse.updatedAt( product.getUpdatedAt() );
+        productResponse.description( product.getDescription() );
+        productResponse.isActive( product.getIsActive() );
         productResponse.variants( productVariantListToVariantResponseList( product.getVariants() ) );
+        productResponse.images( productImageListToImageResponseList( product.getImages() ) );
+        productResponse.createdAt( product.getCreatedAt() );
+        productResponse.updatedAt( product.getUpdatedAt() );
 
         return productResponse.build();
     }
@@ -87,9 +87,9 @@ public class ProductMapperImpl implements ProductMapper {
             return;
         }
 
+        product.setName( request.getName() );
         product.setDescription( request.getDescription() );
         product.setIsActive( request.getIsActive() );
-        product.setName( request.getName() );
     }
 
     @Override
@@ -100,10 +100,10 @@ public class ProductMapperImpl implements ProductMapper {
 
         ProductVariant.ProductVariantBuilder productVariant = ProductVariant.builder();
 
-        productVariant.isActive( request.getIsActive() );
+        productVariant.sku( request.getSku() );
         productVariant.price( request.getPrice() );
         productVariant.quantity( request.getQuantity() );
-        productVariant.sku( request.getSku() );
+        productVariant.isActive( request.getIsActive() );
 
         return productVariant.build();
     }
@@ -116,12 +116,12 @@ public class ProductMapperImpl implements ProductMapper {
 
         VariantResponse.VariantResponseBuilder variantResponse = VariantResponse.builder();
 
-        variantResponse.attributeValues( attributeValueListToAttributeValueResponseList( variant.getAttributeValues() ) );
         variantResponse.id( variant.getId() );
-        variantResponse.isActive( variant.getIsActive() );
+        variantResponse.sku( variant.getSku() );
+        variantResponse.attributeValues( attributeValueListToAttributeValueResponseList( variant.getAttributeValues() ) );
         variantResponse.price( variant.getPrice() );
         variantResponse.quantity( variant.getQuantity() );
-        variantResponse.sku( variant.getSku() );
+        variantResponse.isActive( variant.getIsActive() );
 
         return variantResponse.build();
     }
@@ -133,10 +133,10 @@ public class ProductMapperImpl implements ProductMapper {
         }
 
         variant.setId( request.getId() );
-        variant.setIsActive( request.getIsActive() );
+        variant.setSku( request.getSku() );
         variant.setPrice( request.getPrice() );
         variant.setQuantity( request.getQuantity() );
-        variant.setSku( request.getSku() );
+        variant.setIsActive( request.getIsActive() );
     }
 
     @Override
@@ -200,19 +200,6 @@ public class ProductMapperImpl implements ProductMapper {
         return name;
     }
 
-    protected List<ImageResponse> productImageListToImageResponseList(List<ProductImage> list) {
-        if ( list == null ) {
-            return null;
-        }
-
-        List<ImageResponse> list1 = new ArrayList<ImageResponse>( list.size() );
-        for ( ProductImage productImage : list ) {
-            list1.add( toImageResponse( productImage ) );
-        }
-
-        return list1;
-    }
-
     protected List<VariantResponse> productVariantListToVariantResponseList(List<ProductVariant> list) {
         if ( list == null ) {
             return null;
@@ -221,6 +208,19 @@ public class ProductMapperImpl implements ProductMapper {
         List<VariantResponse> list1 = new ArrayList<VariantResponse>( list.size() );
         for ( ProductVariant productVariant : list ) {
             list1.add( toVariantResponse( productVariant ) );
+        }
+
+        return list1;
+    }
+
+    protected List<ImageResponse> productImageListToImageResponseList(List<ProductImage> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<ImageResponse> list1 = new ArrayList<ImageResponse>( list.size() );
+        for ( ProductImage productImage : list ) {
+            list1.add( toImageResponse( productImage ) );
         }
 
         return list1;

@@ -128,6 +128,7 @@ const AdminLayout = () => {
     { key: '/admin/products', icon: <AppstoreOutlined />, label: <Link to="/admin/products">Sản phẩm</Link> },
     { key: '/admin/attributes', icon: <TagsOutlined />, label: <Link to="/admin/attributes">Thuộc tính</Link> },
     { key: '/admin/categories', icon: <AppstoreOutlined />, label: <Link to="/admin/categories">Danh mục</Link> },
+    { key: '/admin/reviews', icon: <FileTextOutlined />, label: <Link to="/admin/reviews">Đánh giá</Link> },
 
     // 4. Marketing / bán hàng
     { key: '/admin/vouchers', icon: <DollarCircleOutlined />, label: <Link to="/admin/vouchers">Vouchers</Link> },

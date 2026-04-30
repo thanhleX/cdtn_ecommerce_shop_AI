@@ -33,6 +33,7 @@ import UserManagePage from './features/admin/pages/UserManagePage';
 import StaffManagePage from './features/admin/pages/StaffManagePage';
 import RoleManagePage from './features/admin/pages/RoleManagePage';
 import AttributeManagePage from './features/admin/pages/AttributeManagePage';
+import ReviewManagePage from './features/admin/pages/ReviewManagePage';
 
 import { useCart } from './hooks/useCart';
 import ScrollToTop from './components/common/ScrollToTop';
@@ -85,6 +86,7 @@ function AppContent() {
             <Route path="products" element={<ProductManagePage />} />
             <Route path="attributes" element={<AttributeManagePage />} />
             <Route path="categories" element={<CategoryManagePage />} />
+            <Route path="reviews" element={<ReviewManagePage />} />
             <Route path="orders" element={<OrderManagePage />} />
             <Route path="users" element={<UserManagePage />} />
             <Route path="staff" element={<StaffManagePage />} />

@@ -68,6 +68,15 @@ const adminApi = {
 
   deleteBlog: (id) => {
     return axiosClient.delete(`/admin/blogs/${id}`);
+  },
+
+  // Quản lý Reviews
+  getReviews: (params) => {
+    return axiosClient.get('/admin/reviews', { params });
+  },
+
+  updateReviewStatus: (id, status) => {
+    return axiosClient.put(`/admin/reviews/${id}/status`, null, { params: { status } });
   }
 };
 

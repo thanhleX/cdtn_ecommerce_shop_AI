@@ -46,7 +46,8 @@ public class SecurityConfig {
     private final String[] PUBLIC_GET = {
             "/api/products/**",
             "/api/categories/**",
-            "/api/blogs/**"
+            "/api/blogs/**",
+            "/api/reviews/**"
     };
 
     @Bean
