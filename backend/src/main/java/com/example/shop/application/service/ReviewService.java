@@ -57,14 +57,19 @@ public class ReviewService {
                 .build();
 
         review = reviewRepository.save(review);
+        updateProductStats(product.getId());
         return mapToResponse(review);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<ReviewResponse> getProductReviews(Long productId, Pageable pageable) {
-        Page<ReviewResponse> page = reviewRepository.findByProductIdAndStatus(productId, ReviewStatus.ACTIVE, pageable)
-                .map(this::mapToResponse);
-        return PageResponse.of(page);
+    public PageResponse<ReviewResponse> getProductReviews(Long productId, Integer rating, Pageable pageable) {
+        Page<ProductReview> page;
+        if (rating != null && rating > 0) {
+            page = reviewRepository.findByProductIdAndStatusAndRating(productId, ReviewStatus.ACTIVE, rating, pageable);
+        } else {
+            page = reviewRepository.findByProductIdAndStatus(productId, ReviewStatus.ACTIVE, pageable);
+        }
+        return PageResponse.of(page.map(this::mapToResponse));
     }
 
     @Transactional(readOnly = true)
@@ -88,6 +93,7 @@ public class ReviewService {
         review.setRating(request.getRating());
         review.setComment(request.getComment());
         review = reviewRepository.save(review);
+        updateProductStats(review.getProduct().getId());
         return mapToResponse(review);
     }
 
@@ -116,6 +122,17 @@ public class ReviewService {
                 .orElseThrow(() -> new RuntimeException("Review not found"));
         review.setStatus(status);
         reviewRepository.save(review);
+        updateProductStats(review.getProduct().getId());
+    }
+
+    private void updateProductStats(Long productId) {
+        Product product = productRepository.findById(productId).orElse(null);
+        if (product != null) {
+            com.example.shop.application.dto.response.ReviewStatsResponse stats = reviewRepository.getReviewStats(productId, ReviewStatus.ACTIVE);
+            product.setAverageRating(stats.getAverageRating());
+            product.setReviewCount(stats.getTotalReviews().intValue());
+            productRepository.save(product);
+        }
     }
 
     private ReviewResponse mapToResponse(ProductReview review) {

@@ -10,6 +10,7 @@ const { Title } = Typography;
 const ReviewSection = ({ productId }) => {
   const [eligible, setEligible] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [ratingFilter, setRatingFilter] = useState(null);
 
   useEffect(() => {
     const checkEligible = async () => {
@@ -35,7 +36,12 @@ const ReviewSection = ({ productId }) => {
     <Card bordered={false} style={{ marginTop: 32, borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
       <Title level={3} style={{ marginBottom: 24, textAlign: 'left' }}>Đánh giá sản phẩm</Title>
       
-      <ReviewStats productId={productId} refreshKey={refreshKey} />
+      <ReviewStats 
+        productId={productId} 
+        refreshKey={refreshKey} 
+        selectedRating={ratingFilter}
+        onSelectRating={(r) => setRatingFilter(prev => prev === r ? null : r)}
+      />
 
       {eligible && (
         <div style={{ marginBottom: 32 }}>
@@ -44,7 +50,12 @@ const ReviewSection = ({ productId }) => {
         </div>
       )}
 
-      <ReviewList productId={productId} refreshKey={refreshKey} onReviewUpdate={handleReviewSuccess} />
+      <ReviewList 
+        productId={productId} 
+        refreshKey={refreshKey} 
+        ratingFilter={ratingFilter}
+        onReviewUpdate={handleReviewSuccess} 
+      />
     </Card>
   );
 };

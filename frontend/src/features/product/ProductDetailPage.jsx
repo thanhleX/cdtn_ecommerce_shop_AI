@@ -202,7 +202,7 @@ const ProductDetailPage = () => {
 
               {/* --- Variant Selectors --- */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                {attributes.map(attr => (
+                {attributes.slice(0, 2).map(attr => (
                   <div key={attr.name}>
                     <Text strong style={{ display: 'flex', alignItems: 'start', marginBottom: 12, textTransform: 'uppercase', fontSize: 12, color: '#8c8c8c' }}>
                       {attr.name} {attr.isPricing && <Tooltip title="Lựa chọn này làm thay đổi giá"><span style={{ color: '#faad14', marginLeft: 4 }}>★</span></Tooltip>}
@@ -288,13 +288,37 @@ const ProductDetailPage = () => {
           size="large"
           items={[
             {
-              label: 'MÔ TẢ SẢN PHẨM',
+              label: 'CHI TIẾT SẢN PHẨM',
               key: '1',
               children: (
                 <div
-                  style={{ display: 'flex', alignItems: 'start', fontSize: 16, lineHeight: '1.8', color: '#4a4a4a', padding: '16px 0' }}
+                  style={{ fontSize: 16, lineHeight: '1.8', color: '#4a4a4a', marginTop: 16 }}
                   dangerouslySetInnerHTML={{ __html: product.description?.replace(/\n/g, '<br/>') || 'Chưa có mô tả' }}
                 />
+              )
+            },
+            {
+              label: 'THÔNG SỐ KỸ THUẬT',
+              key: '2',
+              children: (
+                <div style={{ marginTop: 16, maxWidth: 800 }}>
+                  <div style={{ border: '1px solid #f0f0f0', borderRadius: 8, overflow: 'hidden' }}>
+                    {attributes.map((attr, index) => (
+                      <div 
+                        key={attr.name} 
+                        style={{ 
+                          display: 'flex', 
+                          padding: '16px 24px', 
+                          backgroundColor: index % 2 === 0 ? '#fafafa' : '#fff',
+                          borderBottom: index < attributes.length - 1 ? '1px solid #f0f0f0' : 'none'
+                        }}
+                      >
+                        <Text type="secondary" style={{ width: '40%', fontSize: 14 }}>{attr.name}</Text>
+                        <Text strong style={{ width: '60%', fontSize: 14 }}>{attr.values.join(', ')}</Text>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )
             }
           ]}

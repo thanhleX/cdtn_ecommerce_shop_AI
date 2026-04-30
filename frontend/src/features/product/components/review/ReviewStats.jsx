@@ -4,7 +4,7 @@ import reviewApi from '../../../../api/reviewApi';
 
 const { Title, Text } = Typography;
 
-const ReviewStats = ({ productId, refreshKey }) => {
+const ReviewStats = ({ productId, refreshKey, selectedRating, onSelectRating }) => {
   const [stats, setStats] = useState({
     totalReviews: 0,
     averageRating: 0,
@@ -29,9 +29,7 @@ const ReviewStats = ({ productId, refreshKey }) => {
     }
   }, [productId, refreshKey]);
 
-  if (stats.totalReviews === 0) {
-    return null;
-  }
+  // Always render to show 5.0 default state
 
   const ratings = [
     { star: 5, count: stats.fiveStarCount },
@@ -54,13 +52,28 @@ const ReviewStats = ({ productId, refreshKey }) => {
         <Col xs={24} md={16}>
           {ratings.map(r => {
             const percent = stats.totalReviews > 0 ? (r.count / stats.totalReviews) * 100 : 0;
+            const isSelected = selectedRating === r.star;
             return (
-              <div key={r.star} style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ width: 60, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div 
+                key={r.star} 
+                onClick={() => onSelectRating(r.star)}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  marginBottom: 8, 
+                  cursor: 'pointer',
+                  padding: '4px 8px',
+                  borderRadius: 8,
+                  backgroundColor: isSelected ? '#f5f5f5' : 'transparent',
+                  border: isSelected ? '1px solid #d9d9d9' : '1px solid transparent',
+                  transition: 'all 0.3s'
+                }}
+              >
+                <span style={{ width: 60, display: 'flex', alignItems: 'center', gap: 4, fontWeight: isSelected ? 'bold' : 'normal' }}>
                   {r.star} <span style={{ color: '#faad14' }}>★</span>
                 </span>
-                <Progress percent={percent} showInfo={false} style={{ flex: 1, margin: '0 16px' }} strokeColor="#faad14" />
-                <span style={{ width: 40, textAlign: 'right', color: '#8c8c8c' }}>{r.count}</span>
+                <Progress percent={percent} showInfo={false} style={{ flex: 1, margin: '0 16px' }} strokeColor={isSelected ? '#1890ff' : '#faad14'} />
+                <span style={{ width: 40, textAlign: 'right', color: '#8c8c8c', fontWeight: isSelected ? 'bold' : 'normal' }}>{r.count}</span>
               </div>
             );
           })}

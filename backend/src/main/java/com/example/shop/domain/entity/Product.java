@@ -36,11 +36,11 @@ public class Product extends BaseAuditEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 
-    @Transient
-    private Double averageRating;
+    @Column(name = "average_rating", columnDefinition = "DOUBLE DEFAULT 5.0")
+    private Double averageRating = 5.0;
 
-    @Transient
-    private Integer reviewCount;
+    @Column(name = "review_count", columnDefinition = "INTEGER DEFAULT 0")
+    private Integer reviewCount = 0;
 
     @PrePersist
     protected void onCreate() {

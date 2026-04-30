@@ -45,10 +45,11 @@ public class ReviewController {
     @GetMapping("/products/{productId}")
     public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getProductReviews(
             @PathVariable Long productId,
+            @RequestParam(required = false) Integer rating,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        PageResponse<ReviewResponse> reviews = reviewService.getProductReviews(productId, pageable);
+        PageResponse<ReviewResponse> reviews = reviewService.getProductReviews(productId, rating, pageable);
         return ResponseEntity.ok(ApiResponse.success(reviews, "Lấy danh sách đánh giá thành công"));
     }
 

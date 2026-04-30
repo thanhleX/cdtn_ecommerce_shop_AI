@@ -156,6 +156,14 @@ const ProductCard = ({ product }) => {
         {product.name}
       </Link>
 
+      {/* RATING */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, fontSize: 13, color: '#888', textAlign: 'left' }}>
+        <span style={{ color: '#faad14', fontWeight: 'bold' }}>
+          ★ {(product.averageRating && product.averageRating > 0 ? product.averageRating : 5.0).toFixed(1)}
+        </span>
+        <span>({product.reviewCount || 0} đánh giá)</span>
+      </div>
+
       {/* VARIANTS LEFT-ALIGNED */}
       <div style={{ marginBottom: 10 }}>
         {attributes.slice(0, 2).map(attr => (

@@ -8,12 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductReviewRepository extends JpaRepository<ProductReview, Long> {
     Page<ProductReview> findByProductIdAndStatus(Long productId, ReviewStatus status, Pageable pageable);
+    Page<ProductReview> findByProductIdAndStatusAndRating(Long productId, ReviewStatus status, Integer rating, Pageable pageable);
+
     
     boolean existsByUserIdAndProductId(Long userId, Long productId);
     
     Page<ProductReview> findByStatus(ReviewStatus status, Pageable pageable);
 
-    @org.springframework.data.jpa.repository.Query("SELECT new com.example.shop.application.dto.response.ReviewStatsResponse(COUNT(r), COALESCE(AVG(r.rating), 0.0), " +
+    @org.springframework.data.jpa.repository.Query("SELECT new com.example.shop.application.dto.response.ReviewStatsResponse(COUNT(r), COALESCE(AVG(r.rating), 5.0), " +
            "COALESCE(SUM(CASE WHEN r.rating = 5 THEN 1L ELSE 0L END), 0L), " +
            "COALESCE(SUM(CASE WHEN r.rating = 4 THEN 1L ELSE 0L END), 0L), " +
            "COALESCE(SUM(CASE WHEN r.rating = 3 THEN 1L ELSE 0L END), 0L), " +

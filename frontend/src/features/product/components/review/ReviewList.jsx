@@ -6,7 +6,7 @@ import useAuthStore from '../../../../store/authStore';
 
 const { Text } = Typography;
 
-const ReviewList = ({ productId, refreshKey, onReviewUpdate }) => {
+const ReviewList = ({ productId, refreshKey, onReviewUpdate, ratingFilter }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5, total: 0 });
@@ -18,7 +18,11 @@ const ReviewList = ({ productId, refreshKey, onReviewUpdate }) => {
   const fetchReviews = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await reviewApi.getProductReviews(productId, { page: page - 1, size: pagination.pageSize });
+      const params = { page: page - 1, size: pagination.pageSize };
+      if (ratingFilter) {
+        params.rating = ratingFilter;
+      }
+      const res = await reviewApi.getProductReviews(productId, params);
       setReviews(res.data.content);
       setPagination({
         ...pagination,
@@ -36,7 +40,7 @@ const ReviewList = ({ productId, refreshKey, onReviewUpdate }) => {
     if (productId) {
       fetchReviews(1);
     }
-  }, [productId, refreshKey]);
+  }, [productId, refreshKey, ratingFilter]);
 
   const handleTableChange = (page) => {
     fetchReviews(page);
