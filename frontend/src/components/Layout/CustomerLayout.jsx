@@ -298,11 +298,13 @@ const CustomerLayout = () => {
             </Dropdown>
           )}
 
-          <Link to="/cart">
-            <Badge count={cartCount} showZero size="small">
-              <ShoppingCartOutlined style={{ fontSize: 22, color: '#595959' }} />
-            </Badge>
-          </Link>
+          {(!isAuthenticated || user?.roles?.some(r => r.name === 'ROLE_CUSTOMER' || r.name === 'CUSTOMER' || r === 'ROLE_CUSTOMER' || r === 'CUSTOMER')) && (
+            <Link to="/cart">
+              <Badge count={cartCount} showZero size="small">
+                <ShoppingCartOutlined style={{ fontSize: 22, color: '#595959' }} />
+              </Badge>
+            </Link>
+          )}
 
           {isAuthenticated ? (
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">

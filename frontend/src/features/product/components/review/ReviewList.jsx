@@ -102,13 +102,17 @@ const ReviewList = ({ productId, refreshKey, onReviewUpdate, ratingFilter }) => 
         const isOwner = user && user.id === item.userId;
         const canEdit = isOwner && (new Date() - new Date(item.createdAt)) < 24 * 60 * 60 * 1000;
 
-        let actions = [
-          <Tooltip title="Báo cáo vi phạm" key="report">
-            <Button type="text" size="small" danger icon={<WarningOutlined />} onClick={() => handleReport(item.id)}>
-              Báo cáo
-            </Button>
-          </Tooltip>
-        ];
+        let actions = [];
+
+        if (!isOwner) {
+          actions.push(
+            <Tooltip title="Báo cáo vi phạm" key="report">
+              <Button type="text" size="small" danger icon={<WarningOutlined />} onClick={() => handleReport(item.id)}>
+                Báo cáo
+              </Button>
+            </Tooltip>
+          );
+        }
 
         if (canEdit && editingId !== item.id) {
           actions.unshift(

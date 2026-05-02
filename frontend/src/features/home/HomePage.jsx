@@ -17,7 +17,7 @@ import {
 } from '@ant-design/icons';
 import { useProducts } from '../../hooks/useProducts';
 import ProductCard from '../product/components/ProductCard';
-import BlogGrid from '../blog/components/BlogGrid';
+import BlogCarousel from '../blog/components/BlogCarousel';
 import { Link, useNavigate } from 'react-router-dom';
 import categoryApi from '../../api/categoryApi';
 
@@ -192,7 +192,7 @@ const HomePage = () => {
             <Title level={2} style={{ margin: 0 }}>Tin Tức & Khuyến Mãi</Title>
             <div style={{ width: 60, height: 4, background: '#1890ff', margin: '12px auto', borderRadius: 2 }} />
           </div>
-          <BlogGrid />
+          <BlogCarousel />
         </div>
       </div>
     </div>

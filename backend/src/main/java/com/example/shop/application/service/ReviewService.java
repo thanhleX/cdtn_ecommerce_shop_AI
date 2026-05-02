@@ -14,6 +14,8 @@ import com.example.shop.domain.repository.ProductReviewRepository;
 import com.example.shop.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import com.example.shop.domain.exception.AppException;
+import com.example.shop.domain.exception.ErrorCode;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,9 +100,14 @@ public class ReviewService {
     }
 
     @Transactional
-    public void reportReview(Long reviewId) {
+    public void reportReview(Long reviewId, Long reporterUserId) {
         ProductReview review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
+        
+        if (review.getUser().getId().equals(reporterUserId)) {
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        
         review.setStatus(ReviewStatus.REPORTED);
         reviewRepository.save(review);
     }

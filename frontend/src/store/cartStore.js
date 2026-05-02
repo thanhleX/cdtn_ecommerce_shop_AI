@@ -47,9 +47,14 @@ const useCartStore = create((set, get) => ({
   },
 
   addToCart: async (productVariantId, quantity, productInfo = null) => {
-    const isAuthenticated = useAuthStore.getState().isAuthenticated;
+    const { isAuthenticated, permissions } = useAuthStore.getState();
 
     if (isAuthenticated) {
+      if (!permissions.includes('ROLE_CUSTOMER')) {
+        const error = new Error('Tài khoản quản trị không được phép mua hàng!');
+        error.response = { data: { message: error.message } };
+        throw error;
+      }
       try {
         const response = await cartApi.addToCart({ productVariantId, quantity });
         const cartData = response.data || response;
@@ -75,7 +80,10 @@ const useCartStore = create((set, get) => ({
           id: `guest_${productVariantId}`, // temporary ID
           productVariantId,
           quantity,
-          ...productInfo // contains price, name, image, etc. for display
+          productName: productInfo?.productName || 'Sản phẩm',
+          variantAttributes: productInfo?.variantAttributes || '',
+          price: productInfo?.price || 0,
+          imageUrl: productInfo?.imageUrl || null
         });
       }
 

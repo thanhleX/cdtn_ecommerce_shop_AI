@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-04-30T23:45:43+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
+    date = "2026-05-02T21:25:02+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class CategoryMapperImpl implements CategoryMapper {
@@ -30,9 +30,9 @@ public class CategoryMapperImpl implements CategoryMapper {
 
         Category.CategoryBuilder category = Category.builder();
 
-        category.name( request.getName() );
-        category.isActive( request.getIsActive() );
         category.imageUrl( request.getImageUrl() );
+        category.isActive( request.getIsActive() );
+        category.name( request.getName() );
 
         return category.build();
     }
@@ -47,12 +47,12 @@ public class CategoryMapperImpl implements CategoryMapper {
 
         categoryResponse.parentId( categoryParentId( category ) );
         categoryResponse.children( toCategoryResponseList( category.getChildren() ) );
+        categoryResponse.attributes( attributeListToAttributeResponseList( category.getAttributes() ) );
         categoryResponse.id( category.getId() );
+        categoryResponse.imageUrl( category.getImageUrl() );
+        categoryResponse.isActive( category.getIsActive() );
         categoryResponse.name( category.getName() );
         categoryResponse.slug( category.getSlug() );
-        categoryResponse.isActive( category.getIsActive() );
-        categoryResponse.attributes( attributeListToAttributeResponseList( category.getAttributes() ) );
-        categoryResponse.imageUrl( category.getImageUrl() );
 
         return categoryResponse.build();
     }
@@ -77,9 +77,9 @@ public class CategoryMapperImpl implements CategoryMapper {
             return;
         }
 
-        category.setName( request.getName() );
-        category.setIsActive( request.getIsActive() );
         category.setImageUrl( request.getImageUrl() );
+        category.setIsActive( request.getIsActive() );
+        category.setName( request.getName() );
     }
 
     private Long categoryParentId(Category category) {

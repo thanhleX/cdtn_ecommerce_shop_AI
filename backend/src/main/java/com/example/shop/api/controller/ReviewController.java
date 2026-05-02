@@ -84,7 +84,7 @@ public class ReviewController {
 
     @PostMapping("/{reviewId}/report")
     public ResponseEntity<ApiResponse<Void>> reportReview(@PathVariable Long reviewId) {
-        reviewService.reportReview(reviewId);
+        reviewService.reportReview(reviewId, getCurrentUserId());
         return ResponseEntity.ok(ApiResponse.success(null, "Báo cáo đánh giá thành công"));
     }
 }

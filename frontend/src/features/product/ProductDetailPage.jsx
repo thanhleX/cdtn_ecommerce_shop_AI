@@ -123,7 +123,13 @@ const ProductDetailPage = () => {
 
   const handleAddToCart = async () => {
     if (selectedVariant) {
-      await addToCart(selectedVariant.id, quantity);
+      const thumbnail = product.images?.find(img => img.isThumbnail)?.imageUrl || product.images?.[0]?.imageUrl || null;
+      await addToCart(selectedVariant.id, quantity, {
+        productName: product.name,
+        variantAttributes: selectedVariant.attributeValues?.map(av => av.value).join(', ') || '',
+        price: selectedVariant.price,
+        imageUrl: thumbnail
+      });
       setQuantity(1);
     }
   };

@@ -307,7 +307,12 @@ const ProductCard = ({ product }) => {
         icon={<ShoppingCartOutlined />}
         disabled={!currentVariant || currentVariant.quantity <= 0}
         onClick={() =>
-          currentVariant && addToCart(currentVariant.id, 1)
+          currentVariant && addToCart(currentVariant.id, 1, {
+            productName: product.name,
+            variantAttributes: currentVariant.attributeValues?.map(av => av.value).join(', ') || '',
+            price: currentVariant.price,
+            imageUrl: thumbnail
+          })
         }
       >
         Thêm vào giỏ

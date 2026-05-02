@@ -35,7 +35,9 @@ export const useAuth = () => {
 
     // Check for guest cart to merge
     const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
-    if (guestCart.length > 0) {
+    const isCustomer = user?.roles?.some(r => r.name === 'ROLE_CUSTOMER' || r.name === 'CUSTOMER' || r === 'ROLE_CUSTOMER' || r === 'CUSTOMER');
+
+    if (guestCart.length > 0 && isCustomer) {
       const { Modal } = await import('antd');
       const { mergeGuestCart } = useCartStore.getState();
       
@@ -59,6 +61,7 @@ export const useAuth = () => {
         }
       });
     } else {
+      if (!isCustomer) localStorage.removeItem('guestCart');
       navigate(redirectUrl, { replace: true });
     }
   };

@@ -66,4 +66,13 @@ public class CartController {
         CartResponse cartResponse = cartService.clearCart(userDetails.getId());
         return ResponseEntity.ok(ApiResponse.success(cartResponse, "Đã làm trống giỏ hàng"));
     }
+
+    @PostMapping("/merge")
+    @Operation(summary = "Merge guest cart with user cart")
+    public ResponseEntity<ApiResponse<CartResponse>> mergeCart(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody com.example.shop.application.dto.request.CartMergeRequest request) {
+        CartResponse cartResponse = cartService.mergeCart(userDetails.getId(), request.getItems(), request.isCombine());
+        return ResponseEntity.ok(ApiResponse.success(cartResponse, "Đã gộp giỏ hàng thành công"));
+    }
 }
