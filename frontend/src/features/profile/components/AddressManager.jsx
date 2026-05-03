@@ -18,7 +18,7 @@ const AddressManager = () => {
       const response = await addressApi.getAddresses();
       setAddresses(response.data || []);
     } catch (error) {
-      message.error('Không thể tải danh sách địa chỉ');
+      message.error(error?.message || 'Không thể tải danh sách địa chỉ');
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ const AddressManager = () => {
       handleCancel();
       fetchAddresses();
     } catch (error) {
-      message.error(error.response?.data?.message || 'Có lỗi xảy ra');
+      message.error(error?.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -80,7 +80,7 @@ const AddressManager = () => {
       message.success('Xóa địa chỉ thành công');
       fetchAddresses();
     } catch (error) {
-      message.error('Không thể xóa địa chỉ');
+      message.error(error?.message || 'Không thể xóa địa chỉ');
     }
   };
 

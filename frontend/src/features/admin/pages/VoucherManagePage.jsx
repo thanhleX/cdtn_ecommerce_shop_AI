@@ -55,7 +55,7 @@ const VoucherManagePage = () => {
         total: data.totalElements,
       });
     } catch (error) {
-      message.error('Không thể lấy danh sách voucher');
+      message.error(error?.message || 'Không thể lấy danh sách voucher');
     } finally {
       setLoading(false);
     }

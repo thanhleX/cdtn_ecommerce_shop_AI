@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiResponse<Void>> handleAppException(AppException e) {
         ErrorCode errorCode = e.getErrorCode();
-        ApiResponse<Void> response = ApiResponse.error(errorCode.getMessage(), null);
+        ApiResponse<Void> response = ApiResponse.error(errorCode.getCode(), errorCode.getMessage(), null);
         return new ResponseEntity<>(response, errorCode.getStatusCode());
     }
 
@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        ApiResponse<Void> response = ApiResponse.error("Dữ liệu không hợp lệ", errors);
+        ApiResponse<Void> response = ApiResponse.error(400, "Dữ liệu không hợp lệ", errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -40,13 +40,15 @@ public class GlobalExceptionHandler {
         org.springframework.security.authentication.InternalAuthenticationServiceException.class
     })
     public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(Exception e) {
-        ApiResponse<Void> response = ApiResponse.error("Tài khoản hoặc mật khẩu không hợp lệ", e.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(ErrorCode.INVALID_CREDENTIALS.getCode(), 
+                ErrorCode.INVALID_CREDENTIALS.getMessage(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception e) {
-        ApiResponse<Void> response = ApiResponse.error(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage(), e.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode(), 
+                ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -76,7 +76,7 @@ const BlogManagePage = () => {
       setCategories(Array.isArray(data) ? data : (data.data || []));
     } catch (error) {
       console.error('Fetch categories error:', error);
-      message.error('Không thể lấy danh mục bài viết');
+      message.error(error?.message || 'Không thể lấy danh mục bài viết');
     }
   }, []);
 
@@ -106,7 +106,7 @@ const BlogManagePage = () => {
       }
     } catch (error) {
       console.error('Fetch blogs error:', error);
-      message.error('Không thể lấy danh sách bài viết');
+      message.error(error?.message || 'Không thể lấy danh sách bài viết');
     } finally {
       setLoading(false);
     }
@@ -175,7 +175,7 @@ const BlogManagePage = () => {
       form.setFieldsValue({ thumbnail: url });
       message.success('Tải ảnh lên thành công');
     } catch (error) {
-      message.error('Lỗi khi tải ảnh lên');
+      message.error(error?.message || 'Lỗi khi tải ảnh lên');
     } finally {
       setUploadLoading(false);
     }

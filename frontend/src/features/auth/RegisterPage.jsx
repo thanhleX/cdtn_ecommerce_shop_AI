@@ -62,6 +62,7 @@ const RegisterPage = () => {
             onFinish={onFinish}
             size="large"
             layout="vertical"
+            validateTrigger="onSubmit"
             style={{ textAlign: 'left' }}
           >
             <Form.Item
@@ -92,7 +93,11 @@ const RegisterPage = () => {
               name="password"
               rules={[
                 { required: true, message: 'Vui lòng nhập mật khẩu!' },
-                { min: 6, message: 'Mật khẩu phải từ 6 ký tự!' }
+                { min: 8, message: 'Mật khẩu phải từ 8 ký tự!' },
+                { 
+                  pattern: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/,
+                  message: 'Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!'
+                }
               ]}
             >
               <Input.Password prefix={<LockOutlined />} placeholder="Mật khẩu" />

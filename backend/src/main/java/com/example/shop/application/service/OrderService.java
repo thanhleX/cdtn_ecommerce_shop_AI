@@ -193,7 +193,10 @@ public class OrderService {
         List<OrderItem> items = orderItemRepository.findByOrder(order);
         for (OrderItem item : items) {
             ProductVariant variant = item.getProductVariant();
-            productVariantRepository.save(variant);
+            if (variant != null) {
+                variant.setQuantity(variant.getQuantity() + item.getQuantity());
+                productVariantRepository.save(variant);
+            }
         }
 
         // Revert Voucher Usage

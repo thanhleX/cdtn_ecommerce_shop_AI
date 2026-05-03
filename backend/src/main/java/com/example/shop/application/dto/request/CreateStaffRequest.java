@@ -1,7 +1,6 @@
 package com.example.shop.application.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
 import java.util.Set;
@@ -13,6 +12,11 @@ public class CreateStaffRequest {
     private String username;
     
     @NotBlank(message = "Mật khẩu không được để trống")
+    @Size(min = 8, message = "Mật khẩu phải có ít nhất 8 ký tự")
+    @Pattern(
+        regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
+        message = "Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+    )
     private String password;
     
     @NotBlank(message = "Họ tên không được để trống")

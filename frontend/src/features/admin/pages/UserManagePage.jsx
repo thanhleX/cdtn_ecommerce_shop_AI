@@ -30,7 +30,7 @@ const UserManagePage = () => {
       setUsers(customerList);
       setPagination({ current: page, pageSize: pageSize, total: customerList.length });
     } catch (error) {
-      message.error('Không thể lấy danh sách khách hàng');
+      message.error(error?.message || 'Không thể lấy danh sách khách hàng');
     } finally {
       setLoading(false);
     }

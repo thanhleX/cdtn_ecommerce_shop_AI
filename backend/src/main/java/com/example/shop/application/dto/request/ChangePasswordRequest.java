@@ -1,7 +1,6 @@
 package com.example.shop.application.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +12,11 @@ public class ChangePasswordRequest {
     private String oldPassword;
 
     @NotBlank(message = "Mật khẩu mới không được để trống")
-    @Size(min = 6, message = "Mật khẩu mới phải có ít nhất 6 ký tự")
+    @Size(min = 8, message = "Mật khẩu mới phải có ít nhất 8 ký tự")
+    @Pattern(
+        regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
+        message = "Mật khẩu mới phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+    )
     private String newPassword;
 
     @NotBlank(message = "Xác nhận mật khẩu không được để trống")

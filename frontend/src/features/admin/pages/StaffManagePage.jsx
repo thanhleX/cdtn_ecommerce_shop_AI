@@ -37,7 +37,7 @@ const StaffManagePage = () => {
       setUsers(staffList);
       setPagination({ current: page, pageSize: pageSize, total: staffList.length });
     } catch (error) {
-      message.error('Không thể lấy danh sách nhân viên');
+      message.error(error?.message || 'Không thể lấy danh sách nhân viên');
     } finally {
       setLoading(false);
     }
@@ -80,11 +80,7 @@ const StaffManagePage = () => {
       setIsModalVisible(false);
       fetchUsers(1);
     } catch (error) {
-      if (error?.response?.data?.message) {
-        message.error(error.response.data.message);
-      } else {
-        message.error('Lỗi khi tạo nhân viên');
-      }
+      message.error(error?.message || 'Lỗi khi tạo nhân viên');
     }
   };
 
@@ -107,7 +103,7 @@ const StaffManagePage = () => {
       setIsEditModalVisible(false);
       fetchUsers(pagination.current);
     } catch (error) {
-      message.error('Không thể cập nhật vai trò');
+      message.error(error?.message || 'Không thể cập nhật vai trò');
     }
   };
 
@@ -116,7 +112,7 @@ const StaffManagePage = () => {
       await adminApi.resetUserPassword(userId);
       message.success('Đã đặt lại mật khẩu về mặc định: Staff@123');
     } catch (error) {
-      message.error('Lỗi khi đặt lại mật khẩu');
+      message.error(error?.message || 'Lỗi khi đặt lại mật khẩu');
     }
   };
 

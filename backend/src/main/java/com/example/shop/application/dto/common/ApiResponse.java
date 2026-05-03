@@ -8,35 +8,31 @@ import lombok.Getter;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
-    private boolean success;
+    private int code;
     private String message;
     private T data;
     private Object errors;
-    private String timestamp;
 
     public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
-                .success(true)
+                .code(0)
                 .message(message)
                 .data(data)
-                .timestamp(java.time.Instant.now().toString())
                 .build();
     }
 
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
-                .success(true)
+                .code(0)
                 .data(data)
-                .timestamp(java.time.Instant.now().toString())
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(String message, Object errors) {
+    public static <T> ApiResponse<T> error(int code, String message, Object errors) {
         return ApiResponse.<T>builder()
-                .success(false)
+                .code(code)
                 .message(message)
                 .errors(errors)
-                .timestamp(java.time.Instant.now().toString())
                 .build();
     }
 }

@@ -7,7 +7,6 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByParentIsNull();
     List<Category> findByParentIsNullAndIsActiveTrue();
-    List<Category> findByParent(Category parent);
     List<Category> findByParentAndIsActiveTrue(Category parent);
     boolean existsBySlug(String slug);
 }

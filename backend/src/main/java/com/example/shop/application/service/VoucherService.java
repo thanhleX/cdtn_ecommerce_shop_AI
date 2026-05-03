@@ -31,7 +31,7 @@ public class VoucherService {
     @Transactional
     public VoucherResponse createVoucher(VoucherRequest request) {
         if (voucherRepository.findByCode(request.getCode()).isPresent()) {
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION); // Should have DUPLICATE_CODE error
+            throw new AppException(ErrorCode.DUPLICATE_CODE);
         }
         Voucher voucher = voucherMapper.toEntity(request);
         return voucherMapper.toResponse(voucherRepository.save(voucher));

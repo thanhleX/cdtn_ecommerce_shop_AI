@@ -44,7 +44,7 @@ const CategoryManagePage = () => {
       setCategories(response.data || response);
     } catch (error) {
       console.error('Fetch Categories Error:', error);
-      message.error('Không thể lấy danh sách danh mục');
+      message.error(error?.message || 'Không thể lấy danh sách danh mục');
     } finally {
       setLoading(false);
     }
@@ -108,7 +108,7 @@ const CategoryManagePage = () => {
       form.setFieldsValue({ imageUrl: url });
       message.success('Tải ảnh lên thành công');
     } catch (error) {
-      message.error('Lỗi khi tải ảnh lên');
+      message.error(error?.message || 'Lỗi khi tải ảnh lên');
     } finally {
       setUploadLoading(false);
     }
@@ -124,7 +124,7 @@ const CategoryManagePage = () => {
       setSelectedAttrIds(record.attributes?.map(a => a.id) || []);
       setIsAttrModalVisible(true);
     } catch (error) {
-      message.error('Không thể tải thuộc tính');
+      message.error(error?.message || 'Không thể tải thuộc tính');
     }
   };
 
@@ -146,7 +146,7 @@ const CategoryManagePage = () => {
       setIsAttrModalVisible(false);
       fetchCategories();
     } catch (error) {
-      message.error('Lỗi khi cập nhật thuộc tính');
+      message.error(error?.message || 'Lỗi khi cập nhật thuộc tính');
     }
   };
 

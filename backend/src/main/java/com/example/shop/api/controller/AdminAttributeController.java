@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class AdminAttributeController {
 
     @PostMapping
     @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:create')")
-    public ResponseEntity<ApiResponse<AttributeResponse>> createAttribute(@RequestBody AttributeRequest request) {
+    public ResponseEntity<ApiResponse<AttributeResponse>> createAttribute(@Valid @RequestBody AttributeRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.success(attributeService.createAttribute(request), "Tạo thuộc tính thành công")
         );
@@ -38,7 +39,7 @@ public class AdminAttributeController {
 
     @PostMapping("/values")
     @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:create')")
-    public ResponseEntity<ApiResponse<AttributeValueResponse>> addAttributeValue(@RequestBody AttributeValueRequest request) {
+    public ResponseEntity<ApiResponse<AttributeValueResponse>> addAttributeValue(@Valid @RequestBody AttributeValueRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.success(attributeService.addAttributeValue(request), "Thêm giá trị thuộc tính thành công")
         );
@@ -70,7 +71,7 @@ public class AdminAttributeController {
     @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:update')")
     public ResponseEntity<ApiResponse<AttributeResponse>> updateAttribute(
             @PathVariable Long id,
-            @RequestBody AttributeRequest request) {
+            @Valid @RequestBody AttributeRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.success(attributeService.updateAttribute(id, request), "Cập nhật thuộc tính thành công")
         );

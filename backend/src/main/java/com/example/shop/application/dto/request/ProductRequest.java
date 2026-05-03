@@ -1,8 +1,7 @@
 package com.example.shop.application.dto.request;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.util.List;
 
@@ -22,8 +21,13 @@ public class ProductRequest {
     private List<VariantRequest> variants;
 
     // Fields for Simple Product (No variants)
+    @Size(max = 100, message = "SKU không được vượt quá 100 ký tự")
     private String sku;
+
+    @PositiveOrZero(message = "Giá sản phẩm không được âm")
     private java.math.BigDecimal price;
+
+    @PositiveOrZero(message = "Số lượng không được âm")
     private Integer quantity;
 
     @Valid

@@ -52,7 +52,7 @@ const ProductManagePage = () => {
       const response = await categoryApi.getCategories();
       setCategories(response.data || response);
     } catch (error) {
-      message.error('Không thể lấy danh sách danh mục');
+      message.error(error?.message || 'Không thể lấy danh sách danh mục');
     }
   }, []);
 
@@ -88,7 +88,7 @@ const ProductManagePage = () => {
         total: data.totalElements,
       });
     } catch (error) {
-      message.error('Không thể lấy danh sách sản phẩm');
+      message.error(error?.message || 'Không thể lấy danh sách sản phẩm');
     } finally {
       setLoading(false);
     }
@@ -151,7 +151,7 @@ const ProductManagePage = () => {
       });
       setIsModalVisible(true);
     } catch (error) {
-      message.error('Không thể lấy chi tiết sản phẩm');
+      message.error(error?.message || 'Không thể lấy chi tiết sản phẩm');
     } finally {
       setLoading(false);
     }
@@ -383,7 +383,7 @@ const ProductManagePage = () => {
                                 message.success('Upload ảnh thành công');
                                 onSuccess('ok');
                               } catch (err) {
-                                message.error('Lỗi khi tải ảnh lên');
+                                message.error(err?.message || 'Lỗi khi tải ảnh lên');
                                 onError(err);
                               }
                             }}

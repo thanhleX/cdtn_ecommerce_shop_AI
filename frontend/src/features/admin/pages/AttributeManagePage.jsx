@@ -22,7 +22,7 @@ const AttributeManagePage = () => {
       const res = await attributeApi.getAllAttributes();
       setAttributes(res.data || []);
     } catch (error) {
-      message.error('Không thể tải danh sách thuộc tính');
+      message.error(error?.message || 'Không thể tải danh sách thuộc tính');
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ const AttributeManagePage = () => {
       form.resetFields();
       fetchAttributes();
     } catch (error) {
-      message.error('Lỗi thao tác thuộc tính');
+      message.error(error?.message || 'Lỗi thao tác thuộc tính');
     }
   };
 
@@ -68,7 +68,7 @@ const AttributeManagePage = () => {
       message.success('Xóa thuộc tính thành công');
       fetchAttributes();
     } catch (error) {
-      message.error('Không thể xóa thuộc tính (có thể đang được sử dụng)');
+      message.error(error?.message || 'Không thể xóa thuộc tính (có thể đang được sử dụng)');
     }
   };
 
@@ -83,7 +83,7 @@ const AttributeManagePage = () => {
       valueForm.resetFields();
       fetchAttributes();
     } catch (error) {
-      message.error('Lỗi khi thêm giá trị');
+      message.error(error?.message || 'Lỗi khi thêm giá trị');
     }
   };
 
@@ -93,7 +93,7 @@ const AttributeManagePage = () => {
       message.success('Xóa giá trị thành công');
       fetchAttributes();
     } catch (error) {
-      message.error('Không thể xóa giá trị này');
+      message.error(error?.message || 'Không thể xóa giá trị này');
     }
   };
 

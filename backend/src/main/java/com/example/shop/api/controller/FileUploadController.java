@@ -20,13 +20,13 @@ public class FileUploadController {
     public ResponseEntity<ApiResponse<String>> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body(ApiResponse.error("File trống", 400));
+                return ResponseEntity.badRequest().body(ApiResponse.error(400, "File trống", null));
             }
             String imageUrl = cloudinaryService.uploadImage(file);
             return ResponseEntity.ok(ApiResponse.success(imageUrl, "Tải ảnh lên thành công"));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("Tải ảnh lên thất bại: " + e.getMessage(), 400));
+                    .body(ApiResponse.error(400, "Tải ảnh lên thất bại: " + e.getMessage(), null));
         }
     }
 }

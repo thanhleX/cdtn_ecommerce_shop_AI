@@ -38,7 +38,7 @@ public class RoleService {
     @CacheEvict(value = "rolePermissions", allEntries = true)
     public RoleResponse createRole(RoleRequest request) {
         if (roleRepository.findByName(request.getName()).isPresent()) {
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION); // Could be DUPLICATE_ROLE
+            throw new AppException(ErrorCode.ROLE_ALREADY_EXISTS);
         }
 
         Role role = new Role();
@@ -59,7 +59,7 @@ public class RoleService {
                 .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION)); // ROLE_NOT_FOUND
 
         if (role.getName().contains("SUPER_ADMIN")) {
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION); // Cannot modify super admin
+            throw new AppException(ErrorCode.CANNOT_MODIFY_SUPER_ADMIN);
         }
 
         String roleName = request.getName().toUpperCase();
@@ -80,13 +80,13 @@ public class RoleService {
 
         String name = role.getName();
         if (name.contains("SUPER_ADMIN") || name.contains("ADMIN") || name.contains("CUSTOMER")) {
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION); // Cannot delete system roles
+            throw new AppException(ErrorCode.CANNOT_DELETE_SYSTEM_ROLE);
         }
 
         // Check if role is assigned to users
         long usersCount = userRepository.countByRoles_Id(id);
         if (usersCount > 0) {
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION); // ROLE_IN_USE
+            throw new AppException(ErrorCode.ROLE_IN_USE);
         }
         
         // delete

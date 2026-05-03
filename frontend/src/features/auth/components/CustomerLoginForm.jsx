@@ -41,6 +41,7 @@ const CustomerLoginForm = () => {
         onFinish={onFinish}
         size="large"
         layout="vertical"
+        validateTrigger="onSubmit"
       >
         <Form.Item
           name="username"

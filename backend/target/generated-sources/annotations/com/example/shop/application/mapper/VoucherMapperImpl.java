@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-02T21:25:01+0700",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-05-03T14:35:28+0700",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
 public class VoucherMapperImpl implements VoucherMapper {
@@ -22,19 +22,19 @@ public class VoucherMapperImpl implements VoucherMapper {
 
         VoucherResponse voucherResponse = new VoucherResponse();
 
-        voucherResponse.setCode( voucher.getCode() );
-        voucherResponse.setCreatedAt( voucher.getCreatedAt() );
-        voucherResponse.setEndDate( voucher.getEndDate() );
         voucherResponse.setId( voucher.getId() );
+        voucherResponse.setCode( voucher.getCode() );
+        voucherResponse.setType( voucher.getType() );
+        voucherResponse.setValue( voucher.getValue() );
         voucherResponse.setMaxDiscount( voucher.getMaxDiscount() );
         voucherResponse.setMinOrderValue( voucher.getMinOrderValue() );
         voucherResponse.setStartDate( voucher.getStartDate() );
-        voucherResponse.setStatus( voucher.getStatus() );
-        voucherResponse.setType( voucher.getType() );
-        voucherResponse.setUpdatedAt( voucher.getUpdatedAt() );
+        voucherResponse.setEndDate( voucher.getEndDate() );
         voucherResponse.setUsageLimit( voucher.getUsageLimit() );
         voucherResponse.setUsagePerUser( voucher.getUsagePerUser() );
-        voucherResponse.setValue( voucher.getValue() );
+        voucherResponse.setStatus( voucher.getStatus() );
+        voucherResponse.setCreatedAt( voucher.getCreatedAt() );
+        voucherResponse.setUpdatedAt( voucher.getUpdatedAt() );
 
         return voucherResponse;
     }
@@ -48,15 +48,15 @@ public class VoucherMapperImpl implements VoucherMapper {
         Voucher voucher = new Voucher();
 
         voucher.setCode( request.getCode() );
-        voucher.setEndDate( request.getEndDate() );
+        voucher.setType( request.getType() );
+        voucher.setValue( request.getValue() );
         voucher.setMaxDiscount( request.getMaxDiscount() );
         voucher.setMinOrderValue( request.getMinOrderValue() );
         voucher.setStartDate( request.getStartDate() );
-        voucher.setStatus( request.getStatus() );
-        voucher.setType( request.getType() );
+        voucher.setEndDate( request.getEndDate() );
         voucher.setUsageLimit( request.getUsageLimit() );
         voucher.setUsagePerUser( request.getUsagePerUser() );
-        voucher.setValue( request.getValue() );
+        voucher.setStatus( request.getStatus() );
 
         return voucher;
     }

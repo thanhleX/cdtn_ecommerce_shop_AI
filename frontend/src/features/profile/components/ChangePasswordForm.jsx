@@ -16,7 +16,7 @@ const ChangePasswordForm = () => {
       message.success('Đổi mật khẩu thành công');
       form.resetFields();
     } catch (error) {
-      message.error(error.response?.data?.message || 'Có lỗi xảy ra khi đổi mật khẩu');
+      message.error(error?.message || 'Có lỗi xảy ra khi đổi mật khẩu');
     } finally {
       setLoading(false);
     }
@@ -28,7 +28,7 @@ const ChangePasswordForm = () => {
       style={{ width: '100%', maxWidth: 700, marginLeft: 240 }}
     >
       <Text type="secondary" style={{ display: 'block', marginBottom: 24 }}>
-        Để đảm bảo bảo mật, vui lòng chọn mật khẩu có ít nhất 6 ký tự và bao gồm cả chữ và số.
+        Để đảm bảo bảo mật, vui lòng chọn mật khẩu có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.
       </Text>
 
       <Form
@@ -50,7 +50,7 @@ const ChangePasswordForm = () => {
           name="newPassword"
           rules={[
             { required: true, message: 'Vui lòng nhập mật khẩu mới' },
-            { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' }
+            { min: 8, message: 'Mật khẩu phải có ít nhất 8 ký tự' }
           ]}
         >
           <Input.Password prefix={<LockOutlined />} placeholder="Nhập mật khẩu mới" />

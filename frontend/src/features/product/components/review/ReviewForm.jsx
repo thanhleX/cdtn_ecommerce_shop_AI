@@ -20,7 +20,7 @@ const ReviewForm = ({ productId, onSuccess }) => {
       form.resetFields();
       if (onSuccess) onSuccess();
     } catch (error) {
-      message.error(error.response?.data?.message || 'Không thể gửi đánh giá');
+      message.error(error?.message || 'Không thể gửi đánh giá');
     } finally {
       setLoading(false);
     }

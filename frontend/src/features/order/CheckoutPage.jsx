@@ -103,7 +103,7 @@ const CheckoutPage = () => {
       message.success('Áp dụng mã giảm giá thành công!');
     } catch (error) {
       console.error('Voucher validation failed', error);
-      message.error(error.response?.data?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn');
+      message.error(error?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn');
       setDiscountInfo(null);
     } finally {
       setValidatingVoucher(false);

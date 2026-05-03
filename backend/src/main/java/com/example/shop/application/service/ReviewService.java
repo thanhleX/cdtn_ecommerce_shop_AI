@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,13 +43,13 @@ public class ReviewService {
     @Transactional
     public ReviewResponse createReview(ReviewRequest request, Long userId) {
         if (!checkEligibility(userId, request.getProductId())) {
-            throw new RuntimeException("User is not eligible to review this product");
+            throw new AppException(ErrorCode.USER_NOT_ELIGIBLE_TO_REVIEW);
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         ProductReview review = ProductReview.builder()
                 .user(user)
@@ -82,14 +83,14 @@ public class ReviewService {
     @Transactional
     public ReviewResponse updateReview(Long reviewId, ReviewRequest request, Long userId) {
         ProductReview review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new RuntimeException("Review not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
         
         if (!review.getUser().getId().equals(userId)) {
-            throw new RuntimeException("You can only edit your own reviews");
+            throw new AppException(ErrorCode.NOT_YOUR_REVIEW);
         }
         
-        if (review.getCreatedAt().isBefore(java.time.LocalDateTime.now().minusHours(24))) {
-            throw new RuntimeException("Review can only be edited within 24 hours of creation");
+        if (review.getCreatedAt().plusDays(1).isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.REVIEW_EDIT_TIMEOUT);
         }
 
         review.setRating(request.getRating());
