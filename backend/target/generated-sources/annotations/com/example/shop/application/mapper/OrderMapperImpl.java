@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-03T15:31:43+0700",
+    date = "2026-05-03T22:16:23+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -50,7 +50,6 @@ public class OrderMapperImpl implements OrderMapper {
             orderResponse.note( order.getNote() );
             orderResponse.totalAmount( order.getTotalAmount() );
             orderResponse.discountAmount( order.getDiscountAmount() );
-            orderResponse.shippingFee( order.getShippingFee() );
             orderResponse.finalAmount( order.getFinalAmount() );
         }
         List<OrderItemResponse> list = items;

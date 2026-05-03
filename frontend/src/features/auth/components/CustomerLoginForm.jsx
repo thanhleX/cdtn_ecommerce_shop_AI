@@ -61,6 +61,9 @@ const CustomerLoginForm = () => {
           <Button type="primary" htmlType="submit" style={{ width: '100%' }} loading={loading}>
             Đăng nhập
           </Button>
+          <div style={{ textAlign: 'right', marginTop: 8 }}>
+            <Link to="/forgot-password" style={{ fontSize: 13 }}>Quên mật khẩu?</Link>
+          </div>
         </Form.Item>
 
         <Divider plain><Text type="secondary" style={{ fontSize: 12 }}>Hoặc đăng nhập với</Text></Divider>

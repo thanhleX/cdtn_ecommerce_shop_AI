@@ -114,7 +114,6 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
         
         // Handle Voucher
-        BigDecimal shippingFee = BigDecimal.valueOf(30000);
         BigDecimal discountAmount = BigDecimal.ZERO;
         if (request.getVoucherCode() != null && !request.getVoucherCode().isBlank()) {
             Voucher voucher = voucherService.validateVoucher(request.getVoucherCode(), userId, totalAmount.doubleValue());
@@ -131,10 +130,9 @@ public class OrderService {
             voucherUsageRepository.save(usage);
         }
 
-        BigDecimal finalAmount = totalAmount.add(shippingFee).subtract(discountAmount);
+        BigDecimal finalAmount = totalAmount.subtract(discountAmount);
         
         order.setDiscountAmount(discountAmount);
-        order.setShippingFee(shippingFee);
         order.setFinalAmount(finalAmount);
         orderRepository.save(order);
 

@@ -38,9 +38,6 @@ public class Order extends BaseEntity {
     @Column(name = "discount_amount", precision = 12, scale = 2)
     private java.math.BigDecimal discountAmount;
 
-    @Column(name = "shipping_fee", precision = 12, scale = 2)
-    private java.math.BigDecimal shippingFee;
-
     @Column(name = "final_amount", precision = 12, scale = 2)
     private java.math.BigDecimal finalAmount;
 

@@ -146,11 +146,6 @@ const CartPage = () => {
               <Text strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalAmount)}</Text>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-              <Text>Phí giao hàng:</Text>
-              <Text type="secondary">Tính tại bước tiếp theo</Text>
-            </div>
-            
             <Divider style={{ margin: '16px 0' }} />
             
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>

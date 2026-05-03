@@ -21,7 +21,6 @@ public class OrderResponse {
     private String note;
     private BigDecimal totalAmount;
     private BigDecimal discountAmount;
-    private BigDecimal shippingFee;
     private BigDecimal finalAmount;
     private List<OrderItemResponse> items;
 }

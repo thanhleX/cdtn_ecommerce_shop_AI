@@ -11,6 +11,8 @@ import GuestRoute from './components/guards/GuestRoute';
 import CustomerLoginPage from './features/auth/CustomerLoginPage';
 import AdminLoginPage from './features/auth/AdminLoginPage';
 import RegisterPage from './features/auth/RegisterPage';
+import ForgotPasswordPage from './features/auth/ForgotPasswordPage';
+import ResetPasswordPage from './features/auth/ResetPasswordPage';
 
 // Customer Pages
 import HomePage from './features/home/HomePage';
@@ -58,6 +60,8 @@ function AppContent() {
         <Route element={<GuestRoute />}>
           <Route path="/login" element={<CustomerLoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
         
         <Route element={<GuestRoute redirectTo="/admin" />}>
@@ -99,7 +103,7 @@ function AppContent() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {!isAdminRoute && <ChatWidget />}
+      {/* {!isAdminRoute && <ChatWidget />} */}
     </>
   );
 }

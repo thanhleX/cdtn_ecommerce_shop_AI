@@ -67,10 +67,10 @@ const HomePage = () => {
   };
 
   const features = [
-    { icon: <CarOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Miễn Phí Giao Hàng', desc: 'Cho đơn từ 500k' },
-    { icon: <SyncOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Đổi Trả 7 Ngày', desc: 'Thủ tục nhanh chóng' },
-    { icon: <SafetyCertificateOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Thanh Toán An Toàn', desc: 'Bảo mật 100%' },
-    { icon: <PhoneOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Hỗ Trợ 24/7', desc: 'Hotline: 1900 xxxx' },
+    { icon: <CarOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Giao Hàng Toàn Quốc', desc: 'Nhanh chóng và an toàn' },
+    { icon: <SyncOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Đổi Trả 7 Ngày', desc: 'Thủ tục đơn giản, nhanh gọn' },
+    { icon: <SafetyCertificateOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Thanh Toán Khi Nhận Hàng', desc: 'Kiểm hàng trước, thanh toán sau' },
+    { icon: <PhoneOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Hỗ Trợ 24/7', desc: 'Liên hệ: 0912 345 678' },
   ];
 
   return (
@@ -87,8 +87,8 @@ const HomePage = () => {
             justifyContent: 'center',
             color: 'white'
           }}>
-            <Title style={{ color: 'white', fontSize: 48, marginBottom: 16 }}>Bộ Sưu Tập Mới 2026</Title>
-            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, marginBottom: 24 }}>Khám phá những xu hướng thời thượng nhất</Text>
+            <Title style={{ color: 'white', fontSize: 48, marginBottom: 16 }}>Thiết Bị Công Nghệ</Title>
+            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, marginBottom: 24 }}>Giá hợp lý, bảo hành đầy đủ</Text>
             <Button size="large" type="default" shape="round" style={{ fontWeight: 'bold' }}>Mua Ngay</Button>
           </div>
         </div>
@@ -102,9 +102,9 @@ const HomePage = () => {
             justifyContent: 'center',
             color: 'white'
           }}>
-            <Title style={{ color: 'white', fontSize: 48, marginBottom: 16 }}>Sale Chớp Nhoáng</Title>
-            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, marginBottom: 24 }}>Giảm giá lên đến 50% cho thành viên</Text>
-            <Button size="large" type="default" shape="round" style={{ fontWeight: 'bold' }}>Xem Chi Tiết</Button>
+            <Title style={{ color: 'white', fontSize: 48, marginBottom: 16 }}>Ưu Đãi Voucher</Title>
+            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, marginBottom: 24 }}>Áp dụng mã để giảm trực tiếp khi thanh toán</Text>
+            <Button size="large" type="default" shape="round" style={{ fontWeight: 'bold' }}>Xem Mã Ngay</Button>
           </div>
         </div>
       </Carousel>

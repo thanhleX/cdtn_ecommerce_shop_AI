@@ -14,6 +14,7 @@ import com.example.shop.domain.entity.User;
 import com.example.shop.domain.exception.AppException;
 import com.example.shop.domain.exception.ErrorCode;
 import com.example.shop.domain.repository.CartRepository;
+import com.example.shop.domain.repository.OtpVerificationRepository;
 import com.example.shop.domain.repository.RefreshTokenRepository;
 import com.example.shop.domain.repository.RoleRepository;
 import com.example.shop.domain.repository.UserRepository;
@@ -48,6 +49,8 @@ public class AuthService {
     private final CartRepository cartRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final GoogleVerifier googleVerifier;
+    private final OtpVerificationRepository otpVerificationRepository;
+    private final EmailService emailService;
 
     @Value("${app.jwt.refresh-expiration}")
     private long refreshExpirationMs;
@@ -278,6 +281,56 @@ public class AuthService {
         userRepository.save(user);
 
         log.info("User '{}' changed password successfully", user.getUsername());
+    }
+
+    @Transactional
+    public void forgotPassword(com.example.shop.application.dto.request.ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Delete old OTPs for this email
+        otpVerificationRepository.deleteByEmail(user.getEmail());
+
+        // Generate 6-digit OTP
+        String otp = String.format("%06d", new java.util.Random().nextInt(1000000));
+        
+        com.example.shop.domain.entity.OtpVerification otpVerification = com.example.shop.domain.entity.OtpVerification.builder()
+                .email(user.getEmail())
+                .otpCode(otp)
+                .expiredAt(LocalDateTime.now().plusSeconds(60)) // 60 seconds expiry
+                .isUsed(false)
+                .build();
+        
+        otpVerificationRepository.save(otpVerification);
+
+        // Send email
+        emailService.sendOtpEmail(user.getEmail(), otp);
+        
+        log.info("OTP sent to email: {}", user.getEmail());
+    }
+
+    @Transactional
+    public void resetPassword(com.example.shop.application.dto.request.ResetPasswordRequest request) {
+        com.example.shop.domain.entity.OtpVerification otpVerification = otpVerificationRepository
+                .findByEmailAndOtpCodeAndIsUsedFalse(request.getEmail(), request.getOtp())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_OTP));
+
+        if (otpVerification.getExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.OTP_EXPIRED);
+        }
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // Mark OTP as used
+        otpVerification.setIsUsed(true);
+        otpVerificationRepository.save(otpVerification);
+
+        log.info("Password reset successfully for email: {}", request.getEmail());
     }
 
     private String createAndSaveRefreshToken(User user) {

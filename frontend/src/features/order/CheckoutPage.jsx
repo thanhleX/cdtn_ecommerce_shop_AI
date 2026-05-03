@@ -252,15 +252,6 @@ const CheckoutPage = () => {
               ))}
 
               <Divider />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Text>Tạm tính:</Text>
-                <Text strong>{new Intl.NumberFormat('vi-VN').format(totalPrice)}đ</Text>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Text>Phí vận chuyển:</Text>
-                <Text strong>30.000đ</Text>
-              </div>
-
               {/* Voucher Section */}
               <div style={{ margin: '20px 0' }}>
                 <Text strong style={{ display: 'block', marginBottom: 8 }}>Mã giảm giá</Text>
@@ -310,7 +301,7 @@ const CheckoutPage = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32, background: '#fff', padding: 16, borderRadius: 8, border: '1px solid #1890ff' }}>
                 <Text strong style={{ fontSize: 16 }}>Tổng thanh toán:</Text>
                 <Title level={3} type="danger" style={{ margin: 0 }}>
-                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice + 30000 - (discountInfo?.discount || 0))}
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice - (discountInfo?.discount || 0))}
                 </Title>
               </div>
 

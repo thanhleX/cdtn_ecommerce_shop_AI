@@ -36,6 +36,14 @@ const authApi = {
 
   refresh: (refreshToken) => {
     return axiosClient.post('/auth/refresh', { refreshToken });
+  },
+
+  forgotPassword: (data) => {
+    return axiosClient.post('/auth/forgot-password', data);
+  },
+
+  resetPassword: (data) => {
+    return axiosClient.post('/auth/reset-password', data);
   }
 };
 

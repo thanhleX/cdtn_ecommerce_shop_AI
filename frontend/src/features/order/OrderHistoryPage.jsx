@@ -242,10 +242,7 @@ const OrderHistoryPage = () => {
                 <Text>Giảm giá:</Text>
                 <Text type="danger">-₫{selectedOrder.discountAmount?.toLocaleString() || 0}</Text>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <Text>Phí giao hàng:</Text>
-                <Text>₫{selectedOrder.shippingFee?.toLocaleString() || 0}</Text>
-              </div>
+
               <Divider style={{ margin: '12px 0' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text strong style={{ fontSize: 16 }}>Tổng thanh toán:</Text>

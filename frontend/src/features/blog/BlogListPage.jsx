@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Card, Spin, Pagination } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import blogApi from '../../api/blogApi';
 
 const { Title, Paragraph, Text } = Typography;
 const { Meta } = Card;
 
 const BlogListPage = () => {
+  const [searchParams] = useSearchParams();
+  const categorySlug = searchParams.get('category');
+
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 6, total: 0 });
@@ -14,7 +17,13 @@ const BlogListPage = () => {
   const fetchBlogs = async (page = 1, size = 6) => {
     setLoading(true);
     try {
-      const res = await blogApi.getBlogs({ page: page - 1, size });
+      let res;
+      if (categorySlug) {
+        res = await blogApi.getByCategory(categorySlug, { page: page - 1, size });
+      } else {
+        res = await blogApi.getBlogs({ page: page - 1, size });
+      }
+      
       const data = res.data || res;
       setBlogs(data.content || []);
       setPagination({
@@ -31,15 +40,21 @@ const BlogListPage = () => {
 
   useEffect(() => {
     fetchBlogs(1, 6);
-  }, []);
+  }, [categorySlug]);
 
   const handlePageChange = (page) => {
     fetchBlogs(page, pagination.pageSize);
   };
 
+  const getTitle = () => {
+    if (categorySlug === 'tin-tuc') return 'Tin Tức Công Nghệ';
+    if (categorySlug === 'khuyen-mai') return 'Chương Trình Khuyến Mãi';
+    return 'Tin Tức & Khuyến Mãi';
+  };
+
   return (
     <div>
-      <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>Tin Tức & Khuyến Mãi</Title>
+      <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>{getTitle()}</Title>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>

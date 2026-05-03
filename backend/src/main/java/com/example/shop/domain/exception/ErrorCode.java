@@ -13,6 +13,8 @@ public enum ErrorCode {
     TOKEN_BLACKLISTED(1004, "Token đã bị thu hồi, vui lòng đăng nhập lại", HttpStatus.UNAUTHORIZED),
     ACCOUNT_DISABLED(1005, "Tài khoản đã bị vô hiệu hóa", HttpStatus.FORBIDDEN),
     ACCOUNT_LINKING_REQUIRED(1006, "Email đã tồn tại, cần liên kết tài khoản", HttpStatus.ACCEPTED),
+    INVALID_OTP(1007, "Mã OTP không chính xác", HttpStatus.BAD_REQUEST),
+    OTP_EXPIRED(1008, "Mã OTP đã hết hạn (60s)", HttpStatus.BAD_REQUEST),
 
     // ================= USER (1100–1199) =================
     USER_NOT_FOUND(1100, "Không tìm thấy người dùng", HttpStatus.NOT_FOUND),

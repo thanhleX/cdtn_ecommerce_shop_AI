@@ -286,7 +286,29 @@ const CustomerLayout = () => {
 
         {/* [BLOG] & [OTHER] */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginLeft: 20 }}>
-          <Link to="/blog" style={{ color: '#595959', fontWeight: 500 }}>Blog</Link>
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: 'all',
+                  label: <Link to="/blog">Tất cả bài viết</Link>,
+                },
+                {
+                  key: 'news',
+                  label: <Link to="/blog?category=tin-tuc">Tin tức công nghệ</Link>,
+                },
+                {
+                  key: 'promotions',
+                  label: <Link to="/blog?category=khuyen-mai">Chương trình khuyến mãi</Link>,
+                },
+              ]
+            }}
+            placement="bottomLeft"
+          >
+            <Button type='primary' size='large' style={{ color: '#f0f0f0', fontWeight: 500, border: 'none', }}>
+              Bài viết <span style={{ fontSize: 10, marginLeft: 4 }}>▼</span>
+            </Button>
+          </Dropdown>
 
           <div style={{ width: 1, height: 20, background: '#f0f0f0' }} />
 
