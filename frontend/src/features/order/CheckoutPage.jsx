@@ -7,6 +7,7 @@ import { useOrders } from '../../hooks/useOrders';
 import paymentMethodApi from '../../api/paymentMethodApi';
 import addressApi from '../../api/addressApi';
 import voucherApi from '../../api/voucherApi';
+import paymentServiceApi from '../../api/paymentServiceApi';
 import useAuthStore from '../../store/authStore';
 
 const { Title, Text } = Typography;
@@ -125,7 +126,38 @@ const CheckoutPage = () => {
         cartItemIds: selectedCartItemIds
       };
 
-      await placeOrder(orderData);
+      // Đặt hàng
+      const orderRes = await placeOrder(orderData);
+      const order = orderRes.data || orderRes;
+
+      // Nếu là VNPay (ID 2)
+      if (values.paymentMethodId === 2) {
+        try {
+          const finalPrice = totalPrice - (discountInfo?.discount || 0);
+          const paymentRes = await paymentServiceApi.createUrl({
+            amount: finalPrice,
+            orderInfo: `Thanh toan don hang #${order.id}`,
+            bankCode: "", // Để trống để khách chọn tại cổng VNPay
+            language: "vn"
+          });
+
+          if (paymentRes.data) {
+            window.location.href = paymentRes.data;
+          }
+        } catch (paymentErr) {
+          console.error('VNPay service error:', paymentErr);
+          // Hiển thị thông báo bảo trì thân thiện
+          message.error({
+            content: 'Dịch vụ thanh toán VNPay hiện đang bảo trì. Anh vui lòng chọn phương thức thanh toán khác hoặc thử lại sau nhé!',
+            duration: 5,
+            style: { marginTop: '10vh' }
+          });
+          // Không navigate đi đâu cả, để khách ở lại chọn phương thức khác
+        }
+      } else {
+        // Nếu không phải VNPay, quay về trang đơn hàng như cũ
+        navigate('/orders');
+      }
     } catch (error) {
       // Error is handled in hook (useOrders)
     }

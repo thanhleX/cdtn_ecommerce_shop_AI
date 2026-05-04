@@ -50,7 +50,7 @@ public class OrderService {
                 .orElseThrow(() -> new AppException(ErrorCode.CART_NOT_FOUND));
 
         List<CartItem> cartItems = cartItemRepository.findByCart(cart);
-        
+
         // Filter items if cartItemIds is provided
         if (request.getCartItemIds() != null && !request.getCartItemIds().isEmpty()) {
             cartItems = cartItems.stream()
@@ -112,11 +112,12 @@ public class OrderService {
         }
 
         order.setTotalAmount(totalAmount);
-        
+
         // Handle Voucher
         BigDecimal discountAmount = BigDecimal.ZERO;
         if (request.getVoucherCode() != null && !request.getVoucherCode().isBlank()) {
-            Voucher voucher = voucherService.validateVoucher(request.getVoucherCode(), userId, totalAmount.doubleValue());
+            Voucher voucher = voucherService.validateVoucher(request.getVoucherCode(), userId,
+                    totalAmount.doubleValue());
             Double discountDbl = voucherService.calculateDiscount(voucher, totalAmount.doubleValue());
             discountAmount = BigDecimal.valueOf(discountDbl);
 
@@ -131,7 +132,7 @@ public class OrderService {
         }
 
         BigDecimal finalAmount = totalAmount.subtract(discountAmount);
-        
+
         order.setDiscountAmount(discountAmount);
         order.setFinalAmount(finalAmount);
         orderRepository.save(order);
@@ -140,8 +141,7 @@ public class OrderService {
         notificationService.notifyManagement(
                 "Đơn hàng mới",
                 "Có đơn hàng mới #" + order.getId() + " từ " + user.getFullName(),
-                NotificationType.ORDER
-        );
+                NotificationType.ORDER);
 
         // Clear cart
         cartItemRepository.deleteAll(cartItems);
@@ -149,7 +149,6 @@ public class OrderService {
         List<OrderItem> savedItems = orderItemRepository.findByOrder(order);
         return orderMapper.toOrderResponse(order, savedItems.stream().map(orderMapper::toOrderItemResponse).toList());
     }
-
 
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrders(Long userId, Pageable pageable) {
@@ -182,10 +181,9 @@ public class OrderService {
 
         // Notify Management about cancellation
         notificationService.notifyManagement(
-                "Đơn hàng bị khách hủy", 
-                "Đơn hàng #" + orderId + " đã bị khách hàng " + order.getUser().getFullName() + " hủy.", 
-                NotificationType.ORDER
-        );
+                "Đơn hàng bị khách hủy",
+                "Đơn hàng #" + orderId + " đã bị khách hàng " + order.getUser().getFullName() + " hủy.",
+                NotificationType.ORDER);
 
         // Restore stock
         List<OrderItem> items = orderItemRepository.findByOrder(order);
@@ -242,8 +240,7 @@ public class OrderService {
         notificationService.notifyManagement(
                 "Cập nhật đơn hàng #" + orderId,
                 "Trạng thái đơn hàng đã được thay đổi thành: " + status.name(),
-                NotificationType.ORDER
-        );
+                NotificationType.ORDER);
 
         List<OrderItem> items = orderItemRepository.findByOrder(order);
         return orderMapper.toOrderResponse(order, items.stream().map(orderMapper::toOrderItemResponse).toList());

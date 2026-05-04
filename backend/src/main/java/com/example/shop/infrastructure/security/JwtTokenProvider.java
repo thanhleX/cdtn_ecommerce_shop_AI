@@ -27,9 +27,6 @@ public class JwtTokenProvider {
     @Value("${app.jwt.expiration}")
     private long jwtExpirationInMs;
 
-    /** Refresh Token: 7 ngày (604_800_000 ms) */
-    @Value("${app.jwt.refresh-expiration}")
-    private long jwtRefreshExpirationInMs;
 
     private SecretKey key;
 
@@ -69,20 +66,6 @@ public class JwtTokenProvider {
             });
         }
         return buildToken(user.getUsername(), user.getId(), roles, jwtExpirationInMs);
-    }
-
-    public String generateRefreshToken(String username) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtRefreshExpirationInMs);
-
-        return Jwts.builder()
-                .setSubject(username)
-                .claim("typ", "refresh")
-                .setId(UUID.randomUUID().toString())
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
     }
 
     public String getUsernameFromJWT(String token) {

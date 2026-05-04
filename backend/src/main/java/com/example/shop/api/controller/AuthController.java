@@ -42,11 +42,6 @@ public class AuthController {
                 .body(ApiResponse.success(response, "Đăng ký thành công"));
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<AuthResponse>> refresh(@Valid @RequestBody RefreshTokenRequest request) {
-        AuthResponse response = authService.refreshAccessToken(request);
-        return ResponseEntity.ok(ApiResponse.success(response, "Token đã được làm mới"));
-    }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(

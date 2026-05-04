@@ -63,7 +63,7 @@ function AppContent() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
-        
+
         <Route element={<GuestRoute redirectTo="/admin" />}>
           <Route path="/admin/login" element={<AdminLoginPage />} />
         </Route>

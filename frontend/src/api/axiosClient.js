@@ -35,50 +35,16 @@ axiosClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-// Response Interceptor: Standardize format and handle 401 (Refresh Token)
+// Response Interceptor
 axiosClient.interceptors.response.use(
-  (response) => {
-    if (response && response.data) {
-      return response.data;
+  (response) => response.data || response,
+  (error) => {
+    // Nếu lỗi 401 (Hết hạn hoặc chưa đăng nhập) -> Logout thẳng luôn
+    if (error.response?.status === 401) {
+      const { logout } = useAuthStore.getState();
+      logout();
+      window.dispatchEvent(new Event('auth:unauthorized'));
     }
-    return response;
-  },
-  async (error) => {
-    const originalRequest = error.config;
-    const { refreshToken, setToken, logout } = useAuthStore.getState();
-
-    // Nếu lỗi là 401 và chưa thử lại (để tránh lặp vô hạn)
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      if (refreshToken) {
-        try {
-          // Gọi API refresh chuẩn qua axios mới (để tránh interceptor Token cũ)
-          const resp = await axios.post(`${axiosClient.defaults.baseURL}/auth/refresh`, {
-            refreshToken: refreshToken
-          });
-
-          const { token: newToken } = resp.data.data; // Backend returns ApiResponse<AuthResponse>
-          
-          // Cập nhật store và retry request gốc
-          setToken(newToken);
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return axiosClient(originalRequest);
-        } catch (refreshError) {
-          // Refresh token cũng hết hạn hoặc lỗi → Logout
-          logout();
-          window.dispatchEvent(new Event('auth:unauthorized'));
-          return Promise.reject(refreshError);
-        }
-      } else {
-        // Không có refresh token → Logout
-        logout();
-        window.dispatchEvent(new Event('auth:unauthorized'));
-      }
-    }
-
-    // Return the response data wrapped by backend (AppException standardized format)
     return Promise.reject(error.response?.data || error);
   }
 );

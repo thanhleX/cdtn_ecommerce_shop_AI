@@ -37,7 +37,7 @@ const RegisterPage = () => {
           <Button 
             type="text" 
             icon={<ArrowLeftOutlined />} 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
           >
             Quay lại
           </Button>

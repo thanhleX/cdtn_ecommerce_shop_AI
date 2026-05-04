@@ -4,18 +4,15 @@ import com.example.shop.application.dto.request.ChangePasswordRequest;
 import com.example.shop.application.dto.request.GoogleLoginRequest;
 import com.example.shop.application.dto.request.LinkGoogleRequest;
 import com.example.shop.application.dto.request.LoginRequest;
-import com.example.shop.application.dto.request.RefreshTokenRequest;
 import com.example.shop.application.dto.request.RegisterRequest;
 import com.example.shop.application.dto.response.AuthResponse;
 import com.example.shop.domain.entity.Cart;
-import com.example.shop.domain.entity.RefreshToken;
 import com.example.shop.domain.entity.Role;
 import com.example.shop.domain.entity.User;
 import com.example.shop.domain.exception.AppException;
 import com.example.shop.domain.exception.ErrorCode;
 import com.example.shop.domain.repository.CartRepository;
 import com.example.shop.domain.repository.OtpVerificationRepository;
-import com.example.shop.domain.repository.RefreshTokenRepository;
 import com.example.shop.domain.repository.RoleRepository;
 import com.example.shop.domain.repository.UserRepository;
 import com.example.shop.infrastructure.security.JwtTokenProvider;
@@ -47,13 +44,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final CartRepository cartRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final GoogleVerifier googleVerifier;
     private final OtpVerificationRepository otpVerificationRepository;
     private final EmailService emailService;
 
-    @Value("${app.jwt.refresh-expiration}")
-    private long refreshExpirationMs;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -94,9 +88,8 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = tokenProvider.generateToken(authentication);
-        String refreshTokenStr = createAndSaveRefreshToken(savedUser);
 
-        return buildAuthResponse(accessToken, refreshTokenStr, savedUser);
+        return buildAuthResponse(accessToken, savedUser);
     }
 
     @Transactional
@@ -114,11 +107,7 @@ public class AuthService {
 
         String accessToken = tokenProvider.generateToken(authentication);
 
-        // Mỗi lần login: xóa refresh token cũ (nếu có) và tạo mới
-        refreshTokenRepository.deleteByUserId(user.getId());
-        String refreshTokenStr = createAndSaveRefreshToken(user);
-
-        return buildAuthResponse(accessToken, refreshTokenStr, user);
+        return buildAuthResponse(accessToken, user);
     }
 
     @Transactional
@@ -166,10 +155,8 @@ public class AuthService {
             }
 
             String accessToken = tokenProvider.generateTokenFromUser(user);
-            refreshTokenRepository.deleteByUserId(user.getId());
-            String refreshTokenStr = createAndSaveRefreshToken(user);
 
-            return buildAuthResponse(accessToken, refreshTokenStr, user);
+            return buildAuthResponse(accessToken, user);
 
         } catch (Exception e) {
             log.error("Google login error", e);
@@ -203,10 +190,8 @@ public class AuthService {
             userRepository.save(user);
 
             String accessToken = tokenProvider.generateTokenFromUser(user);
-            refreshTokenRepository.deleteByUserId(user.getId());
-            String refreshTokenStr = createAndSaveRefreshToken(user);
 
-            return buildAuthResponse(accessToken, refreshTokenStr, user);
+            return buildAuthResponse(accessToken, user);
 
         } catch (Exception e) {
             log.error("Link google error", e);
@@ -216,51 +201,11 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse refreshAccessToken(RefreshTokenRequest request) {
-        String requestToken = request.getRefreshToken();
-
-        // 1. Kiểm tra token có trong DB không
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(requestToken)
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
-
-        // 2. Kiểm tra token có hết hạn không
-        if (refreshToken.isExpired()) {
-            refreshTokenRepository.delete(refreshToken);
-            throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
-
-        // 3. Xoay vòng Refresh Token (Rotation): Xóa cái cũ, tạo cái mới
-        User user = refreshToken.getUser();
-        refreshTokenRepository.delete(refreshToken);
-        
-        String newAccessToken = tokenProvider.generateTokenFromUser(user);
-        String newRefreshTokenStr = createAndSaveRefreshToken(user);
-
-        return AuthResponse.builder()
-                .token(newAccessToken)
-                .refreshToken(newRefreshTokenStr) // Trả về Refresh Token mới
-                .type("Bearer")
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRoles().stream().map(Role::getName).collect(Collectors.joining(",")))
-                .build();
-    }
-
-    @Transactional
     public void logout(String bearerToken) {
         if (!StringUtils.hasText(bearerToken) || !bearerToken.startsWith("Bearer "))
             throw new AppException(ErrorCode.UNAUTHORIZED);
 
-        String accessToken = bearerToken.substring(7);
-
-        String username = tokenProvider.getUsernameFromJWT(accessToken);
-
-        // Xóa refresh token trong DB
-        userRepository.findByUsername(username)
-                .ifPresent(user -> refreshTokenRepository.deleteByUserId(user.getId()));
-
-        log.info("User '{}' logged out successfully", username);
+        log.info("User logout requested");
     }
 
     @Transactional
@@ -333,22 +278,8 @@ public class AuthService {
         log.info("Password reset successfully for email: {}", request.getEmail());
     }
 
-    private String createAndSaveRefreshToken(User user) {
-        String tokenValue = tokenProvider.generateRefreshToken(user.getUsername());
-        LocalDateTime expiredAt = LocalDateTime.now()
-                .plusSeconds(refreshExpirationMs / 1000);
 
-        RefreshToken refreshToken = RefreshToken.builder()
-                .token(tokenValue)
-                .user(user)
-                .expiredAt(expiredAt)
-                .build();
-
-        refreshTokenRepository.save(refreshToken);
-        return tokenValue;
-    }
-
-    private AuthResponse buildAuthResponse(String accessToken, String refreshToken, User user) {
+    private AuthResponse buildAuthResponse(String accessToken, User user) {
         // Extract all roles to comma-separated string for backwards compatibility payload
         String rolesStr = user.getRoles().stream()
                 .map(Role::getName)
@@ -356,7 +287,6 @@ public class AuthService {
                 
         return AuthResponse.builder()
                 .token(accessToken)
-                .refreshToken(refreshToken)
                 .type("Bearer")
                 .id(user.getId())
                 .username(user.getUsername())
