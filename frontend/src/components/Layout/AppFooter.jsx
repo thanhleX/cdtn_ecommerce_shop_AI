@@ -21,7 +21,7 @@ const AppFooter = () => {
             Hệ thống kinh doanh thiết bị công nghệ hàng đầu Việt Nam. <br /> Cam kết hàng chính hãng, giá cả cạnh tranh và dịch vụ tận tâm.
           </Paragraph>
           
-          <Space size="large" split={<Divider type="vertical" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />}>
+          <Space size="large" separator={<Divider orientation="vertical" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />}>
             <Space>
               <EnvironmentOutlined style={{ color: '#1890ff' }} />
               <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>Hoàn Kiếm, Hà Nội</Text>

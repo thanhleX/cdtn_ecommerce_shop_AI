@@ -77,7 +77,7 @@ public class OrderService {
         Order order = Order.builder()
                 .user(user)
                 .orderDate(LocalDateTime.now())
-                .status(OrderStatus.PENDING)
+                .status(request.getPaymentMethodId() == 2 ? OrderStatus.AWAIT_PAYMENT : OrderStatus.PENDING)
                 .paymentMethod(paymentMethod)
                 .address(address)
                 .note(request.getNote())
@@ -240,6 +240,27 @@ public class OrderService {
         notificationService.notifyManagement(
                 "Cập nhật đơn hàng #" + orderId,
                 "Trạng thái đơn hàng đã được thay đổi thành: " + status.name(),
+                NotificationType.ORDER);
+
+        List<OrderItem> items = orderItemRepository.findByOrder(order);
+        return orderMapper.toOrderResponse(order, items.stream().map(orderMapper::toOrderItemResponse).toList());
+    }
+    @Transactional
+    public OrderResponse confirmPayment(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (order.getStatus() != OrderStatus.AWAIT_PAYMENT) {
+            throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
+        }
+
+        order.setStatus(OrderStatus.PENDING);
+        orderRepository.save(order);
+
+        // Notify Management about payment
+        notificationService.notifyManagement(
+                "Thanh toán thành công",
+                "Đơn hàng #" + orderId + " đã được thanh toán qua VNPay và chuyển sang trạng thái chờ xác nhận.",
                 NotificationType.ORDER);
 
         List<OrderItem> items = orderItemRepository.findByOrder(order);

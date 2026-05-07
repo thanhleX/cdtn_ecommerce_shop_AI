@@ -8,4 +8,5 @@ public class PaymentRequest {
     private String orderInfo;
     private String bankCode;
     private String language;
+    private String returnUrl;
 }

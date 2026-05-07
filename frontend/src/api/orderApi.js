@@ -16,6 +16,10 @@ const orderApi = {
 
   cancelOrder(id) {
     return axiosClient.put(`/orders/${id}/cancel`);
+  },
+  
+  confirmPayment(id) {
+    return axiosClient.post(`/orders/${id}/confirm-payment`);
   }
 };
 

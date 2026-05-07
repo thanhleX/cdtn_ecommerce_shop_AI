@@ -16,12 +16,14 @@ import {
 import { EyeOutlined } from '@ant-design/icons';
 import { useOrders } from '../../hooks/useOrders';
 import orderApi from '../../api/orderApi';
+import paymentServiceApi from '../../api/paymentServiceApi';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
 const statusColorMap = {
   PENDING: 'orange',
+  AWAIT_PAYMENT: 'volcano',
   CONFIRMED: 'blue',
   SHIPPING: 'cyan',
   COMPLETED: 'green',
@@ -30,6 +32,7 @@ const statusColorMap = {
 
 const statusTextMap = {
   PENDING: 'Chờ xác nhận',
+  AWAIT_PAYMENT: 'Chờ thanh toán',
   CONFIRMED: 'Đã xác nhận',
   SHIPPING: 'Đang giao hàng',
   COMPLETED: 'Hoàn thành',
@@ -63,6 +66,28 @@ const OrderHistoryPage = () => {
       message.error('Không thể tải chi tiết đơn hàng');
     } finally {
       setDetailLoading(false);
+    }
+  };
+
+  // ✅ Thanh toán lại
+  const handlePayNow = async (order) => {
+    try {
+      const paymentRes = await paymentServiceApi.createUrl({
+        amount: order.finalAmount,
+        orderInfo: `Thanh toan don hang #${order.id}`,
+        bankCode: "",
+        language: "vn",
+        returnUrl: `${window.location.origin}/payment-return`
+      });
+
+      if (paymentRes.data) {
+        window.location.href = paymentRes.data;
+      } else {
+        message.error('Không thể tạo liên kết thanh toán. Vui lòng thử lại sau!');
+      }
+    } catch (err) {
+      console.error("Payment error:", err);
+      message.error('Dịch vụ thanh toán hiện đang bận. Vui lòng thử lại sau!');
     }
   };
 
@@ -122,7 +147,18 @@ const OrderHistoryPage = () => {
             Chi tiết
           </Button>
 
-          {record.status === 'PENDING' && (
+          {record.status === 'AWAIT_PAYMENT' && (
+            <Button 
+              type="primary" 
+              size="small" 
+              style={{ background: '#fa541c', borderColor: '#fa541c' }}
+              onClick={() => handlePayNow(record)}
+            >
+              Thanh toán ngay
+            </Button>
+          )}
+
+          {(record.status === 'PENDING' || record.status === 'AWAIT_PAYMENT') && (
             <Popconfirm
               title="Bạn có chắc muốn hủy đơn này?"
               onConfirm={() => handleCancel(record.id)}
@@ -154,9 +190,35 @@ const OrderHistoryPage = () => {
         title={`Chi tiết đơn hàng #${selectedOrder?.id}`}
         open={open}
         onCancel={() => setOpen(false)}
-        footer={null}
         width={700}
         confirmLoading={detailLoading}
+        footer={[
+          <Button key="close" onClick={() => setOpen(false)}>
+            Đóng
+          </Button>,
+          (selectedOrder?.status === 'PENDING' || selectedOrder?.status === 'AWAIT_PAYMENT') && (
+            <Popconfirm
+              key="cancel"
+              title="Bạn có chắc muốn hủy đơn này?"
+              onConfirm={() => {
+                handleCancel(selectedOrder.id);
+                setOpen(false);
+              }}
+            >
+              <Button danger>Hủy đơn hàng</Button>
+            </Popconfirm>
+          ),
+          selectedOrder?.status === 'AWAIT_PAYMENT' && (
+            <Button 
+              key="pay" 
+              type="primary" 
+              style={{ background: '#fa541c', borderColor: '#fa541c' }}
+              onClick={() => handlePayNow(selectedOrder)}
+            >
+              Thanh toán ngay
+            </Button>
+          ),
+        ]}
       >
         {selectedOrder && (
           <>

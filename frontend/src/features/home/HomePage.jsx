@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Spin, Button, Carousel, Card } from 'antd';
-import { 
-  SafetyCertificateOutlined, 
-  CarOutlined, 
-  SyncOutlined, 
+import {
+  SafetyCertificateOutlined,
+  CarOutlined,
+  SyncOutlined,
   PhoneOutlined,
   MobileOutlined,
   LaptopOutlined,
@@ -67,25 +67,26 @@ const HomePage = () => {
   };
 
   const features = [
-    { icon: <CarOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Giao Hàng Toàn Quốc', desc: 'Nhanh chóng và an toàn' },
-    { icon: <SyncOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Đổi Trả 7 Ngày', desc: 'Thủ tục đơn giản, nhanh gọn' },
-    { icon: <SafetyCertificateOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Thanh Toán Khi Nhận Hàng', desc: 'Kiểm hàng trước, thanh toán sau' },
-    { icon: <PhoneOutlined style={{ fontSize: 32, color: '#1890ff' }}/>, title: 'Hỗ Trợ 24/7', desc: 'Liên hệ: 0912 345 678' },
+    { icon: <CarOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Giao Hàng Toàn Quốc', desc: 'Nhanh chóng và an toàn' },
+    { icon: <SyncOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Đổi Trả 7 Ngày', desc: 'Thủ tục đơn giản, nhanh gọn' },
+    { icon: <SafetyCertificateOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Thanh Toán Khi Nhận Hàng', desc: 'Kiểm hàng trước, thanh toán sau' },
+    { icon: <PhoneOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Hỗ Trợ 24/7', desc: 'Liên hệ: 0912 345 678' },
   ];
 
   return (
-    <div style={{ marginTop: -50, marginBottom: 60 }}>
+    <div style={{ marginTop: 0, marginBottom: 60 }}>
       {/* 1. HERO BANNER */}
-      <Carousel autoplay effect="fade">
+      <Carousel autoplay effect="fade" style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
         <div>
-          <div style={{ 
-            height: 400, 
-            background: 'linear-gradient(135deg, #1890ff 0%, #0050b3 100%)', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
+          <div style={{
+            height: 400,
+            background: 'linear-gradient(135deg, #1890ff 0%, #0050b3 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             justifyContent: 'center',
-            color: 'white'
+            color: 'white',
+            borderRadius: 12
           }}>
             <Title style={{ color: 'white', fontSize: 48, marginBottom: 16 }}>Thiết Bị Công Nghệ</Title>
             <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, marginBottom: 24 }}>Giá hợp lý, bảo hành đầy đủ</Text>
@@ -93,14 +94,15 @@ const HomePage = () => {
           </div>
         </div>
         <div>
-          <div style={{ 
-            height: 400, 
-            background: 'linear-gradient(135deg, #722ed1 0%, #391085 100%)', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
+          <div style={{
+            height: 400,
+            background: 'linear-gradient(135deg, #722ed1 0%, #391085 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             justifyContent: 'center',
-            color: 'white'
+            color: 'white',
+            borderRadius: 12
           }}>
             <Title style={{ color: 'white', fontSize: 48, marginBottom: 16 }}>Ưu Đãi Voucher</Title>
             <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, marginBottom: 24 }}>Áp dụng mã để giảm trực tiếp khi thanh toán</Text>
@@ -138,11 +140,11 @@ const HomePage = () => {
           ) : (
             categories.map((cat, index) => (
               <Col xs={12} sm={6} key={cat.id || index}>
-                <Card 
-                  hoverable 
+                <Card
+                  hoverable
                   onClick={() => navigate(`/products?category=${cat.slug}`)}
                   style={{ textAlign: 'center', borderRadius: 16, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', overflow: 'hidden' }}
-                  bodyStyle={{ padding: '30px 10px' }}
+                  styles={{ body: { padding: '30px 10px' } }}
                 >
                   <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center', alignItems: 'center', height: 80 }}>
                     {cat.imageUrl ? (
@@ -177,7 +179,7 @@ const HomePage = () => {
             ))}
           </Row>
         )}
-        
+
         <div style={{ textAlign: 'center', marginTop: 40 }}>
           <Link to="/products">
             <Button size="large" shape="round">Xem Thêm Sản Phẩm</Button>

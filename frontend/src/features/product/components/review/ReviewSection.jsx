@@ -33,7 +33,7 @@ const ReviewSection = ({ productId }) => {
   };
 
   return (
-    <Card bordered={false} style={{ marginTop: 32, borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+    <Card variant={false} style={{ marginTop: 32, borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
       <Title level={3} style={{ marginBottom: 24, textAlign: 'left' }}>Đánh giá sản phẩm</Title>
       
       <ReviewStats 

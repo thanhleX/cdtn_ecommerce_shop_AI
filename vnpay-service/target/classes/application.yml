@@ -3,7 +3,7 @@ server:
 
 vnp:
   pay_url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  return_url: http://localhost:5173/checkout/result
+  return_url: http://localhost:5173/payment-return
   tmn_code: LK1L9TK0
   hash_secret: 2W8S35CGC4KBYYG26V2YC8OBII85TTLU
   api_url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction

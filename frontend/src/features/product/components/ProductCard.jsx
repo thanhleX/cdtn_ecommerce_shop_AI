@@ -105,11 +105,13 @@ const ProductCard = ({ product }) => {
         flexDirection: 'column',
         overflow: 'hidden'
       }}
-      bodyStyle={{
-        padding: 12,
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1
+      styles={{
+        body: {
+          padding: 12,
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1
+        }
       }}
       cover={
         <div

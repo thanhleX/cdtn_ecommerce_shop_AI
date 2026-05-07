@@ -107,7 +107,7 @@ function AppContent() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* {!isAdminRoute && <ChatWidget />} */}
+      {!isAdminRoute && <ChatWidget />}
     </>
   );
 }

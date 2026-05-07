@@ -235,7 +235,7 @@ const ProductDetailPage = () => {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                 <Text type="secondary">Mã SKU: <Text strong>{selectedVariant?.sku || 'N/A'}</Text></Text>
-                <Divider type="vertical" />
+                <Divider orientation="vertical" />
               </div>
 
               <div style={{ background: '#f0f5ff', padding: '24px', borderRadius: 12, border: '1px solid #d6e4ff' }}>

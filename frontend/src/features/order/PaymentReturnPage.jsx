@@ -32,9 +32,16 @@ const PaymentReturnPage = () => {
         amount: amount ? parseInt(amount) / 100 : 0
       });
 
-      // TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI (Nếu backend có endpoint)
-      // Ở đây ta có thể gọi một API ẩn để báo cho backend biết là đã thanh toán
-      // Ví dụ: orderApi.confirmPayment(orderId, { transactionNo, amount })
+      // TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI
+      if (orderId) {
+        orderApi.confirmPayment(orderId)
+          .then(() => {
+            console.log("Payment confirmed in backend");
+          })
+          .catch(err => {
+            console.error("Failed to confirm payment:", err);
+          });
+      }
     } else {
       // Thanh toán thất bại hoặc hủy
       setResult({
@@ -65,17 +72,17 @@ const PaymentReturnPage = () => {
             title={<Title level={2}>{result.title}</Title>}
             subTitle={result.subTitle}
             extra={[
-              <Button 
-                type="primary" 
-                key="home" 
+              <Button
+                type="primary"
+                key="home"
                 size="large"
                 icon={<ShoppingOutlined />}
                 onClick={() => navigate('/')}
               >
                 Tiếp tục mua sắm
               </Button>,
-              <Button 
-                key="orders" 
+              <Button
+                key="orders"
                 size="large"
                 icon={<HistoryOutlined />}
                 onClick={() => navigate('/profile')}
@@ -105,7 +112,7 @@ const PaymentReturnPage = () => {
                   )}
                 </Descriptions.Item>
               </Descriptions>
-              
+
               {result.status === 'error' && (
                 <div style={{ marginTop: 20, color: '#666' }}>
                   <Text type="secondary">

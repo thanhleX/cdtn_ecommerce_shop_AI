@@ -14,7 +14,7 @@ const ChatWidget = () => {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  
+
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -37,24 +37,24 @@ const ChatWidget = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8081/chat', { 
-        message: userMsg.text 
+      const response = await axios.post('http://localhost:8082/chat', {
+        message: userMsg.text
       });
-      
-      const botMsg = { 
-        id: Date.now() + 1, 
-        text: response.data.reply, 
+
+      const botMsg = {
+        id: Date.now() + 1,
+        text: response.data.reply,
         sender: 'bot',
         products: response.data.products || []
       };
-      
+
       setMessages(prev => [...prev, botMsg]);
     } catch (error) {
       console.error('Chat error:', error);
-      setMessages(prev => [...prev, { 
-        id: Date.now() + 1, 
-        text: "Xin lỗi, hiện tại dịch vụ tư vấn đang gặp sự cố. Bạn vui lòng thử lại sau nhé!", 
-        sender: 'bot' 
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        text: "Xin lỗi, hiện tại dịch vụ tư vấn đang gặp sự cố. Bạn vui lòng thử lại sau nhé!",
+        sender: 'bot'
       }]);
     } finally {
       setLoading(false);
@@ -66,11 +66,11 @@ const ChatWidget = () => {
       {/* Floating Button */}
       <div style={{ position: 'fixed', bottom: 30, right: 30, zIndex: 1000 }}>
         <Badge count={unreadCount}>
-          <Button 
-            type="primary" 
-            shape="circle" 
-            size="large" 
-            icon={isOpen ? <CloseOutlined /> : <MessageOutlined />} 
+          <Button
+            type="primary"
+            shape="circle"
+            size="large"
+            icon={isOpen ? <CloseOutlined /> : <MessageOutlined />}
             onClick={toggleChat}
             style={{ width: 60, height: 60, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
           />
@@ -79,19 +79,19 @@ const ChatWidget = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <Card 
+        <Card
           title={
             <Space>
               <RobotOutlined style={{ color: '#1890ff' }} />
               <span>AI Support Assistant</span>
             </Space>
           }
-          style={{ 
-            position: 'fixed', 
-            bottom: 100, 
-            right: 30, 
-            width: 350, 
-            height: 500, 
+          style={{
+            position: 'fixed',
+            bottom: 100,
+            right: 30,
+            width: 350,
+            height: 500,
             zIndex: 1000,
             display: 'flex',
             flexDirection: 'column',
@@ -101,7 +101,7 @@ const ChatWidget = () => {
           }}
           bodyStyle={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: 0 }}
         >
-          <div 
+          <div
             ref={scrollRef}
             style={{ flex: 1, overflowY: 'auto', padding: '16px' }}
           >
@@ -109,18 +109,18 @@ const ChatWidget = () => {
               itemLayout="horizontal"
               dataSource={messages}
               renderItem={msg => (
-                <div style={{ 
-                  display: 'flex', 
+                <div style={{
+                  display: 'flex',
                   flexDirection: msg.sender === 'user' ? 'row-reverse' : 'row',
                   marginBottom: 16,
                   alignItems: 'flex-start'
                 }}>
-                  <Avatar 
-                    icon={msg.sender === 'user' ? <UserOutlined /> : <RobotOutlined />} 
-                    style={{ backgroundColor: msg.sender === 'user' ? '#1890ff' : '#f5222d' }} 
+                  <Avatar
+                    icon={msg.sender === 'user' ? <UserOutlined /> : <RobotOutlined />}
+                    style={{ backgroundColor: msg.sender === 'user' ? '#1890ff' : '#f5222d' }}
                   />
-                  <div style={{ 
-                    maxWidth: '80%', 
+                  <div style={{
+                    maxWidth: '80%',
                     margin: msg.sender === 'user' ? '0 12px 0 0' : '0 0 0 12px',
                     padding: '8px 12px',
                     borderRadius: '8px',
@@ -128,13 +128,13 @@ const ChatWidget = () => {
                     textAlign: 'left'
                   }}>
                     <Text>{msg.text}</Text>
-                    
+
                     {msg.products && msg.products.length > 0 && (
                       <div style={{ marginTop: 12 }}>
                         {msg.products.map(p => (
-                          <Link 
-                            key={p.id} 
-                            to={`/products/slug/${p.slug}`} 
+                          <Link
+                            key={p.id}
+                            to={`/products/slug/${p.slug}`}
                             style={{ display: 'block', marginBottom: 8 }}
                             onClick={() => setIsOpen(false)}
                           >
@@ -155,17 +155,28 @@ const ChatWidget = () => {
             {loading && (
               <div style={{ display: 'flex', marginBottom: 16 }}>
                 <Avatar icon={<RobotOutlined />} style={{ backgroundColor: '#f5222d' }} />
-                <div style={{ marginLeft: 12, padding: '8px 12px', borderRadius: '8px', backgroundColor: '#f5f5f5' }}>
-                  <Text italic type="secondary">Đang nhập...</Text>
+                <div style={{
+                  marginLeft: 12,
+                  padding: '10px 16px',
+                  borderRadius: '12px',
+                  backgroundColor: '#f5f5f5',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                }}>
+                  <Space size="small">
+                    <Text italic type="secondary">AI đang phân tích yêu cầu</Text>
+                    <span className="typing-dots">
+                      <span>.</span><span>.</span><span>.</span>
+                    </span>
+                  </Space>
                 </div>
               </div>
             )}
           </div>
-          
+
           <div style={{ padding: '16px', borderTop: '1px solid #f0f0f0' }}>
             <Space.Compact style={{ width: '100%' }}>
-              <Input 
-                placeholder="Nhập câu hỏi của bạn..." 
+              <Input
+                placeholder="Nhập câu hỏi của bạn..."
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 onPressEnter={handleSend}

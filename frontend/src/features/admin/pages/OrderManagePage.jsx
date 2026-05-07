@@ -22,7 +22,8 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 const OrderStatusMap = {
-  PENDING: { color: 'orange', label: 'Chờ xử lý' },
+  PENDING: { color: 'orange', label: 'Chờ xác nhận' },
+  AWAIT_PAYMENT: { color: 'volcano', label: 'Chờ thanh toán' },
   CONFIRMED: { color: 'blue', label: 'Đã xác nhận' },
   SHIPPING: { color: 'cyan', label: 'Đang giao' },
   COMPLETED: { color: 'green', label: 'Hoàn thành' },
@@ -32,6 +33,7 @@ const OrderStatusMap = {
 // ✅ Flow hợp lệ
 const StatusFlow = {
   PENDING: ['CONFIRMED'],
+  AWAIT_PAYMENT: ['CONFIRMED', 'CANCELLED'],
   CONFIRMED: ['SHIPPING'],
   SHIPPING: ['COMPLETED'],
   COMPLETED: [],
@@ -116,16 +118,16 @@ const OrderManagePage = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status, record) => {
-        const nextStatuses = StatusFlow[status] || [];
-        const canUpdateOrder = hasPermission('order:update');
-
         if (!canUpdateOrder) {
+          const statusConfig = OrderStatusMap[status] || { color: 'default', label: status };
           return (
-            <Tag color={OrderStatusMap[status].color}>
-              {OrderStatusMap[status].label}
+            <Tag color={statusConfig.color}>
+              {statusConfig.label}
             </Tag>
           );
         }
+
+        const currentStatusConfig = OrderStatusMap[status] || { color: 'default', label: status };
 
         return (
           <Select
@@ -137,8 +139,8 @@ const OrderManagePage = () => {
           >
             {/* current status */}
             <Option key={status} value={status}>
-              <Tag color={OrderStatusMap[status].color}>
-                {OrderStatusMap[status].label}
+              <Tag color={currentStatusConfig.color}>
+                {currentStatusConfig.label}
               </Tag>
             </Option>
 

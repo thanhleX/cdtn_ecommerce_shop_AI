@@ -314,15 +314,17 @@ const CustomerLayout = () => {
 
           {isAuthenticated && (
             <Dropdown popupRender={() => notificationMenu} placement="bottomRight" trigger={['click']}>
-              <Badge count={unreadCount} size="small">
-                <BellOutlined style={{ fontSize: 22, color: '#595959', cursor: 'pointer' }} />
-              </Badge>
+              <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <Badge count={unreadCount} size="small" offset={[2, 2]}>
+                  <BellOutlined style={{ fontSize: 22, color: '#595959' }} />
+                </Badge>
+              </div>
             </Dropdown>
           )}
 
           {(!isAuthenticated || user?.roles?.some(r => r.name === 'ROLE_CUSTOMER' || r.name === 'CUSTOMER' || r === 'ROLE_CUSTOMER' || r === 'CUSTOMER')) && (
-            <Link to="/cart">
-              <Badge count={cartCount} showZero size="small">
+            <Link to="/cart" style={{ display: 'flex', alignItems: 'center' }}>
+              <Badge count={cartCount} showZero size="small" offset={[2, 2]}>
                 <ShoppingCartOutlined style={{ fontSize: 22, color: '#595959' }} />
               </Badge>
             </Link>

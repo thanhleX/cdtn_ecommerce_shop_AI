@@ -30,21 +30,31 @@ const CheckoutPage = () => {
   const [voucherCode, setVoucherCode] = useState('');
   const [discountInfo, setDiscountInfo] = useState(null);
   const [validatingVoucher, setValidatingVoucher] = useState(false);
+  const [vnpayAvailable, setVnpayAvailable] = useState(true);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     fetchCart();
 
     // Fetch payment methods
     const fetchPMs = async () => {
+      let data = [];
       try {
         const res = await paymentMethodApi.getPaymentMethods();
-        const data = res.data || res;
+        data = res.data || res;
         setPaymentMethods(data || []);
-        if (data?.length > 0) {
-          form.setFieldValue('paymentMethodId', data[0].id);
-        }
       } catch (err) {
         console.error('Failed to load payment methods');
+      }
+
+      // Check VNPay health
+      const isAlive = await paymentServiceApi.checkHealth();
+      setVnpayAvailable(isAlive);
+
+      if (data?.length > 0) {
+        // Tìm phương thức khả dụng đầu tiên (không phải VNPay đang sập)
+        const firstAvailable = data.find(pm => !(pm.id === 2 && !isAlive)) || data[0];
+        form.setFieldValue('paymentMethodId', firstAvailable.id);
       }
     };
 
@@ -77,7 +87,7 @@ const CheckoutPage = () => {
     ? items.filter(item => selectedCartItemIds.includes(item.id))
     : items;
 
-  if (checkoutItems.length === 0) {
+  if (checkoutItems.length === 0 && !isRedirecting && !placingOrder) {
     return (
       <div style={{ padding: 100, textAlign: 'center' }}>
         <Title level={3}>Không có sản phẩm nào được chọn để thanh toán.</Title>
@@ -117,7 +127,14 @@ const CheckoutPage = () => {
       return;
     }
 
+    // VẤN ĐỀ 1: Chặn đặt hàng nếu VNPay sập
+    if (values.paymentMethodId === 2 && !vnpayAvailable) {
+      message.error('Dịch vụ VNPay hiện đang bảo trì. Vui lòng chọn phương thức thanh toán khác.');
+      return;
+    }
+
     try {
+      setIsRedirecting(true); // VẤN ĐỀ 2: Bắt đầu trạng thái điều hướng
       const orderData = {
         paymentMethodId: values.paymentMethodId,
         addressId: values.addressId,
@@ -160,6 +177,7 @@ const CheckoutPage = () => {
         navigate('/order-success', { state: { order } });
       }
     } catch (error) {
+      setIsRedirecting(false);
       // Error handles in hook
     }
   };
@@ -229,27 +247,48 @@ const CheckoutPage = () => {
                 <Radio.Group style={{ width: '100%' }}>
                   <Space orientation="vertical" style={{ width: '100%' }}>
                     {paymentMethods.length > 0 ? paymentMethods.map(pm => (
-                      <Radio key={pm.id} value={pm.id} style={{
-                        width: '100%',
-                        padding: '16px',
-                        border: '1px solid #f0f0f0',
-                        borderRadius: '12px',
-                        marginBottom: '12px',
-                        transition: 'all 0.3s ease'
-                      }}>
+                      <Radio
+                        key={pm.id}
+                        value={pm.id}
+                        disabled={pm.id === 2 && !vnpayAvailable}
+                        style={{
+                          width: '100%',
+                          padding: '16px',
+                          border: pm.id === 2 && !vnpayAvailable ? '1px dashed #d9d9d9' : '1px solid #f0f0f0',
+                          borderRadius: '12px',
+                          marginBottom: '12px',
+                          transition: 'all 0.3s ease',
+                          opacity: pm.id === 2 && !vnpayAvailable ? 0.6 : 1,
+                          cursor: pm.id === 2 && !vnpayAvailable ? 'not-allowed' : 'pointer'
+                        }}
+                      >
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           {pm.image && (
                             <img
                               src={pm.image}
                               alt={pm.name}
-                              style={{ width: 40, height: 40, objectFit: 'contain', marginRight: 16, borderRadius: 4 }}
+                              style={{
+                                width: 40,
+                                height: 40,
+                                objectFit: 'contain',
+                                marginRight: 16,
+                                borderRadius: 4,
+                                filter: pm.id === 2 && !vnpayAvailable ? 'grayscale(100%)' : 'none'
+                              }}
                             />
                           )}
                           <div style={{ textAlign: 'left' }}>
-                            <Text strong style={{ fontSize: 16 }}>{pm.name}</Text>
+                            <Space>
+                              <Text strong style={{ fontSize: 16 }}>{pm.name}</Text>
+                              {pm.id === 2 && !vnpayAvailable && (
+                                <Tag color="default">Bảo trì</Tag>
+                              )}
+                            </Space>
                             <br />
                             <Text type="secondary" style={{ fontSize: '13px' }}>
-                              {pm.description || 'Thanh toán an toàn và bảo mật'}
+                              {pm.id === 2 && !vnpayAvailable
+                                ? 'Dịch vụ hiện đang bảo trì, vui lòng chọn phương thức khác'
+                                : (pm.description || 'Thanh toán an toàn và bảo mật')}
                             </Text>
                           </div>
                         </div>

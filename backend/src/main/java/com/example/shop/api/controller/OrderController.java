@@ -61,4 +61,12 @@ public class OrderController {
         OrderResponse response = orderService.cancelOrder(userDetails.getId(), id);
         return ResponseEntity.ok(ApiResponse.success(response, "Hủy đơn hàng thành công"));
     }
+
+    @PostMapping("/{id}/confirm-payment")
+    @Operation(summary = "Confirm payment for an order")
+    public ResponseEntity<ApiResponse<OrderResponse>> confirmPayment(
+            @PathVariable Long id) {
+        OrderResponse response = orderService.confirmPayment(id);
+        return ResponseEntity.ok(ApiResponse.success(response, "Xác nhận thanh toán thành công"));
+    }
 }
