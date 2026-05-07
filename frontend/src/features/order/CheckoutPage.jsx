@@ -130,36 +130,37 @@ const CheckoutPage = () => {
       const orderRes = await placeOrder(orderData);
       const order = orderRes.data || orderRes;
 
-      // Nếu là VNPay (ID 2)
+      // 2. Chuyển hướng theo phương thức thanh toán
       if (values.paymentMethodId === 2) {
+        // VNPay Flow
         try {
           const finalPrice = totalPrice - (discountInfo?.discount || 0);
           const paymentRes = await paymentServiceApi.createUrl({
             amount: finalPrice,
             orderInfo: `Thanh toan don hang #${order.id}`,
-            bankCode: "", // Để trống để khách chọn tại cổng VNPay
-            language: "vn"
+            bankCode: "",
+            language: "vn",
+            // Đảm bảo URL này khớp với URL đăng ký trong VNPay Merchant Admin hoặc được backend service hỗ trợ
+            returnUrl: `${window.location.origin}/payment-return`
           });
 
           if (paymentRes.data) {
             window.location.href = paymentRes.data;
+          } else {
+            // Nếu không lấy được URL, coi như lỗi hệ thống thanh toán nhưng đơn hàng vẫn đã tạo
+            navigate('/order-success', { state: { order } });
           }
         } catch (paymentErr) {
           console.error('VNPay service error:', paymentErr);
-          // Hiển thị thông báo bảo trì thân thiện
-          message.error({
-            content: 'Dịch vụ thanh toán VNPay hiện đang bảo trì. Anh vui lòng chọn phương thức thanh toán khác hoặc thử lại sau nhé!',
-            duration: 5,
-            style: { marginTop: '10vh' }
-          });
-          // Không navigate đi đâu cả, để khách ở lại chọn phương thức khác
+          message.error('Dịch vụ VNPay hiện đang bảo trì. Anh có thể xem lại đơn hàng trong trang cá nhân nhé!');
+          navigate('/order-success', { state: { order } });
         }
       } else {
-        // Nếu không phải VNPay, quay về trang đơn hàng như cũ
-        navigate('/orders');
+        // COD / Other methods
+        navigate('/order-success', { state: { order } });
       }
     } catch (error) {
-      // Error is handled in hook (useOrders)
+      // Error handles in hook
     }
   };
 

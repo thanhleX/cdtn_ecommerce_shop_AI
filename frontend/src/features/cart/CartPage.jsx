@@ -8,9 +8,9 @@ import useAuthStore from '../../store/authStore';
 const { Title, Text } = Typography;
 
 const CartPage = () => {
-  const { 
-    items, loading, initCart, updateQuantity, removeItem, 
-    selectedItems, setSelectedItems 
+  const {
+    items, loading, initCart, updateQuantity, removeItem,
+    selectedItems, setSelectedItems
   } = useCart();
   const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
@@ -66,11 +66,11 @@ const CartPage = () => {
       key: 'quantity',
       width: 150,
       render: (val, record) => (
-        <InputNumber 
-          min={1} 
-          max={99} 
-          value={val} 
-          onChange={(newVal) => updateQuantity(record.id, newVal)} 
+        <InputNumber
+          min={1}
+          max={99}
+          value={val}
+          onChange={(newVal) => updateQuantity(record.id, newVal)}
         />
       )
     },
@@ -113,14 +113,14 @@ const CartPage = () => {
   return (
     <div>
       <Title level={2} style={{ marginBottom: 24 }}>Giỏ hàng ({items.length} sản phẩm)</Title>
-      
+
       <Row gutter={[32, 32]}>
         <Col xs={24} lg={16}>
           <div style={{ background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #f0f0f0' }}>
-            <Table 
-              columns={columns} 
-              dataSource={items} 
-              rowKey="id" 
+            <Table
+              columns={columns}
+              dataSource={items}
+              rowKey="id"
               pagination={false}
               loading={loading}
               rowSelection={{
@@ -135,7 +135,7 @@ const CartPage = () => {
           <div style={{ background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #f0f0f0', position: 'sticky', top: 24 }}>
             <Title level={4}>Tóm tắt đơn hàng</Title>
             <Divider style={{ margin: '16px 0' }} />
-            
+
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
               <Text>Số sản phẩm đã chọn:</Text>
               <Text strong>{selectedItems.length}</Text>
@@ -145,9 +145,9 @@ const CartPage = () => {
               <Text>Tạm tính:</Text>
               <Text strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalAmount)}</Text>
             </div>
-            
+
             <Divider style={{ margin: '16px 0' }} />
-            
+
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
               <Text strong style={{ fontSize: 16 }}>Tổng cộng:</Text>
               <Title level={3} type="danger" style={{ margin: 0 }}>
@@ -155,10 +155,10 @@ const CartPage = () => {
               </Title>
             </div>
 
-            <Button 
-              type="primary" 
-              size="large" 
-              block 
+            <Button
+              type="primary"
+              size="large"
+              block
               disabled={selectedItems.length === 0}
               onClick={handleCheckout}
               style={{ height: 50, fontSize: 16, fontWeight: 'bold' }}

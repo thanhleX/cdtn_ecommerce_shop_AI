@@ -135,10 +135,56 @@ const ProductDetailPage = () => {
   };
 
   const handleOptionChange = (attrName, value) => {
-    setSelectedOptions(prev => ({
-      ...prev,
-      [attrName]: value
-    }));
+    const newOptions = { ...selectedOptions, [attrName]: value };
+    
+    // Tìm variant khớp tốt nhất với lựa chọn mới
+    // Ưu tiên các thuộc tính đã chọn từ trên xuống dưới
+    const bestMatch = product.variants.find(v => {
+      return v.attributeValues?.some(av => av.attributeName === attrName && av.value === value);
+    }) || product.variants[0];
+
+    // Cập nhật lại toàn bộ selectedOptions từ variant tìm được để đảm bảo tính hợp lệ
+    const updatedOptions = {};
+    bestMatch.attributeValues?.forEach(av => {
+      updatedOptions[av.attributeName] = av.value;
+    });
+    
+    // Giữ lại các lựa chọn cũ nếu chúng vẫn hợp lệ với lựa chọn mới
+    attributes.forEach(attr => {
+      const currentVal = attr.name === attrName ? value : selectedOptions[attr.name];
+      const isValidWithNew = product.variants.some(v => 
+        v.attributeValues?.some(av => av.attributeName === attrName && av.value === value) &&
+        v.attributeValues?.some(av => av.attributeName === attr.name && av.value === currentVal)
+      );
+      if (isValidWithNew) {
+        updatedOptions[attr.name] = currentVal;
+      }
+    });
+
+    setSelectedOptions(updatedOptions);
+  };
+
+  const isOptionDisabled = (attrName, value) => {
+    if (!product || !product.variants) return false;
+
+    const currentIndex = attributes.findIndex(a => a.name === attrName);
+    // Nếu là thuộc tính đầu tiên, chỉ check xem nó có tồn tại trong bất kỳ variant nào không
+    if (currentIndex === 0) {
+      return !product.variants.some(v => 
+        v.attributeValues?.some(av => av.attributeName === attrName && av.value === value)
+      );
+    }
+
+    // Nếu không phải đầu tiên, check xem nó có đi kèm được với các thuộc tính TRƯỚC NÓ không
+    const prevAttrs = attributes.slice(0, currentIndex);
+    return !product.variants.some(variant => {
+      const matchPrev = prevAttrs.every(attr => {
+        const selectedVal = selectedOptions[attr.name];
+        return variant.attributeValues?.some(av => av.attributeName === attr.name && av.value === selectedVal);
+      });
+      const matchCurrent = variant.attributeValues?.some(av => av.attributeName === attrName && av.value === value);
+      return matchPrev && matchCurrent;
+    });
   };
 
   const productSchema = {
@@ -190,7 +236,6 @@ const ProductDetailPage = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                 <Text type="secondary">Mã SKU: <Text strong>{selectedVariant?.sku || 'N/A'}</Text></Text>
                 <Divider type="vertical" />
-                <Text type="secondary">Đã bán: <Text strong>{product.soldCount || 0}</Text></Text>
               </div>
 
               <div style={{ background: '#f0f5ff', padding: '24px', borderRadius: 12, border: '1px solid #d6e4ff' }}>
@@ -231,10 +276,13 @@ const ProductDetailPage = () => {
                         <Radio.Button
                           key={val}
                           value={val}
+                          disabled={isOptionDisabled(attr.name, val)}
                           style={{
                             borderRadius: 8,
                             minWidth: 80,
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            opacity: isOptionDisabled(attr.name, val) ? 0.5 : 1,
+                            cursor: isOptionDisabled(attr.name, val) ? 'not-allowed' : 'pointer'
                           }}
                         >
                           {val}
@@ -309,18 +357,20 @@ const ProductDetailPage = () => {
               children: (
                 <div style={{ marginTop: 16, maxWidth: 800 }}>
                   <div style={{ border: '1px solid #f0f0f0', borderRadius: 8, overflow: 'hidden' }}>
-                    {attributes.map((attr, index) => (
+                    {selectedVariant?.attributeValues?.map((av, index) => (
                       <div
-                        key={attr.name}
+                        key={av.attributeName}
                         style={{
                           display: 'flex',
                           padding: '16px 24px',
                           backgroundColor: index % 2 === 0 ? '#fafafa' : '#fff',
-                          borderBottom: index < attributes.length - 1 ? '1px solid #f0f0f0' : 'none'
+                          borderBottom: index < (selectedVariant.attributeValues.length - 1) ? '1px solid #f0f0f0' : 'none'
                         }}
                       >
-                        <Text type="secondary" style={{ width: '40%', fontSize: 14 }}>{attr.name}</Text>
-                        <Text strong style={{ width: '60%', fontSize: 14 }}>{attr.values.join(', ')}</Text>
+                        <Text type="secondary" style={{ width: '40%', fontSize: 14 }}>{av.attributeName}</Text>
+                        <Text strong style={{ width: '60%', fontSize: 14 }}>
+                          {av.value?.includes(':') ? av.value.split(':')[1].trim() : av.value}
+                        </Text>
                       </div>
                     ))}
                   </div>

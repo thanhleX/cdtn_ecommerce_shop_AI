@@ -46,8 +46,6 @@ export const useOrders = () => {
       await fetchCart();
       
       const newOrder = response.data || response;
-      // Redirect to order history
-      navigate('/profile');
       return newOrder;
     } catch (error) {
       console.error('Error placing order:', error);

@@ -20,6 +20,8 @@ import ProductListPage from './features/product/ProductListPage';
 import ProductDetailPage from './features/product/ProductDetailPage';
 import CartPage from './features/cart/CartPage';
 import CheckoutPage from './features/order/CheckoutPage';
+import OrderSuccessPage from './features/order/OrderSuccessPage';
+import PaymentReturnPage from './features/order/PaymentReturnPage';
 import ProfilePage from './features/profile/ProfilePage';
 import BlogListPage from './features/blog/BlogListPage';
 import BlogDetailPage from './features/blog/BlogDetailPage';
@@ -77,6 +79,8 @@ function AppContent() {
           <Route path="blog/:slug" element={<BlogDetailPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="order-success" element={<OrderSuccessPage />} />
+          <Route path="payment-return" element={<PaymentReturnPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="profile" element={<ProfilePage />} />
