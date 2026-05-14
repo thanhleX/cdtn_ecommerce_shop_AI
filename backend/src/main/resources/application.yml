@@ -35,9 +35,15 @@ app:
   google:
     client-id: 437402316397-vpo3brm7dqpa3lgkpr3fpm4hil6ga3bm.apps.googleusercontent.com
 
+vnp:
+  pay_url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return_url: ${VNP_RETURN_URL:http://localhost:5173/payment-return}
+  tmn_code: ${VNP_TMN_CODE:LK1L9TK0}
+  hash_secret: ${VNP_HASH_SECRET:2W8S35CGC4KBYYG26V2YC8OBII85TTLU}
+  api_url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
 spring.task.scheduling.pool.size: 2    # Cho phép @Scheduled chạy
 
 cloudinary:
-  cloud-name: "dskwek4ju"
-  api-key: "575491814491519"
-  api-secret: "t-az2VOpw3jOm1hdcD2SEF0C2gw"
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:"dskwek4ju"}
+  api-key: ${CLOUDINARY_API_KEY:"575491814491519"}
+  api-secret: ${CLOUDINARY_API_SECRET:"t-az2VOpw3jOm1hdcD2SEF0C2gw"}
