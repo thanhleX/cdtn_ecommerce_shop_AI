@@ -115,7 +115,7 @@ const AdminLayout = () => {
 
   const { hasPermission } = usePermission();
 
-  const isSystemAdmin = user?.roles?.some(r => ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'].includes(r));
+  const isSystemAdmin = user?.roles?.some(r => ['ROLE_ADMIN'].includes(r));
 
   const menuItems = [
     // 1. Dashboard

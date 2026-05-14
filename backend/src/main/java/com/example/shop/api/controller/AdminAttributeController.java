@@ -22,7 +22,7 @@ public class AdminAttributeController {
     private final AttributeService attributeService;
 
     @GetMapping
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:read')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('product:read')")
     public ResponseEntity<ApiResponse<List<AttributeResponse>>> getAllAttributes() {
         return ResponseEntity.ok(
                 ApiResponse.success(attributeService.getAllAttributes(), "Lấy danh sách thuộc tính thành công")
@@ -30,7 +30,7 @@ public class AdminAttributeController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:create')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('product:create')")
     public ResponseEntity<ApiResponse<AttributeResponse>> createAttribute(@Valid @RequestBody AttributeRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.success(attributeService.createAttribute(request), "Tạo thuộc tính thành công")
@@ -38,7 +38,7 @@ public class AdminAttributeController {
     }
 
     @PostMapping("/values")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:create')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('product:create')")
     public ResponseEntity<ApiResponse<AttributeValueResponse>> addAttributeValue(@Valid @RequestBody AttributeValueRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.success(attributeService.addAttributeValue(request), "Thêm giá trị thuộc tính thành công")
@@ -46,7 +46,7 @@ public class AdminAttributeController {
     }
 
     @PostMapping("/categories/{categoryId}/assign/{attributeId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('category:manage')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('category:manage')")
     public ResponseEntity<ApiResponse<Void>> assignAttributeToCategory(
             @PathVariable Long categoryId,
             @PathVariable Long attributeId) {
@@ -57,7 +57,7 @@ public class AdminAttributeController {
     }
 
     @DeleteMapping("/categories/{categoryId}/remove/{attributeId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('category:manage')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('category:manage')")
     public ResponseEntity<ApiResponse<Void>> removeAttributeFromCategory(
             @PathVariable Long categoryId,
             @PathVariable Long attributeId) {
@@ -68,7 +68,7 @@ public class AdminAttributeController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:update')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('product:update')")
     public ResponseEntity<ApiResponse<AttributeResponse>> updateAttribute(
             @PathVariable Long id,
             @Valid @RequestBody AttributeRequest request) {
@@ -78,7 +78,7 @@ public class AdminAttributeController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:delete')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('product:delete')")
     public ResponseEntity<ApiResponse<Void>> deleteAttribute(@PathVariable Long id) {
         attributeService.deleteAttribute(id);
         return ResponseEntity.ok(
@@ -87,7 +87,7 @@ public class AdminAttributeController {
     }
 
     @DeleteMapping("/values/{valueId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasAuthority('product:delete')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('product:delete')")
     public ResponseEntity<ApiResponse<Void>> deleteAttributeValue(@PathVariable Long valueId) {
         attributeService.deleteAttributeValue(valueId);
         return ResponseEntity.ok(

@@ -75,7 +75,7 @@ public enum ErrorCode {
     ROLE_ALREADY_EXISTS(2000, "Vai trò đã tồn tại", HttpStatus.CONFLICT),
     ROLE_IN_USE(2001, "Vai trò đang được sử dụng", HttpStatus.CONFLICT),
     CANNOT_DELETE_SYSTEM_ROLE(2002, "Không thể xóa vai trò hệ thống", HttpStatus.FORBIDDEN),
-    CANNOT_MODIFY_SUPER_ADMIN(2003, "Không thể sửa Super Admin", HttpStatus.FORBIDDEN),
+    CANNOT_MODIFY_ADMIN(2003, "Không thể sửa Quản trị viên hệ thống", HttpStatus.FORBIDDEN),
 
     // ================= COMMON =================
     FORBIDDEN(9000, "Không có quyền truy cập", HttpStatus.FORBIDDEN),

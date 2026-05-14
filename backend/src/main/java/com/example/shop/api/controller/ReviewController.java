@@ -27,7 +27,8 @@ public class ReviewController {
 
     private Long getCurrentUserIdOrNull() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
             return null;
         }
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -78,8 +79,10 @@ public class ReviewController {
     }
 
     @GetMapping("/products/{productId}/stats")
-    public ResponseEntity<ApiResponse<com.example.shop.application.dto.response.ReviewStatsResponse>> getProductReviewStats(@PathVariable Long productId) {
-        return ResponseEntity.ok(ApiResponse.success(reviewService.getProductReviewStats(productId), "Lấy thống kê đánh giá thành công"));
+    public ResponseEntity<ApiResponse<com.example.shop.application.dto.response.ReviewStatsResponse>> getProductReviewStats(
+            @PathVariable Long productId) {
+        return ResponseEntity.ok(ApiResponse.success(reviewService.getProductReviewStats(productId),
+                "Lấy thống kê đánh giá thành công"));
     }
 
     @PostMapping("/{reviewId}/report")

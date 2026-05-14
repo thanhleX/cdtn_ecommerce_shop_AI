@@ -84,11 +84,11 @@ public class ReviewService {
     public ReviewResponse updateReview(Long reviewId, ReviewRequest request, Long userId) {
         ProductReview review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
-        
+
         if (!review.getUser().getId().equals(userId)) {
             throw new AppException(ErrorCode.NOT_YOUR_REVIEW);
         }
-        
+
         if (review.getCreatedAt().plusDays(1).isBefore(LocalDateTime.now())) {
             throw new AppException(ErrorCode.REVIEW_EDIT_TIMEOUT);
         }
@@ -104,11 +104,11 @@ public class ReviewService {
     public void reportReview(Long reviewId, Long reporterUserId) {
         ProductReview review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
-        
+
         if (review.getUser().getId().equals(reporterUserId)) {
             throw new AppException(ErrorCode.FORBIDDEN);
         }
-        
+
         review.setStatus(ReviewStatus.REPORTED);
         reviewRepository.save(review);
     }
@@ -136,7 +136,8 @@ public class ReviewService {
     private void updateProductStats(Long productId) {
         Product product = productRepository.findById(productId).orElse(null);
         if (product != null) {
-            com.example.shop.application.dto.response.ReviewStatsResponse stats = reviewRepository.getReviewStats(productId, ReviewStatus.ACTIVE);
+            com.example.shop.application.dto.response.ReviewStatsResponse stats = reviewRepository
+                    .getReviewStats(productId, ReviewStatus.ACTIVE);
             product.setAverageRating(stats.getAverageRating());
             product.setReviewCount(stats.getTotalReviews().intValue());
             productRepository.save(product);

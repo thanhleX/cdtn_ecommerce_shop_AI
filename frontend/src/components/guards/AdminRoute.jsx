@@ -28,7 +28,7 @@ const AdminRoute = () => {
   // 3. Hệ thống RBAC: 
   // Ưu tiên dùng permissions từ store (vì nó được giải mã từ JWT ngay khi có token)
   const isStaffOrAdmin = permissions?.some(p =>
-    ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_STAFF'].includes(p)
+    ['ROLE_ADMIN', 'ROLE_STAFF'].includes(p)
   ) || permissions?.length > 0;
 
   if (!isStaffOrAdmin) {

@@ -32,7 +32,7 @@ const OrderStatusMap = {
 
 // ✅ Flow hợp lệ
 const StatusFlow = {
-  PENDING: ['CONFIRMED'],
+  PENDING: ['CONFIRMED', 'CANCELLED'],
   AWAIT_PAYMENT: ['CONFIRMED', 'CANCELLED'],
   CONFIRMED: ['SHIPPING'],
   SHIPPING: ['COMPLETED'],

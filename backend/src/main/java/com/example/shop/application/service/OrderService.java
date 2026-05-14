@@ -219,6 +219,21 @@ public class OrderService {
             throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
         }
 
+        if (status == OrderStatus.CANCELLED) {
+            // Restore stock
+            List<OrderItem> items = orderItemRepository.findByOrder(order);
+            for (OrderItem item : items) {
+                ProductVariant variant = item.getProductVariant();
+                if (variant != null) {
+                    variant.setQuantity(variant.getQuantity() + item.getQuantity());
+                    productVariantRepository.save(variant);
+                }
+            }
+
+            // Revert Voucher Usage
+            voucherUsageRepository.findByOrderId(orderId).ifPresent(voucherUsageRepository::delete);
+        }
+
         order.setStatus(status);
         orderRepository.save(order);
 

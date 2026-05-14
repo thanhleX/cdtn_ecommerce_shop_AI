@@ -70,7 +70,7 @@ public class NotificationService {
     }
 
     public void notifyManagement(String title, String content, NotificationType type) {
-        List<String> managementRoles = List.of("SUPER_ADMIN", "STAFF");
+        List<String> managementRoles = List.of("ADMIN", "STAFF");
         createNotification(managementRoles, title, content, type);
     }
 

@@ -31,10 +31,10 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        log.info("Checking for Super Admin initialization...");
+        log.info("Checking for Admin initialization...");
 
-        if (!userRepository.existsByUsername("superadmin")) {
-            log.info("Super Admin not found. Creating a new one...");
+        if (!userRepository.existsByUsername("admin")) {
+            log.info("Admin not found. Creating a new one...");
 
             // Get all current permissions in the system
             List<Permission> allPermissions = permissionRepository.findAll();
@@ -44,33 +44,33 @@ public class DataSeeder implements CommandLineRunner {
                 return;
             }
 
-            // Create or update SUPER_ADMIN role with all permissions
-            Role superAdminRole = roleRepository.findByName("SUPER_ADMIN").orElseGet(() -> {
+            // Create or update ADMIN role with all permissions
+            Role adminRole = roleRepository.findByName("ADMIN").orElseGet(() -> {
                 Role role = new Role();
-                role.setName("SUPER_ADMIN");
+                role.setName("ADMIN");
                 return role;
             });
             
-            superAdminRole.setPermissions(new HashSet<>(allPermissions));
-            roleRepository.save(superAdminRole);
+            adminRole.setPermissions(new HashSet<>(allPermissions));
+            roleRepository.save(adminRole);
 
-            // Assign SUPER_ADMIN role to superadmin user
+            // Assign ADMIN role to admin user
             Set<Role> roles = new HashSet<>();
-            roles.add(superAdminRole);
+            roles.add(adminRole);
 
-            User superAdmin = User.builder()
-                    .username("superadmin")
+            User admin = User.builder()
+                    .username("admin")
                     .fullName("System Owner")
-                    .email("super@admin.system")
-                    .password(passwordEncoder.encode("superadmin"))
+                    .email("admin@viettechstore.system")
+                    .password(passwordEncoder.encode("admin"))
                     .roles(roles)
                     .isActive(true)
                     .build();
 
-            userRepository.save(superAdmin);
-            log.info("Super Admin has been created successfully (username: superadmin, password: superadmin).");
+            userRepository.save(admin);
+            log.info("Admin has been created successfully (username: admin, password: admin).");
         } else {
-            Role adminRole = roleRepository.findByName("SUPER_ADMIN").orElse(null);
+            Role adminRole = roleRepository.findByName("ADMIN").orElse(null);
 
             if (adminRole != null) {
                 List<Permission> allPermissions = permissionRepository.findAll();
@@ -88,9 +88,9 @@ public class DataSeeder implements CommandLineRunner {
                 if (newPermissions.size() != currentPermissions.size()) {
                     adminRole.setPermissions(newPermissions);
                     roleRepository.save(adminRole);
-                    log.info("Added missing permissions to SUPER_ADMIN.");
+                    log.info("Added missing permissions to ADMIN.");
                 } else {
-                    log.info("SUPER_ADMIN permissions already up to date.");
+                    log.info("ADMIN permissions already up to date.");
                 }
             }
         }

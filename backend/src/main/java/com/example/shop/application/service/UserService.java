@@ -54,7 +54,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(Pageable pageable) {
-        return userRepository.findByUsernameNot("superadmin", pageable).map(userMapper::toUserResponse);
+        return userRepository.findByUsernameNot("admin", pageable).map(userMapper::toUserResponse);
     }
 
     @Transactional
@@ -62,7 +62,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         
-        if ("superadmin".equals(user.getUsername())) {
+        if ("admin".equals(user.getUsername())) {
             throw new AppException(ErrorCode.UNAUTHORIZED); // Hoặc tạo ErrorCode riêng cho Restricted Access
         }
 
@@ -75,7 +75,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        if ("superadmin".equals(user.getUsername())) {
+        if ("admin".equals(user.getUsername())) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
@@ -90,7 +90,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        if ("superadmin".equals(user.getUsername())) {
+        if ("admin".equals(user.getUsername())) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 

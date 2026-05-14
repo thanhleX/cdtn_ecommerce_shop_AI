@@ -8,9 +8,19 @@ const { Text } = Typography;
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?", sender: 'bot', products: [] }
-  ]);
+  const [messages, setMessages] = useState(() => {
+    const saved = sessionStorage.getItem('cdtn_chat_history');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error parsing chat history:", e);
+      }
+    }
+    return [
+      { id: 1, text: "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?", sender: 'bot', products: [] }
+    ];
+  });
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -18,6 +28,7 @@ const ChatWidget = () => {
   const scrollRef = useRef(null);
 
   useEffect(() => {
+    sessionStorage.setItem('cdtn_chat_history', JSON.stringify(messages));
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }

@@ -125,7 +125,7 @@ const StaffManagePage = () => {
           <Avatar icon={<UserOutlined />} src={record.avatarUrl} />
           <div>
             <Text strong>{record.username}</Text>
-            {record.username === 'superadmin' && <Tag color="gold" style={{ marginLeft: 8 }}>System</Tag>}
+            {record.username === 'admin' && <Tag color="gold" style={{ marginLeft: 8 }}>System</Tag>}
             <br />
             <Text type="secondary" size="small">{record.email}</Text>
           </div>
@@ -144,7 +144,7 @@ const StaffManagePage = () => {
       render: (roleArray) => (
         <Space wrap>
           {roleArray?.map((r) => (
-            <Tag color={r === 'ROLE_SUPER_ADMIN' ? 'gold' : r === 'ROLE_ADMIN' ? 'red' : 'blue'} key={r}>
+            <Tag color={r === 'ROLE_ADMIN' ? 'red' : 'blue'} key={r}>
               {r}
             </Tag>
           ))}
@@ -158,7 +158,7 @@ const StaffManagePage = () => {
       render: (active, record) => (
         <Switch 
           checked={active} 
-          disabled={!canManageStaff || record.username === 'superadmin'}
+          disabled={!canManageStaff || record.username === 'admin'}
           onChange={() => handleToggleActive(record.id)}
           checkedChildren="Bật"
           unCheckedChildren="Chặn"
@@ -170,7 +170,7 @@ const StaffManagePage = () => {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          {canManageStaff && record.username !== 'superadmin' && (
+          {canManageStaff && record.username !== 'admin' && (
             <>
               <Tooltip title="Sửa Vai Trò">
                 <Button 

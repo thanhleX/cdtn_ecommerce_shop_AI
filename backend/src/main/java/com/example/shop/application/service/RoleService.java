@@ -58,8 +58,8 @@ public class RoleService {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION)); // ROLE_NOT_FOUND
 
-        if (role.getName().contains("SUPER_ADMIN")) {
-            throw new AppException(ErrorCode.CANNOT_MODIFY_SUPER_ADMIN);
+        if (role.getName().contains("ADMIN")) {
+            throw new AppException(ErrorCode.CANNOT_MODIFY_ADMIN);
         }
 
         String roleName = request.getName().toUpperCase();
@@ -79,7 +79,7 @@ public class RoleService {
                 .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
 
         String name = role.getName();
-        if (name.contains("SUPER_ADMIN") || name.contains("ADMIN") || name.contains("CUSTOMER")) {
+        if (name.contains("ADMIN") || name.contains("CUSTOMER")) {
             throw new AppException(ErrorCode.CANNOT_DELETE_SYSTEM_ROLE);
         }
 

@@ -112,20 +112,20 @@ const RoleManagePage = () => {
             type="text" 
             icon={<EditOutlined />} 
             onClick={() => handleEdit(record)}
-            disabled={!canManageRole || record.name === 'ROLE_SUPER_ADMIN' || record.name === 'ROLE_CUSTOMER'}
+            disabled={!canManageRole || record.name === 'ROLE_ADMIN' || record.name === 'ROLE_CUSTOMER'}
           />
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa vai trò này?"
             onConfirm={() => handleDelete(record.id)}
             okText="Xóa"
             cancelText="Hủy"
-            disabled={!canManageRole || record.name === 'ROLE_SUPER_ADMIN' || record.name === 'ROLE_CUSTOMER'}
+            disabled={!canManageRole || record.name === 'ROLE_ADMIN' || record.name === 'ROLE_CUSTOMER'}
           >
             <Button 
               type="text" 
               danger 
               icon={<DeleteOutlined />} 
-              disabled={!canManageRole || record.name === 'ROLE_SUPER_ADMIN' || record.name === 'ROLE_CUSTOMER'}
+              disabled={!canManageRole || record.name === 'ROLE_ADMIN' || record.name === 'ROLE_CUSTOMER'}
             />
           </Popconfirm>
         </Space>
