@@ -107,7 +107,8 @@ const ReviewList = ({ productId, refreshKey, onReviewUpdate, ratingFilter }) => 
         if (!isOwner) {
           actions.push(
             <Tooltip title="Báo cáo vi phạm" key="report">
-              <Button type="text" size="small" danger icon={<WarningOutlined />} onClick={() => handleReport(item.id)}>
+              <Button type="text" size="small" danger icon={<WarningOutlined />} onClick={() => handleReport(item.id)}
+              style={{ display: 'flex', paddingLeft: 40}}>
                 Báo cáo
               </Button>
             </Tooltip>
@@ -129,7 +130,7 @@ const ReviewList = ({ productId, refreshKey, onReviewUpdate, ratingFilter }) => 
         }
 
         return (
-          <List.Item key={item.id} actions={actions}>
+          <List.Item key={item.id} actions={actions} style={{ textAlign: 'left' }}>
             <List.Item.Meta
               avatar={<Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />}
               title={

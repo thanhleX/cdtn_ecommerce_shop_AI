@@ -87,6 +87,11 @@ public class OrderService {
 
         for (CartItem cartItem : cartItems) {
             ProductVariant variant = cartItem.getProductVariant();
+            
+            if (!variant.getProduct().getIsActive()) {
+                throw new AppException(ErrorCode.PRODUCT_DISABLED);
+            }
+
             if (variant.getQuantity() < cartItem.getQuantity()) {
                 throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
             }
@@ -151,8 +156,13 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public Page<OrderResponse> getOrders(Long userId, Pageable pageable) {
-        Page<Order> orders = orderRepository.findByUserId(userId, pageable);
+    public Page<OrderResponse> getOrders(Long userId, OrderStatus status, Pageable pageable) {
+        Page<Order> orders;
+        if (status != null) {
+            orders = orderRepository.findByUserIdAndStatus(userId, status, pageable);
+        } else {
+            orders = orderRepository.findByUserId(userId, pageable);
+        }
         return orders.map(order -> {
             List<OrderItem> items = orderItemRepository.findByOrder(order);
             return orderMapper.toOrderResponse(order, items.stream().map(orderMapper::toOrderItemResponse).toList());
@@ -172,12 +182,25 @@ public class OrderService {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (order.getStatus() != OrderStatus.PENDING) {
+        OrderStatus oldStatus = order.getStatus();
+
+        if (oldStatus != OrderStatus.PENDING && oldStatus != OrderStatus.AWAIT_PAYMENT) {
             throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
         }
 
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
+
+        // Notify Customer about cancellation
+        String customerMsg = "Đơn hàng #" + orderId + " đã được hủy thành công.";
+        if (order.getPaymentMethod().getId() == 2L && oldStatus != OrderStatus.AWAIT_PAYMENT) {
+            customerMsg += " Hệ thống sẽ tiến hành hoàn tiền qua VNPay trong vòng 3-5 ngày làm việc.";
+        }
+        notificationService.createNotification(
+                order.getUser().getId(),
+                "Hủy đơn hàng",
+                customerMsg,
+                NotificationType.ORDER);
 
         // Notify Management about cancellation
         notificationService.notifyManagement(
@@ -202,8 +225,13 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        Page<Order> orders = orderRepository.findAll(pageable);
+    public Page<OrderResponse> getAllOrders(OrderStatus status, Pageable pageable) {
+        Page<Order> orders;
+        if (status != null) {
+            orders = orderRepository.findByStatus(status, pageable);
+        } else {
+            orders = orderRepository.findAll(pageable);
+        }
         return orders.map(order -> {
             List<OrderItem> items = orderItemRepository.findByOrder(order);
             return orderMapper.toOrderResponse(order, items.stream().map(orderMapper::toOrderItemResponse).toList());
@@ -215,7 +243,9 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (order.getStatus() == OrderStatus.CANCELLED) {
+        OrderStatus oldStatus = order.getStatus();
+
+        if (oldStatus == OrderStatus.CANCELLED) {
             throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
         }
 
@@ -242,7 +272,13 @@ public class OrderService {
             case CONFIRMED -> "Đơn hàng #" + orderId + " đã được xác nhận.";
             case SHIPPING -> "Đơn hàng #" + orderId + " đang được giao.";
             case COMPLETED -> "Đơn hàng #" + orderId + " đã hoàn thành.";
-            case CANCELLED -> "Đơn hàng #" + orderId + " đã bị hủy.";
+            case CANCELLED -> {
+                String msg = "Đơn hàng #" + orderId + " đã bị hủy.";
+                if (order.getPaymentMethod().getId() == 2L && oldStatus != OrderStatus.AWAIT_PAYMENT) {
+                    msg += " Hệ thống sẽ tiến hành hoàn tiền qua VNPay trong vòng 3-5 ngày làm việc.";
+                }
+                yield msg;
+            }
             default -> "Đơn hàng #" + orderId + " đã được cập nhật trạng thái.";
         };
         notificationService.createNotification(

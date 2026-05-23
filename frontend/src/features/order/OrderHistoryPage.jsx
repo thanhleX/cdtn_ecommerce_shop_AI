@@ -12,6 +12,7 @@ import {
   Avatar,
   message,
   Popconfirm,
+  Tabs
 } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import { useOrders } from '../../hooks/useOrders';
@@ -45,13 +46,14 @@ const OrderHistoryPage = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [open, setOpen] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('ALL');
 
   useEffect(() => {
-    fetchOrders({ page: 1, size: 10 });
+    fetchOrders({ page: 1, size: 10, status: filterStatus === 'ALL' ? undefined : filterStatus });
   }, []);
 
   const handleTableChange = (pag) => {
-    fetchOrders({ page: pag.current, size: pag.pageSize });
+    fetchOrders({ page: pag.current, size: pag.pageSize, status: filterStatus === 'ALL' ? undefined : filterStatus });
   };
 
   // ✅ Lấy chi tiết đơn hàng
@@ -96,7 +98,7 @@ const OrderHistoryPage = () => {
     try {
       await orderApi.cancelOrder(id);
       message.success('Đã hủy đơn hàng');
-      fetchOrders({ page: pagination.current, size: pagination.pageSize });
+      fetchOrders({ page: pagination.current, size: pagination.pageSize, status: filterStatus === 'ALL' ? undefined : filterStatus });
     } catch (err) {
       message.error('Không thể hủy đơn');
     }
@@ -176,6 +178,23 @@ const OrderHistoryPage = () => {
       <Title level={3} style={{ marginBottom: 24 }}>
         Lịch sử đơn hàng
       </Title>
+
+      <Tabs 
+        activeKey={filterStatus}
+        onChange={(key) => {
+          setFilterStatus(key);
+          fetchOrders({ page: 1, size: pagination.pageSize, status: key === 'ALL' ? undefined : key });
+        }}
+        items={[
+          { key: 'ALL', label: 'Tất cả' },
+          { key: 'PENDING', label: 'Chờ xác nhận' },
+          { key: 'AWAIT_PAYMENT', label: 'Chờ thanh toán' },
+          { key: 'CONFIRMED', label: 'Đã xác nhận' },
+          { key: 'SHIPPING', label: 'Đang giao' },
+          { key: 'COMPLETED', label: 'Hoàn thành' },
+          { key: 'CANCELLED', label: 'Đã hủy' }
+        ]}
+      />
 
       <Table
         columns={columns}

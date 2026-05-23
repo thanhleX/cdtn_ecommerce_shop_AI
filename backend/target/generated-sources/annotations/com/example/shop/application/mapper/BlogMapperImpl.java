@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-14T13:50:36+0700",
+    date = "2026-05-15T08:52:59+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -24,13 +24,13 @@ public class BlogMapperImpl implements BlogMapper {
 
         Blog.BlogBuilder blog = Blog.builder();
 
-        blog.title( request.getTitle() );
-        blog.slug( request.getSlug() );
-        blog.content( request.getContent() );
-        blog.thumbnail( request.getThumbnail() );
-        blog.isPublished( request.getIsPublished() );
-        blog.isFeatured( request.getIsFeatured() );
         blog.carouselOrder( request.getCarouselOrder() );
+        blog.content( request.getContent() );
+        blog.isFeatured( request.getIsFeatured() );
+        blog.isPublished( request.getIsPublished() );
+        blog.slug( request.getSlug() );
+        blog.thumbnail( request.getThumbnail() );
+        blog.title( request.getTitle() );
 
         return blog.build();
     }

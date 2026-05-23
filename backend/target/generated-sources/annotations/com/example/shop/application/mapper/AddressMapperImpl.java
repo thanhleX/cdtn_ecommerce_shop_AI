@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-14T13:50:36+0700",
+    date = "2026-05-15T08:52:59+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -25,9 +25,9 @@ public class AddressMapperImpl implements AddressMapper {
         Address.AddressBuilder address = Address.builder();
 
         address.fullAddress( request.getFullAddress() );
+        address.isDefault( request.getIsDefault() );
         address.phone( request.getPhone() );
         address.receiverName( request.getReceiverName() );
-        address.isDefault( request.getIsDefault() );
 
         return address.build();
     }
@@ -70,8 +70,8 @@ public class AddressMapperImpl implements AddressMapper {
         }
 
         address.setFullAddress( request.getFullAddress() );
+        address.setIsDefault( request.getIsDefault() );
         address.setPhone( request.getPhone() );
         address.setReceiverName( request.getReceiverName() );
-        address.setIsDefault( request.getIsDefault() );
     }
 }

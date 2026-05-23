@@ -36,16 +36,18 @@ const VoucherManagePage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingVoucher, setEditingVoucher] = useState(null);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+  const [searchText, setSearchText] = useState('');
   const [form] = Form.useForm();
 
-  const fetchVouchers = useCallback(async (page = 1, pageSize = 10) => {
+  const fetchVouchers = useCallback(async (page = 1, pageSize = 10, keyword = searchText) => {
     setLoading(true);
     try {
       const response = await voucherApi.getAll({ 
         page: page - 1, 
         size: pageSize,
         sortBy: 'id',
-        direction: 'desc'
+        direction: 'desc',
+        keyword: keyword || undefined
       });
       const data = response.data || response;
       setVouchers(data.content);
@@ -66,7 +68,7 @@ const VoucherManagePage = () => {
   }, [fetchVouchers]);
 
   const handleTableChange = (newPagination) => {
-    fetchVouchers(newPagination.current, newPagination.pageSize);
+    fetchVouchers(newPagination.current, newPagination.pageSize, searchText);
   };
 
   const handleAdd = () => {
@@ -89,7 +91,7 @@ const VoucherManagePage = () => {
     try {
       await voucherApi.delete(id);
       message.success('Xóa voucher thành công');
-      fetchVouchers(pagination.current);
+      fetchVouchers(pagination.current, pagination.pageSize, searchText);
     } catch (error) {
       message.error(error?.message || 'Lỗi khi xóa voucher');
     }
@@ -114,7 +116,7 @@ const VoucherManagePage = () => {
         message.success('Thêm voucher thành công');
       }
       setIsModalVisible(false);
-      fetchVouchers(pagination.current);
+      fetchVouchers(pagination.current, pagination.pageSize, searchText);
     } catch (error) {
       if (error?.errorFields) return;
       message.error(error?.message || 'Lỗi khi lưu voucher');
@@ -194,11 +196,23 @@ const VoucherManagePage = () => {
     <div style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <Title level={3}>Quản lý Voucher / Coupon</Title>
-        {hasPermission('voucher:manage') && (
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            Thêm Voucher
-          </Button>
-        )}
+        <Space>
+          <Input.Search
+            placeholder="Tìm theo mã voucher..."
+            allowClear
+            onSearch={(value) => {
+              setSearchText(value);
+              setPagination(prev => ({ ...prev, current: 1 }));
+              fetchVouchers(1, pagination.pageSize, value);
+            }}
+            style={{ width: 250 }}
+          />
+          {hasPermission('voucher:manage') && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+              Thêm Voucher
+            </Button>
+          )}
+        </Space>
       </div>
 
       <Table 
@@ -242,12 +256,22 @@ const VoucherManagePage = () => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item
-                name="value"
-                label="Giá trị"
-                rules={[{ required: true, message: 'Vui lòng nhập giá trị!' }]}
-              >
-                <InputNumber style={{ width: '100%' }} min={0} />
+              <Form.Item noStyle shouldUpdate={(prev, curr) => prev.type !== curr.type}>
+                {({ getFieldValue }) => {
+                  const type = getFieldValue('type');
+                  return (
+                    <Form.Item
+                      name="value"
+                      label="Giá trị"
+                      rules={[
+                        { required: true, message: 'Vui lòng nhập giá trị!' },
+                        type === 'PERCENT' ? { type: 'number', max: 100, message: 'Giá trị không vượt quá 100%' } : {}
+                      ]}
+                    >
+                      <InputNumber style={{ width: '100%' }} min={0} max={type === 'PERCENT' ? 100 : undefined} />
+                    </Form.Item>
+                  );
+                }}
               </Form.Item>
             </Col>
           </Row>

@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 public interface ProductReviewRepository extends JpaRepository<ProductReview, Long> {
     Page<ProductReview> findByProductIdAndStatus(Long productId, ReviewStatus status, Pageable pageable);
     Page<ProductReview> findByProductIdAndStatusAndRating(Long productId, ReviewStatus status, Integer rating, Pageable pageable);
+    Page<ProductReview> findByProductIdAndStatusIn(Long productId, java.util.Collection<ReviewStatus> statuses, Pageable pageable);
+    Page<ProductReview> findByProductIdAndStatusInAndRating(Long productId, java.util.Collection<ReviewStatus> statuses, Integer rating, Pageable pageable);
 
     boolean existsByUserIdAndProductId(Long userId, Long productId);
     
@@ -25,6 +27,6 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, Lo
            "CAST(COALESCE(SUM(CASE WHEN r.rating = 3 THEN 1L ELSE 0L END), 0L) AS long), " +
            "CAST(COALESCE(SUM(CASE WHEN r.rating = 2 THEN 1L ELSE 0L END), 0L) AS long), " +
            "CAST(COALESCE(SUM(CASE WHEN r.rating = 1 THEN 1L ELSE 0L END), 0L) AS long)) " +
-           "FROM ProductReview r WHERE r.product.id = :productId AND r.status = :status")
-    ReviewStatsResponse getReviewStats(@Param("productId") Long productId, @Param("status") ReviewStatus status);
+           "FROM ProductReview r WHERE r.product.id = :productId AND r.status IN :statuses")
+    ReviewStatsResponse getReviewStats(@Param("productId") Long productId, @Param("statuses") java.util.Collection<ReviewStatus> statuses);
 }

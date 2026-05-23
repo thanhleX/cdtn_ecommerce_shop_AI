@@ -284,12 +284,12 @@ const ProductManagePage = () => {
             style={{ width: 250 }}
           />
           <Select
-            placeholder="Lọc theo danh mục"
+            placeholder="Lọc theo danh mục gốc"
             allowClear
             style={{ width: 200 }}
             onChange={handleCategoryFilter}
           >
-            {flattenedCategories.map(c => (
+            {categories.map(c => (
               <Option key={c.id} value={c.id}>{c.name}</Option>
             ))}
           </Select>

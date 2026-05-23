@@ -25,8 +25,10 @@ public class AdminOrderController {
 
     @GetMapping
     @Operation(summary = "Get all orders (paginated)")
-    public ResponseEntity<ApiResponse<PageResponse<OrderResponse>>> getAllOrders(Pageable pageable) {
-        Page<OrderResponse> response = orderService.getAllOrders(pageable);
+    public ResponseEntity<ApiResponse<PageResponse<OrderResponse>>> getAllOrders(
+            @RequestParam(required = false) OrderStatus status,
+            Pageable pageable) {
+        Page<OrderResponse> response = orderService.getAllOrders(status, pageable);
         return ResponseEntity.ok(ApiResponse.success(PageResponse.of(response), "Lấy danh sách đơn hàng thành công"));
     }
 

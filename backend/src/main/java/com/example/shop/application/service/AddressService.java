@@ -37,6 +37,10 @@ public class AddressService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        if (addressRepository.countByUser(user) >= 3) {
+            throw new AppException(ErrorCode.ADDRESS_LIMIT_EXCEEDED);
+        }
+
         if (Boolean.TRUE.equals(request.getIsDefault())) {
             clearDefaultAddress(user);
         }

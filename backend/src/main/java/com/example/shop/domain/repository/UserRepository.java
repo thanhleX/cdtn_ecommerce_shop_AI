@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Query;
+
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
@@ -17,4 +20,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countByRoles_Name(String roleName);
     long countByRoles_Id(Long roleId);
     Page<User> findByUsernameNot(String username, Pageable pageable);
+
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN u.roles r WHERE " +
+           "u.username != 'admin' AND (" +
+           ":keyword IS NULL OR :keyword = '' OR " +
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<User> searchUsersExcludingAdmin(@Param("keyword") String keyword, Pageable pageable);
 }

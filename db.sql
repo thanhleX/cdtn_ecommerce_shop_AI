@@ -333,7 +333,8 @@ CREATE TABLE orders (
     'CONFIRMED',
     'SHIPPING',
     'COMPLETED',
-    'CANCELLED'
+    'CANCELLED',
+    'AWAIT_PAYMENT'
   ) NOT NULL DEFAULT 'PENDING',
   total_amount DECIMAL(12, 2),
   discount_amount DECIMAL(12, 2),
@@ -414,7 +415,7 @@ CREATE TABLE blogs (
 -- ============================================================
 -- Roles
 INSERT INTO roles (id, name)
-VALUES (1, 'SUPER_ADMIN'),
+VALUES (1, 'ADMIN'),
   (2, 'CUSTOMER'),
   (3, 'STAFF') ON DUPLICATE KEY
 UPDATE name =
@@ -439,7 +440,7 @@ VALUES (1, 'category:manage', 'Quản lý danh mục'),
   (16, 'review:manage', 'Quản lý đánh giá') ON DUPLICATE KEY
 UPDATE description =
 VALUES(description);
--- SUPER_ADMIN có tất cả permissions
+-- ADMIN có tất cả permissions
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT 1,
   id
@@ -462,30 +463,23 @@ UPDATE role_id = role_id;
 INSERT INTO payment_methods (id, name, description, image)
 VALUES (
     1,
-    'Thanh toán khi nhận hàng',
-    'COD - Trả tiền mặt khi nhận',
-    NULL
+    'Thanh toán khi nhận hàng (COD)',
+    'Trả tiền mặt khi nhận hàng tại nhà',
+    'https://img.icons8.com/color/96/000000/delivery--v1.png'
   ),
   (
     2,
-    'Chuyển khoản ngân hàng',
-    'Chuyển khoản qua ngân hàng',
-    NULL
-  ),
-  (
-    3,
-    'Ví điện tử MoMo',
-    'Thanh toán qua MoMo',
-    NULL
+    'Thanh toán VNPay',
+    'Thanh toán qua cổng VNPay (ATM / Thẻ quốc tế / QR)',
+    'https://cdn.itviec.com/employers/vnpay/logo/social/8S9ZqD9zGzVzZzZzZzZzZzZz/vnpay-logo.png'
   ) ON DUPLICATE KEY
 UPDATE name =
 VALUES(name);
 -- Blog Categories mặc định
-INSERT INTO blog_categories (id, name, slug, is_active)
-VALUES (1, 'Tin tức', 'tin-tuc', TRUE),
-  (2, 'Hướng dẫn', 'huong-dan', TRUE),
-  (3, 'Khuyến mãi', 'khuyen-mai', TRUE),
-  (4, 'Kiến thức', 'kien-thuc', TRUE),
-  (5, 'Thông tin khác', 'thong-tin-khac', TRUE) ON DUPLICATE KEY
-UPDATE name =
-VALUES(name);
+INSERT INTO blog_categories (name, slug, is_active)
+SELECT 'Tin tức', 'tin-tuc', true
+WHERE NOT EXISTS (SELECT 1 FROM blog_categories WHERE slug = 'tin-tuc');
+
+INSERT INTO blog_categories (name, slug, is_active)
+SELECT 'Khuyến mãi', 'khuyen-mai', true
+WHERE NOT EXISTS (SELECT 1 FROM blog_categories WHERE slug = 'khuyen-mai');

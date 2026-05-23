@@ -30,6 +30,9 @@ public class VoucherService {
 
     @Transactional
     public VoucherResponse createVoucher(VoucherRequest request) {
+        if (request.getType() == com.example.shop.domain.enums.VoucherType.PERCENT && request.getValue() > 100) {
+            throw new AppException(ErrorCode.INVALID_VOUCHER_VALUE);
+        }
         if (voucherRepository.findByCode(request.getCode()).isPresent()) {
             throw new AppException(ErrorCode.DUPLICATE_CODE);
         }
@@ -39,6 +42,9 @@ public class VoucherService {
 
     @Transactional
     public VoucherResponse updateVoucher(Long id, VoucherRequest request) {
+        if (request.getType() == com.example.shop.domain.enums.VoucherType.PERCENT && request.getValue() > 100) {
+            throw new AppException(ErrorCode.INVALID_VOUCHER_VALUE);
+        }
         Voucher voucher = voucherRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
         
@@ -58,7 +64,11 @@ public class VoucherService {
     }
 
     @Transactional(readOnly = true)
-    public Page<VoucherResponse> getAllVouchers(Pageable pageable) {
+    public Page<VoucherResponse> getAllVouchers(String keyword, Pageable pageable) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return voucherRepository.findByCodeContainingIgnoreCase(keyword.trim(), pageable)
+                    .map(voucherMapper::toResponse);
+        }
         return voucherRepository.findAll(pageable).map(voucherMapper::toResponse);
     }
 

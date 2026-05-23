@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-14T13:50:36+0700",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-05-23T23:09:20+0700",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
 public class CartMapperImpl implements CartMapper {
@@ -52,11 +52,13 @@ public class CartMapperImpl implements CartMapper {
         CartItemResponse.CartItemResponseBuilder cartItemResponse = CartItemResponse.builder();
 
         cartItemResponse.productVariantId( cartItemProductVariantId( cartItem ) );
+        cartItemResponse.productId( cartItemProductVariantProductId( cartItem ) );
         cartItemResponse.productName( cartItemProductVariantProductName( cartItem ) );
         cartItemResponse.productSlug( cartItemProductVariantProductSlug( cartItem ) );
         cartItemResponse.sku( cartItemProductVariantSku( cartItem ) );
         cartItemResponse.price( cartItemProductVariantPrice( cartItem ) );
         cartItemResponse.imageUrl( mapImageUrl( cartItemProductVariantProductImages( cartItem ) ) );
+        cartItemResponse.isActive( cartItemProductVariantProductIsActive( cartItem ) );
         cartItemResponse.id( cartItem.getId() );
         cartItemResponse.quantity( cartItem.getQuantity() );
 
@@ -89,6 +91,25 @@ public class CartMapperImpl implements CartMapper {
             return null;
         }
         Long id = productVariant.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
+    }
+
+    private Long cartItemProductVariantProductId(CartItem cartItem) {
+        if ( cartItem == null ) {
+            return null;
+        }
+        ProductVariant productVariant = cartItem.getProductVariant();
+        if ( productVariant == null ) {
+            return null;
+        }
+        Product product = productVariant.getProduct();
+        if ( product == null ) {
+            return null;
+        }
+        Long id = product.getId();
         if ( id == null ) {
             return null;
         }
@@ -180,5 +201,24 @@ public class CartMapperImpl implements CartMapper {
             return null;
         }
         return images;
+    }
+
+    private Boolean cartItemProductVariantProductIsActive(CartItem cartItem) {
+        if ( cartItem == null ) {
+            return null;
+        }
+        ProductVariant productVariant = cartItem.getProductVariant();
+        if ( productVariant == null ) {
+            return null;
+        }
+        Product product = productVariant.getProduct();
+        if ( product == null ) {
+            return null;
+        }
+        Boolean isActive = product.getIsActive();
+        if ( isActive == null ) {
+            return null;
+        }
+        return isActive;
     }
 }

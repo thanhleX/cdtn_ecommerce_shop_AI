@@ -39,8 +39,9 @@ public class OrderController {
     @Operation(summary = "Get current user's order history")
     public ResponseEntity<ApiResponse<PageResponse<OrderResponse>>> getOrders(
             @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) com.example.shop.domain.enums.OrderStatus status,
             Pageable pageable) {
-        Page<OrderResponse> response = orderService.getOrders(userDetails.getId(), pageable);
+        Page<OrderResponse> response = orderService.getOrders(userDetails.getId(), status, pageable);
         return ResponseEntity.ok(ApiResponse.success(PageResponse.of(response), "Lấy lịch sử đơn hàng thành công"));
     }
 

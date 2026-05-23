@@ -26,6 +26,7 @@ public interface CartMapper {
     @Mapping(source = "productVariant.sku", target = "sku")
     @Mapping(source = "productVariant.price", target = "price")
     @Mapping(source = "productVariant.product.images", target = "imageUrl", qualifiedByName = "mapImageUrl")
+    @Mapping(source = "productVariant.product.isActive", target = "isActive")
     CartItemResponse toCartItemResponse(CartItem cartItem);
 
     @Named("mapImageUrl")

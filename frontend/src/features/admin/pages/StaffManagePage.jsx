@@ -17,6 +17,7 @@ const StaffManagePage = () => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+  const [keyword, setKeyword] = useState('');
   
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -24,10 +25,10 @@ const StaffManagePage = () => {
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  const fetchUsers = useCallback(async (page = 1, pageSize = 10) => {
+  const fetchUsers = useCallback(async (page = 1, pageSize = 10, searchKw = keyword) => {
     setLoading(true);
     try {
-      const response = await adminApi.getUsers({ page: page - 1, size: pageSize });
+      const response = await adminApi.getUsers({ page: page - 1, size: pageSize, keyword: searchKw });
       const data = response.data || response;
       
       const staffList = data.content.filter(u => 
@@ -41,7 +42,7 @@ const StaffManagePage = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [keyword]);
 
   const fetchRoles = useCallback(async () => {
     try {
@@ -207,15 +208,23 @@ const StaffManagePage = () => {
       <Card 
         title={<Title level={3} style={{ marginBottom: 0 }}>Quản lý Nhân viên</Title>}
         extra={
-          canManageStaff && (
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />} 
-              onClick={handleShowCreateModal}
-            >
-              Thêm Nhân Viên
-            </Button>
-          )
+          <Space>
+            <Input.Search
+              placeholder="Tìm theo tên, vai trò..."
+              allowClear
+              onSearch={(value) => setKeyword(value)}
+              style={{ width: 250 }}
+            />
+            {canManageStaff && (
+              <Button 
+                type="primary" 
+                icon={<PlusOutlined />} 
+                onClick={handleShowCreateModal}
+              >
+                Thêm Nhân Viên
+              </Button>
+            )}
+          </Space>
         }
       >
         <Table 
@@ -224,7 +233,7 @@ const StaffManagePage = () => {
           rowKey="id" 
           loading={loading}
           pagination={pagination}
-          onChange={(p) => fetchUsers(p.current, p.pageSize)}
+          onChange={(p) => fetchUsers(p.current, p.pageSize, keyword)}
         />
       </Card>
 

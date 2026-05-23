@@ -30,6 +30,7 @@ public class VoucherController {
     @GetMapping("/admin/vouchers")
     @PreAuthorize("hasAuthority('voucher:manage')")
     public ResponseEntity<ApiResponse<Page<VoucherResponse>>> getAllVouchers(
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -38,7 +39,7 @@ public class VoucherController {
         Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         return ResponseEntity
-                .ok(ApiResponse.success(voucherService.getAllVouchers(pageable), "Lấy danh sách Voucher thành công"));
+                .ok(ApiResponse.success(voucherService.getAllVouchers(keyword, pageable), "Lấy danh sách Voucher thành công"));
     }
 
     @PostMapping("/admin/vouchers")

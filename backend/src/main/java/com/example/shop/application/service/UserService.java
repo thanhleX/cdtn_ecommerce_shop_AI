@@ -53,8 +53,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(Pageable pageable) {
-        return userRepository.findByUsernameNot("admin", pageable).map(userMapper::toUserResponse);
+    public Page<UserResponse> getAllUsers(String keyword, Pageable pageable) {
+        return userRepository.searchUsersExcludingAdmin(keyword, pageable).map(userMapper::toUserResponse);
     }
 
     @Transactional

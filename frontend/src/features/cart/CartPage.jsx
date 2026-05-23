@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Table, Button, Typography, InputNumber, Row, Col, Divider, Empty, message } from 'antd';
-import { DeleteOutlined, ShoppingCartOutlined, RightOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ShoppingCartOutlined, RightOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
 import useAuthStore from '../../store/authStore';
@@ -65,24 +65,60 @@ const CartPage = () => {
       dataIndex: 'quantity',
       key: 'quantity',
       width: 150,
-      render: (val, record) => (
-        <InputNumber
-          min={1}
-          max={99}
-          value={val}
-          onChange={(newVal) => updateQuantity(record.id, newVal)}
-        />
-      )
+      render: (val, record) => {
+        if (record.isActive === false) {
+          return <Text disabled>0</Text>;
+        }
+        return (
+        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #d9d9d9', borderRadius: 8, overflow: 'hidden', width: 'max-content' }}>
+          <Button
+            type="text"
+            icon={<MinusOutlined />}
+            onClick={() => updateQuantity(record.id, Math.max(1, val - 1))}
+            disabled={val <= 1}
+            style={{ border: 'none', borderRadius: 0, height: 32, width: 32, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          />
+          <InputNumber
+            min={1}
+            max={99}
+            value={val}
+            onChange={(newVal) => updateQuantity(record.id, newVal || 1)}
+            controls={false}
+            bordered={false}
+            style={{ width: 40 }}
+            styles={{
+              input: {
+                textAlign: 'center',
+                height: 32,
+                padding: 0,
+              },
+            }}
+          />
+          <Button
+            type="text"
+            icon={<PlusOutlined />}
+            onClick={() => updateQuantity(record.id, Math.min(99, val + 1))}
+            disabled={val >= 99}
+            style={{ border: 'none', borderRadius: 0, height: 32, width: 32, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          />
+        </div>
+        );
+      }
     },
     {
       title: 'Thành tiền',
       key: 'total',
       width: 150,
-      render: (_, record) => (
+      render: (_, record) => {
+        if (record.isActive === false) {
+          return <Text type="danger" disabled>Ngừng kinh doanh</Text>;
+        }
+        return (
         <Text strong type="danger">
           {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price * record.quantity)}
         </Text>
-      )
+        );
+      }
     },
     {
       title: 'Thao tác',
@@ -107,7 +143,7 @@ const CartPage = () => {
     );
   }
 
-  const selectedProducts = items.filter(item => selectedItems.includes(item.id));
+  const selectedProducts = items.filter(item => selectedItems.includes(item.id) && item.isActive !== false);
   const totalAmount = selectedProducts.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   return (
@@ -123,9 +159,13 @@ const CartPage = () => {
               rowKey="id"
               pagination={false}
               loading={loading}
+              scroll={{ x: 800, y: 500 }}
               rowSelection={{
                 selectedRowKeys: selectedItems,
                 onChange: (keys) => setSelectedItems(keys),
+                getCheckboxProps: (record) => ({
+                  disabled: record.isActive === false,
+                }),
               }}
             />
           </div>

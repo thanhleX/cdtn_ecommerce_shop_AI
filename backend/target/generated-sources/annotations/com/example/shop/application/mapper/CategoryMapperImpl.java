@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-14T13:50:36+0700",
+    date = "2026-05-15T08:52:59+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -30,9 +30,9 @@ public class CategoryMapperImpl implements CategoryMapper {
 
         Category.CategoryBuilder category = Category.builder();
 
-        category.name( request.getName() );
-        category.isActive( request.getIsActive() );
         category.imageUrl( request.getImageUrl() );
+        category.isActive( request.getIsActive() );
+        category.name( request.getName() );
 
         return category.build();
     }
@@ -77,9 +77,9 @@ public class CategoryMapperImpl implements CategoryMapper {
             return;
         }
 
-        category.setName( request.getName() );
-        category.setIsActive( request.getIsActive() );
         category.setImageUrl( request.getImageUrl() );
+        category.setIsActive( request.getIsActive() );
+        category.setName( request.getName() );
     }
 
     private Long categoryParentId(Category category) {

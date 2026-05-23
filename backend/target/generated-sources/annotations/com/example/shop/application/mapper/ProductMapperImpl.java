@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-14T13:50:36+0700",
+    date = "2026-05-15T08:52:59+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -37,9 +37,9 @@ public class ProductMapperImpl implements ProductMapper {
 
         Product.ProductBuilder product = Product.builder();
 
-        product.name( request.getName() );
         product.description( request.getDescription() );
         product.isActive( request.getIsActive() );
+        product.name( request.getName() );
 
         return product.build();
     }
@@ -89,9 +89,9 @@ public class ProductMapperImpl implements ProductMapper {
             return;
         }
 
-        product.setName( request.getName() );
         product.setDescription( request.getDescription() );
         product.setIsActive( request.getIsActive() );
+        product.setName( request.getName() );
     }
 
     @Override
@@ -102,10 +102,10 @@ public class ProductMapperImpl implements ProductMapper {
 
         ProductVariant.ProductVariantBuilder productVariant = ProductVariant.builder();
 
-        productVariant.sku( request.getSku() );
+        productVariant.isActive( request.getIsActive() );
         productVariant.price( request.getPrice() );
         productVariant.quantity( request.getQuantity() );
-        productVariant.isActive( request.getIsActive() );
+        productVariant.sku( request.getSku() );
 
         return productVariant.build();
     }
@@ -135,10 +135,10 @@ public class ProductMapperImpl implements ProductMapper {
         }
 
         variant.setId( request.getId() );
-        variant.setSku( request.getSku() );
+        variant.setIsActive( request.getIsActive() );
         variant.setPrice( request.getPrice() );
         variant.setQuantity( request.getQuantity() );
-        variant.setIsActive( request.getIsActive() );
+        variant.setSku( request.getSku() );
     }
 
     @Override

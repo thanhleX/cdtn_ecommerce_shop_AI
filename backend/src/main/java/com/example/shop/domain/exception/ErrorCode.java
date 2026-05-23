@@ -23,6 +23,7 @@ public enum ErrorCode {
     INVALID_PASSWORD(1103, "Mật khẩu hiện tại không chính xác", HttpStatus.BAD_REQUEST),
     CONFIRM_PASSWORD_NOT_MATCH(1104, "Mật khẩu xác nhận không khớp", HttpStatus.BAD_REQUEST),
     ADDRESS_NOT_FOUND(1105, "Không tìm thấy địa chỉ", HttpStatus.NOT_FOUND),
+    ADDRESS_LIMIT_EXCEEDED(1106, "Đã đạt giới hạn tối đa 3 địa chỉ", HttpStatus.BAD_REQUEST),
 
     // ================= PRODUCT (1200–1299) =================
     PRODUCT_NOT_FOUND(1200, "Không tìm thấy sản phẩm", HttpStatus.NOT_FOUND),
@@ -30,6 +31,7 @@ public enum ErrorCode {
     INSUFFICIENT_STOCK(1202, "Tồn kho không đủ", HttpStatus.BAD_REQUEST),
     SKU_ALREADY_EXISTS(1203, "Mã SKU đã tồn tại", HttpStatus.CONFLICT),
     INVALID_IMAGE_URL(1204, "Đường dẫn ảnh không hợp lệ", HttpStatus.BAD_REQUEST),
+    PRODUCT_DISABLED(1205, "Sản phẩm đã ngừng kinh doanh", HttpStatus.BAD_REQUEST),
 
     // ================= CART (1300–1399) =================
     CART_NOT_FOUND(1300, "Không tìm thấy giỏ hàng", HttpStatus.NOT_FOUND),
@@ -51,6 +53,7 @@ public enum ErrorCode {
     VOUCHER_MIN_ORDER_VALUE(1505, "Đơn chưa đạt giá trị tối thiểu", HttpStatus.BAD_REQUEST),
     VOUCHER_INACTIVE(1506, "Mã giảm giá đang bị khóa", HttpStatus.BAD_REQUEST),
     DUPLICATE_CODE(1507, "Mã đã tồn tại", HttpStatus.CONFLICT),
+    INVALID_VOUCHER_VALUE(1508, "Giá trị phần trăm không được vượt quá 100", HttpStatus.BAD_REQUEST),
 
     // ================= REVIEW (1600–1699) =================
     REVIEW_NOT_FOUND(1600, "Không tìm thấy đánh giá", HttpStatus.NOT_FOUND),

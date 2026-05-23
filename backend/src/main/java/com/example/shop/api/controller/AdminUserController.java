@@ -22,8 +22,10 @@ public class AdminUserController {
     @GetMapping("/api/admin/users")
     @PreAuthorize("hasAuthority('user:manage')")
     @Operation(summary = "Get all users (Admin)")
-    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getAllUsers(Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(userService.getAllUsers(pageable)), "Lấy danh sách người dùng thành công"));
+    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getAllUsers(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(userService.getAllUsers(keyword, pageable)), "Lấy danh sách người dùng thành công"));
     }
 
     @PutMapping("/api/admin/users/{id}/toggle-active")

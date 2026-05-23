@@ -72,6 +72,7 @@ public class AuthService {
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .provider("local")
                 .roles(roles)
                 .isActive(true)
                 .build();

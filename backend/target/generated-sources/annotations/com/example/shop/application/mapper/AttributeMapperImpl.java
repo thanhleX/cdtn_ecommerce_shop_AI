@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-14T13:50:36+0700",
+    date = "2026-05-15T08:52:59+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.0.v20260407-0427, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -27,9 +27,9 @@ public class AttributeMapperImpl implements AttributeMapper {
 
         Attribute.AttributeBuilder attribute = Attribute.builder();
 
-        attribute.name( request.getName() );
         attribute.isFilterable( request.getIsFilterable() );
         attribute.isPricing( request.getIsPricing() );
+        attribute.name( request.getName() );
 
         return attribute.build();
     }
@@ -57,9 +57,9 @@ public class AttributeMapperImpl implements AttributeMapper {
             return;
         }
 
-        attribute.setName( request.getName() );
         attribute.setIsFilterable( request.getIsFilterable() );
         attribute.setIsPricing( request.getIsPricing() );
+        attribute.setName( request.getName() );
     }
 
     @Override

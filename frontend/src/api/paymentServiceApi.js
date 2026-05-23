@@ -1,17 +1,16 @@
-import axios from 'axios';
+import axiosClient from './axiosClient';
 
 const paymentServiceApi = {
   createUrl: async (data) => {
-    // Port 8081 là port của Spring Boot vnpay-service độc lập
-    // Endpoint chuẩn theo logic Porting từ JSP demo
-    const response = await axios.post('http://localhost:8081/api/vnpay/create-payment', data);
-    return response.data;
+    // Gọi trực tiếp vào backend chính do VNPay service đã được gộp
+    const response = await axiosClient.post('/vnpay/create-payment', data);
+    return response;
   },
   checkHealth: async () => {
     try {
-      // Gọi endpoint health check với timeout ngắn
-      const response = await axios.get('http://localhost:8081/api/vnpay/health', { timeout: 2000 });
-      return response.data?.status === 'UP';
+      // Gọi endpoint health check của module VNPay trên backend chính
+      const response = await axiosClient.get('/vnpay/health', { timeout: 2000 });
+      return response?.status === 'UP';
     } catch (error) {
       return false;
     }

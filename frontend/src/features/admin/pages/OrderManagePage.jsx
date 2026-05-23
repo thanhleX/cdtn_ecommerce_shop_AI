@@ -42,19 +42,22 @@ const StatusFlow = {
 
 const OrderManagePage = () => {
   const { hasPermission } = usePermission();
+  const canUpdateOrder = hasPermission('order:update');
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+  const [filterStatus, setFilterStatus] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const fetchOrders = useCallback(async (page = 1, pageSize = 10) => {
+  const fetchOrders = useCallback(async (page = 1, pageSize = 10, status = filterStatus) => {
     setLoading(true);
     try {
       const response = await adminApi.getOrders({
         page: page - 1,
         size: pageSize,
-        sort: 'orderDate,desc'
+        sort: 'orderDate,desc',
+        status: status || undefined
       });
       const data = response.data || response;
       setOrders(data.content);
@@ -118,6 +121,8 @@ const OrderManagePage = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status, record) => {
+        const nextStatuses = StatusFlow[status] || [];
+
         if (!canUpdateOrder) {
           const statusConfig = OrderStatusMap[status] || { color: 'default', label: status };
           return (
@@ -174,7 +179,29 @@ const OrderManagePage = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Title level={3} style={{ marginBottom: 24 }}>Quản lý đơn hàng</Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <Title level={3} style={{ margin: 0 }}>Quản lý đơn hàng</Title>
+        <Space>
+          <Text strong>Trạng thái:</Text>
+          <Select
+            allowClear
+            placeholder="Tất cả trạng thái"
+            style={{ width: 200 }}
+            value={filterStatus}
+            onChange={(value) => {
+              setFilterStatus(value);
+              setPagination(prev => ({ ...prev, current: 1 }));
+              fetchOrders(1, pagination.pageSize, value);
+            }}
+          >
+            {Object.entries(OrderStatusMap).map(([key, config]) => (
+              <Option key={key} value={key}>
+                <Tag color={config.color}>{config.label}</Tag>
+              </Option>
+            ))}
+          </Select>
+        </Space>
+      </div>
 
       <Table
         columns={columns}
@@ -182,7 +209,7 @@ const OrderManagePage = () => {
         rowKey="id"
         loading={loading}
         pagination={pagination}
-        onChange={(p) => fetchOrders(p.current, p.pageSize)}
+        onChange={(p) => fetchOrders(p.current, p.pageSize, filterStatus)}
       />
 
       <Modal

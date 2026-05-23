@@ -144,13 +144,16 @@ def extract_intent(user_msg: str, local_products: list) -> dict:
     
     Nhiệm vụ:
     1. Phân tích yêu cầu kỹ thuật của khách: "{user_msg}"
-    2. Dựa vào KIẾN THỨC THỰC TẾ của bạn về các model trên, hãy xác định xem sản phẩm nào trong danh sách TRÊN có thông số khớp với yêu cầu (ví dụ: cùng loại card đồ họa, cùng dòng CPU, hoặc tính năng đặc biệt).
-    3. Trả về kết quả dưới dạng JSON:
+    2. Dựa vào KIẾN THỨC THỰC TẾ của bạn về các model trên, hãy xác định xem sản phẩm nào trong danh sách TRÊN có thông số khớp với yêu cầu.
+    3. QUAN TRỌNG: TUYỆT ĐỐI KHÔNG thực hiện so sánh các sản phẩm với nhau (ví dụ: "so sánh A và B", "cái nào tốt hơn"). Nếu khách yêu cầu so sánh, hãy từ chối việc so sánh.
+    4. XÁC ĐỊNH CHỦ ĐỀ: Nếu câu hỏi của khách hoàn toàn không liên quan đến sản phẩm công nghệ, điện tử, phần cứng hoặc mua sắm (ví dụ: thời tiết, nấu ăn, chuyện phiếm...), hãy đặt "is_off_topic" thành true.
+    5. Trả về kết quả dưới dạng JSON:
        - "matched_ids": Danh sách ID của các sản phẩm khớp (tối đa 5).
-       - "reason": Giải thích ngắn gọn tại sao chọn các sản phẩm đó.
+       - "reason": Giải thích ngắn gọn tại sao chọn các sản phẩm đó. TUYỆT ĐỐI KHÔNG dùng từ ngữ so sánh hơn/nhất, không phân tích ưu/nhược điểm giữa chúng. Nếu khách yêu cầu so sánh, hãy ghi chính xác câu này: "Hệ thống hiện không hỗ trợ tính năng so sánh trực tiếp. Dưới đây là thông tin các sản phẩm bạn quan tâm để bạn tự tham khảo."
        - "keywords": Các từ khóa bóc tách được.
+       - "is_off_topic": true hoặc false (boolean).
     
-    Chỉ trả về JSON, không giải thích thêm.
+    Chỉ trả về JSON định dạng hợp lệ, không giải thích thêm.
     """
     try:
         response = call_gemini_with_retry(prompt)
@@ -168,7 +171,10 @@ async def startup_event():
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
-    user_msg = request.message
+    user_msg = request.message.strip()
+    if len(user_msg) > 200:
+        raise HTTPException(status_code=400, detail="Tin nhắn không được vượt quá 200 ký tự.")
+
     if not product_index:
         return {"reply": "Dữ liệu sản phẩm đang được cập nhật...", "products": []}
 
@@ -177,6 +183,15 @@ async def chat(request: ChatRequest):
     
     # 2. Get Technical Match from Gemini
     intent = extract_intent(user_msg, all_prods)
+    
+    if intent.get("is_off_topic", False):
+        return {
+            "reply": "Xin lỗi, tôi là trợ lý AI chuyên về tư vấn sản phẩm công nghệ. Hệ thống không hỗ trợ trả lời các câu hỏi ngoài luồng này ạ.",
+            "products": [],
+            "debug_keywords": user_msg,
+            "debug_matches": []
+        }
+
     matched_ids = intent.get("matched_ids", [])
     search_keywords = intent.get("keywords", user_msg)
     ai_reason = intent.get("reason", "")

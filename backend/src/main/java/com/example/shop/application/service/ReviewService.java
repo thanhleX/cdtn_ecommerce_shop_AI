@@ -67,17 +67,18 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public PageResponse<ReviewResponse> getProductReviews(Long productId, Integer rating, Pageable pageable) {
         Page<ProductReview> page;
+        List<ReviewStatus> visibleStatuses = List.of(ReviewStatus.ACTIVE, ReviewStatus.REPORTED);
         if (rating != null && rating > 0) {
-            page = reviewRepository.findByProductIdAndStatusAndRating(productId, ReviewStatus.ACTIVE, rating, pageable);
+            page = reviewRepository.findByProductIdAndStatusInAndRating(productId, visibleStatuses, rating, pageable);
         } else {
-            page = reviewRepository.findByProductIdAndStatus(productId, ReviewStatus.ACTIVE, pageable);
+            page = reviewRepository.findByProductIdAndStatusIn(productId, visibleStatuses, pageable);
         }
         return PageResponse.of(page.map(this::mapToResponse));
     }
 
     @Transactional(readOnly = true)
     public com.example.shop.application.dto.response.ReviewStatsResponse getProductReviewStats(Long productId) {
-        return reviewRepository.getReviewStats(productId, ReviewStatus.ACTIVE);
+        return reviewRepository.getReviewStats(productId, List.of(ReviewStatus.ACTIVE, ReviewStatus.REPORTED));
     }
 
     @Transactional
@@ -137,7 +138,7 @@ public class ReviewService {
         Product product = productRepository.findById(productId).orElse(null);
         if (product != null) {
             com.example.shop.application.dto.response.ReviewStatsResponse stats = reviewRepository
-                    .getReviewStats(productId, ReviewStatus.ACTIVE);
+                    .getReviewStats(productId, List.of(ReviewStatus.ACTIVE, ReviewStatus.REPORTED));
             product.setAverageRating(stats.getAverageRating());
             product.setReviewCount(stats.getTotalReviews().intValue());
             productRepository.save(product);

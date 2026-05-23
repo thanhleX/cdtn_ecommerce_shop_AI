@@ -41,6 +41,14 @@ const ChatWidget = () => {
 
   const handleSend = async () => {
     if (!inputValue.trim()) return;
+    if (inputValue.length > 200) {
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: "Tin nhắn vượt quá giới hạn 200 ký tự.",
+        sender: 'bot'
+      }]);
+      return;
+    }
 
     const userMsg = { id: Date.now(), text: inputValue, sender: 'user' };
     setMessages(prev => [...prev, userMsg]);
@@ -62,9 +70,13 @@ const ChatWidget = () => {
       setMessages(prev => [...prev, botMsg]);
     } catch (error) {
       console.error('Chat error:', error);
+      let errorText = "Xin lỗi, hiện tại dịch vụ tư vấn đang gặp sự cố. Bạn vui lòng thử lại sau nhé!";
+      if (error.response && error.response.data && error.response.data.detail) {
+        errorText = error.response.data.detail;
+      }
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
-        text: "Xin lỗi, hiện tại dịch vụ tư vấn đang gặp sự cố. Bạn vui lòng thử lại sau nhé!",
+        text: errorText,
         sender: 'bot'
       }]);
     } finally {
@@ -192,6 +204,8 @@ const ChatWidget = () => {
                 onChange={e => setInputValue(e.target.value)}
                 onPressEnter={handleSend}
                 disabled={loading}
+                maxLength={200}
+                showCount
               />
               <Button type="primary" icon={<SendOutlined />} onClick={handleSend} loading={loading} />
             </Space.Compact>

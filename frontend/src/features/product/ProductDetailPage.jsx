@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Row, Col, Typography, Button, Spin, Tag, InputNumber, Divider, Breadcrumb, Tabs, Radio, Space, message, Tooltip } from 'antd';
 import { Helmet } from 'react-helmet-async';
-import { ShoppingCartOutlined, HomeOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined, HomeOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useProducts } from '../../hooks/useProducts';
 import { useCart } from '../../hooks/useCart';
 import ProductGallery from './components/ProductGallery';
@@ -136,7 +136,7 @@ const ProductDetailPage = () => {
 
   const handleOptionChange = (attrName, value) => {
     const newOptions = { ...selectedOptions, [attrName]: value };
-    
+
     // Tìm variant khớp tốt nhất với lựa chọn mới
     // Ưu tiên các thuộc tính đã chọn từ trên xuống dưới
     const bestMatch = product.variants.find(v => {
@@ -148,11 +148,11 @@ const ProductDetailPage = () => {
     bestMatch.attributeValues?.forEach(av => {
       updatedOptions[av.attributeName] = av.value;
     });
-    
+
     // Giữ lại các lựa chọn cũ nếu chúng vẫn hợp lệ với lựa chọn mới
     attributes.forEach(attr => {
       const currentVal = attr.name === attrName ? value : selectedOptions[attr.name];
-      const isValidWithNew = product.variants.some(v => 
+      const isValidWithNew = product.variants.some(v =>
         v.attributeValues?.some(av => av.attributeName === attrName && av.value === value) &&
         v.attributeValues?.some(av => av.attributeName === attr.name && av.value === currentVal)
       );
@@ -170,7 +170,7 @@ const ProductDetailPage = () => {
     const currentIndex = attributes.findIndex(a => a.name === attrName);
     // Nếu là thuộc tính đầu tiên, chỉ check xem nó có tồn tại trong bất kỳ variant nào không
     if (currentIndex === 0) {
-      return !product.variants.some(v => 
+      return !product.variants.some(v =>
         v.attributeValues?.some(av => av.attributeName === attrName && av.value === value)
       );
     }
@@ -298,15 +298,39 @@ const ProductDetailPage = () => {
                   SỐ LƯỢNG
                 </Text>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <InputNumber
-                    size="large"
-                    min={1}
-                    max={selectedVariant?.quantity || 1}
-                    value={quantity}
-                    onChange={setQuantity}
-                    disabled={!selectedVariant || selectedVariant.quantity < 1}
-                    style={{ width: 120, borderRadius: 8 }}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #d9d9d9', borderRadius: 8, overflow: 'hidden' }}>
+                    <Button
+                      type="text"
+                      icon={<MinusOutlined />}
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      disabled={!selectedVariant || selectedVariant.quantity < 1 || quantity <= 1}
+                      style={{ border: 'none', borderRadius: 0, height: 40, width: 40, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                    />
+                    <InputNumber
+                      min={1}
+                      max={selectedVariant?.quantity || 1}
+                      value={quantity}
+                      onChange={(val) => setQuantity(val || 1)}
+                      disabled={!selectedVariant || selectedVariant.quantity < 1}
+                      controls={false}
+                      bordered={false}
+                      style={{ width: 60 }}
+                      styles={{
+                        input: {
+                          textAlign: 'center',
+                          height: 40,
+                          padding: 0,
+                        },
+                      }}
+                    />
+                    <Button
+                      type="text"
+                      icon={<PlusOutlined />}
+                      onClick={() => setQuantity(Math.min(selectedVariant?.quantity || 1, quantity + 1))}
+                      disabled={!selectedVariant || selectedVariant.quantity < 1 || quantity >= (selectedVariant?.quantity || 1)}
+                      style={{ border: 'none', borderRadius: 0, height: 40, width: 40, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                    />
+                  </div>
                   <Text type="secondary">
                     {selectedVariant?.quantity > 0 ? `${selectedVariant.quantity} sản phẩm có sẵn` : 'Hết hàng'}
                   </Text>
