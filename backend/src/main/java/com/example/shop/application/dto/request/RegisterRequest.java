@@ -6,10 +6,11 @@ import lombok.Data;
 @Data
 public class RegisterRequest {
     @NotBlank(message = "Tên đăng nhập không được để trống")
-    @Size(min = 3, max = 50, message = "Tên đăng nhập phải từ 3 đến 50 ký tự")
+    @Size(min = 3, max = 255, message = "Tên đăng nhập phải từ 3 đến 255 ký tự")
     private String username;
 
     @NotBlank(message = "Họ tên không được để trống")
+    @Size(max = 255, message = "Họ tên không được vượt quá 255 ký tự")
     private String fullName;
 
     @NotBlank(message = "Email không được để trống")

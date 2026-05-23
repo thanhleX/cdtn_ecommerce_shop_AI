@@ -98,10 +98,14 @@ const ResetPasswordPage = () => {
               name="newPassword"
               rules={[
                 { required: true, message: 'Vui lòng nhập mật khẩu mới!' },
-                { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+                { min: 8, message: 'Mật khẩu phải từ 8 ký tự!' },
+                { 
+                  pattern: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/,
+                  message: 'Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!'
+                }
               ]}
             >
-              <Input.Password prefix={<LockOutlined />} placeholder="Tối thiểu 6 ký tự" size="large" />
+              <Input.Password prefix={<LockOutlined />} placeholder="Mật khẩu mạnh (Hoa, thường, số, ký tự đặc biệt)" size="large" />
             </Form.Item>
 
             <Form.Item

@@ -67,16 +67,22 @@ const RegisterPage = () => {
           >
             <Form.Item
               name="username"
-              rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
+              rules={[
+                { required: true, message: 'Vui lòng nhập tên đăng nhập!' },
+                { max: 255, message: 'Tên đăng nhập không được vượt quá 255 ký tự!' }
+              ]}
             >
-              <Input prefix={<UserOutlined />} placeholder="Tên đăng nhập" />
+              <Input prefix={<UserOutlined />} placeholder="Tên đăng nhập" maxLength={255} />
             </Form.Item>
 
             <Form.Item
               name="fullName"
-              rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
+              rules={[
+                { required: true, message: 'Vui lòng nhập họ và tên!' },
+                { max: 255, message: 'Họ và tên không được vượt quá 255 ký tự!' }
+              ]}
             >
-              <Input prefix={<IdcardOutlined />} placeholder="Họ và Tên" />
+              <Input prefix={<IdcardOutlined />} placeholder="Họ và Tên" maxLength={255} />
             </Form.Item>
 
             <Form.Item

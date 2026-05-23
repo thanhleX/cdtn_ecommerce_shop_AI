@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-23T23:09:20+0700",
+    date = "2026-05-24T00:18:34+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -52,7 +52,6 @@ public class CartMapperImpl implements CartMapper {
         CartItemResponse.CartItemResponseBuilder cartItemResponse = CartItemResponse.builder();
 
         cartItemResponse.productVariantId( cartItemProductVariantId( cartItem ) );
-        cartItemResponse.productId( cartItemProductVariantProductId( cartItem ) );
         cartItemResponse.productName( cartItemProductVariantProductName( cartItem ) );
         cartItemResponse.productSlug( cartItemProductVariantProductSlug( cartItem ) );
         cartItemResponse.sku( cartItemProductVariantSku( cartItem ) );
@@ -91,25 +90,6 @@ public class CartMapperImpl implements CartMapper {
             return null;
         }
         Long id = productVariant.getId();
-        if ( id == null ) {
-            return null;
-        }
-        return id;
-    }
-
-    private Long cartItemProductVariantProductId(CartItem cartItem) {
-        if ( cartItem == null ) {
-            return null;
-        }
-        ProductVariant productVariant = cartItem.getProductVariant();
-        if ( productVariant == null ) {
-            return null;
-        }
-        Product product = productVariant.getProduct();
-        if ( product == null ) {
-            return null;
-        }
-        Long id = product.getId();
         if ( id == null ) {
             return null;
         }

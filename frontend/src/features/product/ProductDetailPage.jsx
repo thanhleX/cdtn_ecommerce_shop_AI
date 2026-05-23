@@ -240,10 +240,13 @@ const ProductDetailPage = () => {
 
               <div style={{ background: '#f0f5ff', padding: '24px', borderRadius: 12, border: '1px solid #d6e4ff' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
-                  <Title level={1} style={{ margin: 0, fontSize: 36, color: '#1890ff' }}>
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedVariant?.price || 0)}
+                  <Title level={1} style={{ margin: 0, fontSize: selectedVariant?.quantity < 1 ? 28 : 36, color: selectedVariant?.quantity < 1 ? '#ff4d4f' : '#1890ff' }}>
+                    {selectedVariant?.quantity < 1 
+                      ? 'Ngừng kinh doanh' 
+                      : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedVariant?.price || 0)
+                    }
                   </Title>
-                  {product.discount > 0 && (
+                  {product.discount > 0 && selectedVariant?.quantity > 0 && (
                     <Tag color="blue" style={{ fontSize: 16, padding: '4px 12px' }}>-{product.discount}%</Tag>
                   )}
                 </div>

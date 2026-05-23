@@ -29,7 +29,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         WHERE
             (:keyword IS NULL OR :keyword = ''
              OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-             OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+             OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR EXISTS (SELECT 1 FROM product_variants v_sku WHERE v_sku.product_id = p.id AND LOWER(v_sku.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))))
         AND (:hasCategoryIds = false OR p.category_id IN (:categoryIds))
         AND (:isActive IS NULL OR p.is_active = :isActive)
         AND (:minPrice IS NULL OR EXISTS (
@@ -66,7 +67,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             WHERE
                 (:keyword IS NULL OR :keyword = ''
                  OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                 OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                 OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                 OR EXISTS (SELECT 1 FROM product_variants v_sku WHERE v_sku.product_id = p.id AND LOWER(v_sku.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))))
             AND (:hasCategoryIds = false OR p.category_id IN (:categoryIds))
             AND (:isActive IS NULL OR p.is_active = :isActive)
             AND (:minPrice IS NULL OR EXISTS (
@@ -119,7 +121,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         WHERE
             (:keyword IS NULL OR :keyword = ''
              OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-             OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+             OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR EXISTS (SELECT 1 FROM product_variants v_sku WHERE v_sku.product_id = p.id AND LOWER(v_sku.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))))
 
         AND (:hasCategoryIds = false OR p.category_id IN (:categoryIds))
 
@@ -152,7 +155,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         WHERE
             (:keyword IS NULL OR :keyword = ''
              OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-             OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+             OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+             OR EXISTS (SELECT 1 FROM product_variants v_sku WHERE v_sku.product_id = p.id AND LOWER(v_sku.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))))
 
         AND (:hasCategoryIds = false OR p.category_id IN (:categoryIds))
 

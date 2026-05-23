@@ -371,6 +371,20 @@ const ProductManagePage = () => {
                         addonAfter={
                           <Upload
                             showUploadList={false}
+                            accept="image/*"
+                            beforeUpload={(file) => {
+                              const isImage = file.type.startsWith('image/');
+                              if (!isImage) {
+                                message.error('Chỉ được phép tải lên file hình ảnh!');
+                                return Upload.LIST_IGNORE;
+                              }
+                              const isLt5M = file.size / 1024 / 1024 <= 5;
+                              if (!isLt5M) {
+                                message.error('Kích thước ảnh phải nhỏ hơn hoặc bằng 5MB!');
+                                return Upload.LIST_IGNORE;
+                              }
+                              return true;
+                            }}
                             customRequest={async ({ file, onSuccess, onError }) => {
                               try {
                                 const response = await fileApi.uploadFile(file);
