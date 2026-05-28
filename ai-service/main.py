@@ -222,14 +222,15 @@ async def chat(request: ChatRequest):
                     final_products.append(item["info"])
                     final_ids.add(item["info"]["id"])
     
-    # Add top vector matches (if high similarity and not already added)
-    for item in vector_results:
-        if item["similarity"] > 0.3: # Higher threshold for vector fallback
-            if item["info"]["id"] not in final_ids:
-                final_products.append(item["info"])
-                final_ids.add(item["info"]["id"])
-        if len(final_products) >= 5:
-            break
+    # Add top vector matches only if Gemini is not available (to avoid injecting irrelevant products)
+    if not client:
+        for item in vector_results:
+            if item["similarity"] > 0.6: # Strict threshold to ensure relevance
+                if item["info"]["id"] not in final_ids:
+                    final_products.append(item["info"])
+                    final_ids.add(item["info"]["id"])
+            if len(final_products) >= 5:
+                break
 
     # 5. Build reply
     if final_products:
