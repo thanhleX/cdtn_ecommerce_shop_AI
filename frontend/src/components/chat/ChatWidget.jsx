@@ -56,7 +56,8 @@ const ChatWidget = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8082/chat', {
+      const aiApiUrl = import.meta.env.VITE_AI_API_URL || 'http://localhost:8082';
+      const response = await axios.post(`${aiApiUrl}/chat`, {
         message: userMsg.text
       });
 

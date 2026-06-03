@@ -6,6 +6,7 @@ import { ShoppingCartOutlined, HomeOutlined, MinusOutlined, PlusOutlined } from 
 import { useProducts } from '../../hooks/useProducts';
 import { useCart } from '../../hooks/useCart';
 import ProductGallery from './components/ProductGallery';
+import DOMPurify from 'dompurify';
 
 import categoryApi from '../../api/categoryApi';
 import CategoryBreadcrumb from '../../components/common/CategoryBreadcrumb';
@@ -374,7 +375,7 @@ const ProductDetailPage = () => {
               children: (
                 <div
                   style={{ fontSize: 16, lineHeight: '1.8', color: '#4a4a4a', marginTop: 16, textAlign: 'start' }}
-                  dangerouslySetInnerHTML={{ __html: product.description?.replace(/\n/g, '<br/>') || 'Chưa có mô tả' }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description?.replace(/\n/g, '<br/>') || 'Chưa có mô tả') }}
                 />
               )
             },

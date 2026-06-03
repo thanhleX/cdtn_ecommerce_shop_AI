@@ -15,6 +15,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @org.springframework.scheduling.annotation.Async("taskExecutor")
     public void sendOtpEmail(String to, String otp) {
         String subject = "Mã xác thực đổi mật khẩu - VietTech Store";
         String content = "<h3>Xin chào,</h3>"

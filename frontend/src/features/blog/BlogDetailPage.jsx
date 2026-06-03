@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Typography, Spin, Breadcrumb, Row, Col, Divider, Tag } from 'antd';
 import { HomeOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import blogApi from '../../api/blogApi';
+import DOMPurify from 'dompurify';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -65,7 +66,7 @@ const BlogDetailPage = () => {
             <div
               className="blog-content"
               style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}
-              dangerouslySetInnerHTML={{ __html: blog.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content) }}
             />
 
             <Divider />

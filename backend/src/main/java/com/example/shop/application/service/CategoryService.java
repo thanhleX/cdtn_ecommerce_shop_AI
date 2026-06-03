@@ -21,6 +21,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
+    @org.springframework.cache.annotation.Cacheable(value = "categories", key = "#activeOnly")
     @Transactional(readOnly = true)
     public List<CategoryResponse> getCategoryTree(Boolean activeOnly) {
         List<Category> rootCategories;
@@ -37,6 +38,7 @@ public class CategoryService {
         }
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = "categories", key = "'all_' + #activeOnly")
     @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories(Boolean activeOnly) {
         List<Category> categories;
@@ -74,6 +76,7 @@ public class CategoryService {
         return categoryMapper.toCategoryResponse(category);
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
     @Transactional
     public CategoryResponse createCategory(CategoryRequest request) {
         String slug = SlugUtils.toSlug(request.getName());
@@ -99,6 +102,7 @@ public class CategoryService {
         return categoryMapper.toCategoryResponse(categoryRepository.save(category));
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
     @Transactional
     public CategoryResponse updateCategory(Long id, CategoryRequest request) {
         Category category = categoryRepository.findById(id)
@@ -134,6 +138,7 @@ public class CategoryService {
         return categoryMapper.toCategoryResponse(categoryRepository.save(category));
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
     @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)

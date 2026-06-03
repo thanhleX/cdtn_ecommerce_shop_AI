@@ -19,7 +19,8 @@ export const useWebSocket = () => {
       return;
     }
 
-    const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:8080/ws';
+    // Lấy URL từ biến môi trường
+    const wsUrl = import.meta.env.VITE_WS_URL;
 
     const client = new Client({
       webSocketFactory: () => new SockJS(wsUrl),
