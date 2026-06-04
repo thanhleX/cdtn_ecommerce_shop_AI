@@ -164,9 +164,15 @@ const AdminLayout = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider trigger={null} collapsible collapsed={collapsed} theme="dark">
-        <div className="logo" style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)', textAlign: 'center', color: '#fff', lineHeight: '32px', fontWeight: 'bold' }}>
+    <Layout style={{ height: '100vh', overflow: 'hidden' }}>
+      <Sider 
+        trigger={null} 
+        collapsible 
+        collapsed={collapsed} 
+        theme="dark"
+        style={{ overflowY: 'auto', height: '100vh' }}
+      >
+        <div className="logo" style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)', textAlign: 'center', color: '#fff', lineHeight: '32px', fontWeight: 'bold', overflow: 'hidden' }}>
           {collapsed ? 'ADM' : 'ADMIN PANEL'}
         </div>
         <Menu
@@ -176,8 +182,8 @@ const AdminLayout = () => {
           items={menuItems}
         />
       </Sider>
-      <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: 0, background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24 }}>
+      <Layout className="site-layout" style={{ display: 'flex', flexDirection: 'column' }}>
+        <Header className="site-layout-background" style={{ padding: 0, background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24, zIndex: 1, boxShadow: '0 1px 4px rgba(0,21,41,.08)' }}>
           {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
             className: 'trigger',
             onClick: () => setCollapsed(!collapsed),
@@ -207,7 +213,9 @@ const AdminLayout = () => {
             padding: 24,
             minHeight: 280,
             background: '#fff',
-            borderRadius: 8
+            borderRadius: 8,
+            overflowY: 'auto',
+            flex: 1
           }}
         >
           {!hasAccess ? (

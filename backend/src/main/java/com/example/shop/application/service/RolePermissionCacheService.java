@@ -19,7 +19,7 @@ public class RolePermissionCacheService {
 
     private final RoleRepository roleRepository;
 
-    @Cacheable(value = "rolePermissions", key = "#roles.toString()")
+    @Cacheable(value = "rolePermissions", key = "#p0 != null ? #p0.toString() : 'null'")
     @Transactional(readOnly = true)
     public List<String> getPermissionsForRoles(List<String> roles) {
         if (roles == null || roles.isEmpty()) {
