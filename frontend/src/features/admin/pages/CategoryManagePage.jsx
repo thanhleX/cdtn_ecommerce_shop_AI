@@ -265,7 +265,13 @@ const CategoryManagePage = () => {
             name="parentId"
             label="Danh mục cha (nếu có)"
           >
-            <Select placeholder="Chọn danh mục cha" allowClear>
+            <Select 
+              placeholder="Chọn danh mục cha" 
+              allowClear
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) => (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())}
+            >
               {flatCategories(categories)
                 .filter(c => c.isActive) // Chỉ hiện cate đang hoạt động
                 .filter(c => !editingCategory || c.id !== editingCategory.id) // Không chọn chính nó làm cha
@@ -340,7 +346,9 @@ const CategoryManagePage = () => {
           placeholder="Chọn thuộc tính"
           value={selectedAttrIds}
           onChange={setSelectedAttrIds}
+          showSearch
           optionFilterProp="children"
+          filterOption={(input, option) => (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())}
         >
           {allAttributes.map(attr => (
             <Option key={attr.id} value={attr.id}>{attr.name}</Option>

@@ -288,6 +288,9 @@ const ProductManagePage = () => {
             allowClear
             style={{ width: 200 }}
             onChange={handleCategoryFilter}
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input, option) => (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())}
           >
             {categories.map(c => (
               <Option key={c.id} value={c.id}>{c.name}</Option>
@@ -335,7 +338,13 @@ const ProductManagePage = () => {
                 label="Danh mục"
                 rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
               >
-                <Select placeholder="Chọn danh mục" allowClear>
+                <Select 
+                  placeholder="Chọn danh mục" 
+                  allowClear
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) => (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())}
+                >
                   {flattenedCategories
                     .filter(c => c.isActive)
                     .map(c => (
@@ -540,6 +549,9 @@ const ProductManagePage = () => {
                                             // Sync back to hidden attributeValueIds if needed, 
                                             // but we'll do it during onFinish to keep it clean.
                                           }}
+                                          showSearch
+                                          optionFilterProp="children"
+                                          filterOption={(input, option) => (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())}
                                         >
                                           {attr.values?.map(val => (
                                             <Select.Option key={val.id} value={val.id}>

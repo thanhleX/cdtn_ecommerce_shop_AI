@@ -69,7 +69,7 @@ const HomePage = () => {
   const features = [
     { icon: <CarOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Giao Hàng Toàn Quốc', desc: 'Nhanh chóng và an toàn' },
     { icon: <SyncOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Đổi Trả 7 Ngày', desc: 'Thủ tục đơn giản, nhanh gọn' },
-    { icon: <SafetyCertificateOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Thanh Toán Khi Nhận Hàng', desc: 'Kiểm hàng trước, thanh toán sau' },
+    { icon: <SafetyCertificateOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Thanh toán linh hoạt', desc: 'Kiểm hàng trước, thanh toán sau' },
     { icon: <PhoneOutlined style={{ fontSize: 32, color: '#1890ff' }} />, title: 'Hỗ Trợ 24/7', desc: 'Liên hệ: 0912 345 678' },
   ];
 

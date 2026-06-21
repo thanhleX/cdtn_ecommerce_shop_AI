@@ -182,13 +182,13 @@ const AttributeManagePage = () => {
             <Input />
           </Form.Item>
           <Form.Item name="isFilterable" label="Sử dụng để lọc?" valuePropName="checked" initialValue={true}>
-            <Select>
+            <Select showSearch optionFilterProp="children" filterOption={(input, option) => (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())}>
               <Select.Option value={true}>Có</Select.Option>
               <Select.Option value={false}>Không</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item name="isPricing" label="Có ảnh hưởng đến giá tiền?" valuePropName="checked" initialValue={false}>
-            <Select>
+            <Select showSearch optionFilterProp="children" filterOption={(input, option) => (option?.children ?? '').toString().toLowerCase().includes(input.toLowerCase())}>
               <Select.Option value={true}>Có (Làm thay đổi giá)</Select.Option>
               <Select.Option value={false}>Không (Giá cố định)</Select.Option>
             </Select>
