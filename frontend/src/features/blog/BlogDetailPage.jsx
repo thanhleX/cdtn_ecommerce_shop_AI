@@ -63,6 +63,16 @@ const BlogDetailPage = () => {
               </div>
             )}
 
+            <style>{`
+              .blog-content img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+              }
+              .blog-content h1, .blog-content h2, .blog-content h3 {
+                color: #000;
+              }
+            `}</style>
             <div
               className="blog-content"
               style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}

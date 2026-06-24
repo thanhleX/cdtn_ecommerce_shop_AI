@@ -35,7 +35,7 @@ spring:
 app:
   jwt:
     secret: ${JWT_SECRET}
-    expiration: 900000          # 15 phút (Access Token)
+    expiration: 9000000         # 15 phút (Access Token)
   google:
     client-id: ${GOOGLE_CLIENT_ID}
 

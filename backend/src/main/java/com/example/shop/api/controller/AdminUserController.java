@@ -24,8 +24,9 @@ public class AdminUserController {
     @Operation(summary = "Get all users (Admin)")
     public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getAllUsers(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String roleType,
             Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(userService.getAllUsers(keyword, pageable)), "Lấy danh sách người dùng thành công"));
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(userService.getAllUsers(keyword, roleType, pageable)), "Lấy danh sách người dùng thành công"));
     }
 
     @PutMapping("/api/admin/users/{id}/toggle-active")

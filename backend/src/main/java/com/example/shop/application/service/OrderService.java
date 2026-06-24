@@ -36,6 +36,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
 
     private final VoucherService voucherService;
+    private final EmailService emailService;
 
     @Lazy
     @Autowired
@@ -286,6 +287,15 @@ public class OrderService {
                 "Cập nhật đơn hàng",
                 statusMsg,
                 NotificationType.ORDER);
+
+        if (order.getUser().getEmail() != null) {
+            emailService.sendOrderStatusEmail(
+                    order.getUser().getEmail(),
+                    order.getUser().getFullName() != null ? order.getUser().getFullName() : order.getUser().getUsername(),
+                    orderId,
+                    statusMsg
+            );
+        }
 
         // Notify Management about status update
         notificationService.notifyManagement(

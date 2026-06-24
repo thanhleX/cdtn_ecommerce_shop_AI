@@ -6,6 +6,7 @@ import adminApi from '../../../api/adminApi';
 const { Title } = Typography;
 
 const ReviewManagePage = () => {
+
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState(''); // Rỗng là lấy tất cả
@@ -124,6 +125,8 @@ const ReviewManagePage = () => {
       ),
     },
   ];
+
+
 
   return (
     <div>

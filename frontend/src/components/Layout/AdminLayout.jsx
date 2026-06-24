@@ -149,6 +149,7 @@ const AdminLayout = () => {
     '/admin/products': 'product:read',
     '/admin/attributes': 'product:read',
     '/admin/categories': 'category:manage',
+    '/admin/reviews': ['review:manage'],
     '/admin/vouchers': 'voucher:manage',
     '/admin/blogs': 'blog:manage',
     '/admin/users': 'customer:manage',
@@ -157,6 +158,7 @@ const AdminLayout = () => {
   };
 
   const requiredPermission = Object.entries(routePermissions).find(([path]) => location.pathname.startsWith(path))?.[1];
+  
   const hasAccess = !requiredPermission || hasPermission(requiredPermission);
 
   const userMenuItems = [

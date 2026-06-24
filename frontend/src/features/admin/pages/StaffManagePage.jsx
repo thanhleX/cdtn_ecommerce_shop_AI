@@ -28,15 +28,13 @@ const StaffManagePage = () => {
   const fetchUsers = useCallback(async (page = 1, pageSize = 10, searchKw = keyword) => {
     setLoading(true);
     try {
-      const response = await adminApi.getUsers({ page: page - 1, size: pageSize, keyword: searchKw });
+      const response = await adminApi.getUsers({ page: page - 1, size: pageSize, keyword: searchKw, roleType: 'STAFF' });
       const data = response.data || response;
       
-      const staffList = data.content.filter(u => 
-        u.roles && u.roles.some(r => r !== 'ROLE_CUSTOMER')
-      );
+      const staffList = data.content;
 
       setUsers(staffList);
-      setPagination({ current: page, pageSize: pageSize, total: staffList.length });
+      setPagination({ current: page, pageSize: pageSize, total: data.totalElements });
     } catch (error) {
       message.error(error?.message || 'Không thể lấy danh sách nhân viên');
     } finally {
@@ -47,7 +45,11 @@ const StaffManagePage = () => {
   const fetchRoles = useCallback(async () => {
     try {
       const { data } = await adminApi.getRoles();
-      setRoles(data || []);
+      const filteredRoles = (data || []).filter(
+        r => r.name !== 'ADMIN' && r.name !== 'ROLE_ADMIN' && r.name !== 'admin'
+        && r.name !== 'CUSTOMER' && r.name !== 'ROLE_CUSTOMER' && r.name !== 'customer'
+      );
+      setRoles(filteredRoles);
     } catch (error) {
       // ignore
     }
@@ -256,7 +258,18 @@ const StaffManagePage = () => {
           <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="password" label="Mật khẩu" rules={[{ required: true }]}>
+          <Form.Item 
+            name="password" 
+            label="Mật khẩu" 
+            rules={[
+              { required: true, message: 'Vui lòng nhập mật khẩu' },
+              { min: 8, message: 'Mật khẩu phải có ít nhất 8 ký tự' },
+              { 
+                pattern: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/, 
+                message: 'Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt' 
+              }
+            ]}
+          >
             <Input.Password />
           </Form.Item>
           <Form.Item name="roleIds" label="Gán vai trò" rules={[{ required: true, message: 'Chọn ít nhất 1 role' }]}>

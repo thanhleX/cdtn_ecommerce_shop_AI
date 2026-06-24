@@ -20,15 +20,13 @@ const UserManagePage = () => {
   const fetchUsers = useCallback(async (page = 1, pageSize = 10) => {
     setLoading(true);
     try {
-      const response = await adminApi.getUsers({ page: page - 1, size: pageSize });
+      const response = await adminApi.getUsers({ page: page - 1, size: pageSize, roleType: 'CUSTOMER' });
       const data = response.data || response;
 
-      const customerList = data.content.filter(u =>
-        !u.roles || u.roles.length === 0 || (u.roles.length === 1 && u.roles[0] === 'ROLE_CUSTOMER')
-      );
+      const customerList = data.content;
 
       setUsers(customerList);
-      setPagination({ current: page, pageSize: pageSize, total: customerList.length });
+      setPagination({ current: page, pageSize: pageSize, total: data.totalElements });
     } catch (error) {
       message.error(error?.message || 'Không thể lấy danh sách khách hàng');
     } finally {

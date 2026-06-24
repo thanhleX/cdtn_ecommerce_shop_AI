@@ -124,11 +124,16 @@ const TiptapEditor = ({ value, onChange }) => {
           height: auto;
           border-radius: 8px;
         }
+        .ProseMirror h1,
+        .ProseMirror h2,
+        .ProseMirror h3 {
+          color: #000;
+        }
       `}</style>
       <div style={{ border: '1px solid #d9d9d9', borderRadius: '8px', overflow: 'hidden' }}>
         <MenuBar editor={editor} />
         <div 
-          style={{ padding: '16px', minHeight: '300px', background: '#fff', cursor: 'text' }} 
+          style={{ padding: '16px', minHeight: '300px', maxHeight: '500px', overflowY: 'auto', background: '#fff', cursor: 'text' }} 
           onClick={() => editor?.commands.focus()}
         >
           <EditorContent editor={editor} />

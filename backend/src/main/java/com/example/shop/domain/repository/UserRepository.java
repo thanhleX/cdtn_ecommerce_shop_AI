@@ -21,11 +21,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countByRoles_Id(Long roleId);
     Page<User> findByUsernameNot(String username, Pageable pageable);
 
-    @Query("SELECT DISTINCT u FROM User u LEFT JOIN u.roles r WHERE " +
+    @Query("SELECT DISTINCT u FROM User u WHERE " +
            "u.username != 'admin' AND (" +
            ":keyword IS NULL OR :keyword = '' OR " +
            "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<User> searchUsersExcludingAdmin(@Param("keyword") String keyword, Pageable pageable);
+           "EXISTS (SELECT 1 FROM u.roles r2 WHERE LOWER(r2.name) LIKE LOWER(CONCAT('%', :keyword, '%')))) AND " +
+           "(:roleType IS NULL OR :roleType = '' OR " +
+           "(:roleType = 'STAFF' AND EXISTS (SELECT 1 FROM u.roles r3 WHERE r3.name != 'CUSTOMER')) OR " +
+           "(:roleType = 'CUSTOMER' AND (u.roles IS EMPTY OR EXISTS (SELECT 1 FROM u.roles r4 WHERE r4.name = 'CUSTOMER'))))")
+    Page<User> searchUsersExcludingAdmin(@Param("keyword") String keyword, @Param("roleType") String roleType, Pageable pageable);
 }
